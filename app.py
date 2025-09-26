@@ -166,10 +166,10 @@ st.markdown("""
         background-color: #E8E8E8; /* Fundo mais escuro para o almoço */
     }
     .metric-saldo-pos {
-        background-color: rgba(92, 228, 136, 0.3);
+        background-color: rgba(92, 228, 136, 0.6);
     }
     .metric-saldo-neg {
-        background-color: rgba(255, 108, 108, 0.3);
+        background-color: rgba(255, 108, 108, 0.6);
     }
     .metric-custom .label {
         font-size: 0.875rem; /* 14px */
@@ -181,9 +181,33 @@ st.markdown("""
         font-weight: 600;
         color: #31333f;
     }
-    .metric-saldo-pos .value { color: #00684A; }
-    .metric-saldo-neg .value { color: #B91C1C; }
+    .metric-saldo-pos .value, .metric-saldo-neg .value {
+        color: #FFFFFF;
+    }
+    .metric-saldo-pos .label, .metric-saldo-neg .label {
+        color: rgba(255, 255, 255, 0.85);
+    }
 
+    /* Container para as métricas responsivas */
+    .metrics-grid-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.75rem; /* Espaçamento entre os quadros */
+    }
+
+    /* Em telas médias, passa para 2 colunas */
+    @media (max-width: 640px) {
+        .metrics-grid-container {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    /* Em telas pequenas, passa para 1 coluna */
+    @media (max-width: 400px) {
+        .metrics-grid-container {
+            grid-template-columns: 1fr;
+        }
+    }
 
     /* Estilos gerais */
     .st-emotion-cache-1anq8dj {border-radius: 1.25rem; }
@@ -333,46 +357,31 @@ if st.session_state.show_results:
                     st.markdown("<hr>", unsafe_allow_html=True)
                     st.markdown("<h3>Resumo do Dia</h3>", unsafe_allow_html=True)
                     
-                    # Layout das métricas
-                    col1, col2, col3, col4 = st.columns(4)
-                    
-                    # Métrica Customizada para Total Trabalhado
-                    total_trabalhado_html = f"""
-                    <div class="metric-custom">
-                        <div class="label">Total Trabalhado</div>
-                        <div class="value">{formatar_duracao(trabalho_liquido_minutos)}</div>
-                    </div>
-                    """
-                    col1.markdown(total_trabalhado_html, unsafe_allow_html=True)
-
-                    # Métrica Customizada para Tempo no Núcleo
-                    tempo_nucleo_html = f"""
-                    <div class="metric-custom">
-                        <div class="label">Tempo no Núcleo</div>
-                        <div class="value">{formatar_duracao(tempo_nucleo_minutos)}</div>
-                    </div>
-                    """
-                    col2.markdown(tempo_nucleo_html, unsafe_allow_html=True)
-
-                    # Métrica Customizada para Almoço/Intervalo
-                    almoco_html = f"""
-                    <div class="metric-custom metric-almoco">
-                        <div class="label">Tempo de {termo_intervalo_real}</div>
-                        <div class="value">{duracao_almoco_minutos_real:.0f}min</div>
-                    </div>
-                    """
-                    col3.markdown(almoco_html, unsafe_allow_html=True)
-
-                    # Métrica Customizada para Saldo do Dia
+                    # Layout das métricas com grid responsivo
                     saldo_css_class = "metric-saldo-pos" if saldo_banco_horas_minutos >= 0 else "metric-saldo-neg"
                     sinal = "+" if saldo_banco_horas_minutos >= 0 else "-"
-                    saldo_html = f"""
-                    <div class="metric-custom {saldo_css_class}">
-                        <div class="label">Saldo do Dia</div>
-                        <div class="value">{sinal} {formatar_duracao(abs(saldo_banco_horas_minutos))}</div>
+                    
+                    metrics_grid_html = f"""
+                    <div class="metrics-grid-container">
+                        <div class="metric-custom">
+                            <div class="label">Total Trabalhado</div>
+                            <div class="value">{formatar_duracao(trabalho_liquido_minutos)}</div>
+                        </div>
+                        <div class="metric-custom">
+                            <div class="label">Tempo no Núcleo</div>
+                            <div class="value">{formatar_duracao(tempo_nucleo_minutos)}</div>
+                        </div>
+                        <div class="metric-custom metric-almoco">
+                            <div class="label">Tempo de {termo_intervalo_real}</div>
+                            <div class="value">{duracao_almoco_minutos_real:.0f}min</div>
+                        </div>
+                        <div class="metric-custom {saldo_css_class}">
+                            <div class="label">Saldo do Dia</div>
+                            <div class="value">{sinal} {formatar_duracao(abs(saldo_banco_horas_minutos))}</div>
+                        </div>
                     </div>
                     """
-                    col4.markdown(saldo_html, unsafe_allow_html=True)
+                    st.markdown(metrics_grid_html, unsafe_allow_html=True)
 
                 # Exibe os avisos (se houver)
                 st.markdown(warnings_html, unsafe_allow_html=True)
@@ -396,5 +405,6 @@ if st.session_state.show_results:
             st.error(f"Ocorreu um erro inesperado: {e}")
         finally:
             st.session_state.show_results = False # Reseta para a próxima interação
+
 
 
