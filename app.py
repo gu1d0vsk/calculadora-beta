@@ -141,6 +141,11 @@ st.markdown("""
         margin: 0.5rem 0 0 0;
     }
 
+    /* Oculta o ícone de âncora/link nos cabeçalhos */
+    h3 > a {
+        display: none !important;
+    }
+
     /* Remove estilos padrão que podem causar conflito */
     div[data-testid="stMetric"] {
         background-color: transparent !important;
