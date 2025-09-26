@@ -156,17 +156,6 @@ st.markdown("""
 
 st.markdown('<p class="main-title">Calculadora de Jornada de Trabalho</p>', unsafe_allow_html=True)
 
-# --- Seção do Banco de Horas Total ---
-st.markdown("---")
-st.markdown("<div class='section-container'><h3>Banco de Horas Total</h3></div>", unsafe_allow_html=True)
-saldo_total_minutos = calcular_banco_de_horas_total()
-st.metric(
-    label="Saldo Acumulado",
-    value=formatar_duracao(abs(saldo_total_minutos)),
-    delta=formatar_duracao(saldo_total_minutos, sinal=True),
-)
-st.markdown("---")
-
 st.markdown('<p class="sub-title">Selecione e preencha os dados do dia</p>', unsafe_allow_html=True)
 
 # Layout dos campos de entrada
@@ -302,6 +291,21 @@ if calculate_clicked:
                             args=(dados_calculados_dia,),
                             use_container_width=True
                         )
+                    
+                    # --- Seção do Banco de Horas Total ---
+                    st.markdown("---")
+                    st.markdown("<div class='section-container'><h3>Banco de Horas Total</h3></div>", unsafe_allow_html=True)
+                    saldo_total_minutos = calcular_banco_de_horas_total()
+                    
+                    # Colunas para centralizar a métrica
+                    m_col1, m_col2, m_col3 = st.columns([1, 2, 1])
+                    with m_col2:
+                        st.metric(
+                            label="Saldo Acumulado",
+                            value=formatar_duracao(abs(saldo_total_minutos)),
+                            delta=formatar_duracao(saldo_total_minutos, sinal=True),
+                        )
+
                 st.markdown(warnings_html, unsafe_allow_html=True)
         
         except ValueError as e:
