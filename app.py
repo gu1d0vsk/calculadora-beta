@@ -147,6 +147,14 @@ st.markdown("""
         padding: 1rem;
         text-align: center;
     }
+
+    /* Força a cor do texto nas métricas padrão para corrigir o tema escuro */
+    div[data-testid="stMetric"] [data-testid="stMetricLabel"] p {
+        color: #5a5a5a !important;
+    }
+    div[data-testid="stMetric"] [data-testid="stMetricValue"] {
+        color: #31333f !important;
+    }
     
     /* Centraliza o valor principal da métrica padrão */
     div[data-testid="stMetric"] div:nth-child(2) {
