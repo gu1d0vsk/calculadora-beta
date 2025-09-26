@@ -140,7 +140,7 @@ st.markdown("""
         margin: 0.5rem 0 0 0;
     }
 
-    /* Estilo para os containers das métricas */
+    /* Estilo para os containers das métricas padrão */
     div[data-testid="stMetric"] {
         background-color: #F0F2F6; /* Cor de fundo suave */
         border-radius: 1.5rem;
@@ -148,10 +148,43 @@ st.markdown("""
         text-align: center;
     }
     
-    /* Centraliza o valor principal da métrica */
+    /* Centraliza o valor principal da métrica padrão */
     div[data-testid="stMetric"] div:nth-child(2) {
         justify-content: center;
     }
+    
+    /* Estilos para a métrica de saldo customizada */
+    .metric-custom {
+        border-radius: 1.5rem;
+        padding: 1rem;
+        text-align: center;
+        height: 100%; /* Garante a mesma altura das outras métricas */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .metric-almoco {
+        background-color: #E8E8E8; /* Fundo mais escuro para o almoço */
+    }
+    .metric-saldo-pos {
+        background-color: rgba(92, 228, 136, 0.3);
+    }
+    .metric-saldo-neg {
+        background-color: rgba(255, 108, 108, 0.3);
+    }
+    .metric-custom .label {
+        font-size: 0.875rem; /* 14px */
+        margin-bottom: 0.25rem;
+        color: #5a5a5a;
+    }
+    .metric-custom .value {
+        font-size: 1.5rem; /* 24px */
+        font-weight: 600;
+        color: #31333f;
+    }
+    .metric-saldo-pos .value { color: #00684A; }
+    .metric-saldo-neg .value { color: #B91C1C; }
+
 
     /* Estilos gerais */
     .st-emotion-cache-1anq8dj {border-radius: 1.25rem; }
@@ -302,25 +335,32 @@ if st.session_state.show_results:
                     st.markdown("<h3>Resumo do Dia</h3>", unsafe_allow_html=True)
                     
                     # Layout das métricas
-                    col1, col2, col3 = st.columns(3)
+                    col1, col2, col3, col4 = st.columns(4)
                     
-                    # Valores para as métricas
-                    total_trabalhado_str = formatar_duracao(trabalho_liquido_minutos)
-                    tempo_nucleo_str = formatar_duracao(tempo_nucleo_minutos)
-                    saldo_texto_str = formatar_duracao(abs(saldo_banco_horas_minutos))
+                    # Métricas Padrão
+                    col1.metric(label="Total Trabalhado", value=formatar_duracao(trabalho_liquido_minutos))
+                    col2.metric(label="Tempo no Núcleo", value=formatar_duracao(tempo_nucleo_minutos))
 
-                    # Exibição das métricas
-                    col1.metric(label="Total Trabalhado", value=total_trabalhado_str)
-                    col2.metric(label="Tempo no Núcleo", value=tempo_nucleo_str)
-                    col3.metric(
-                        label="Saldo do Dia",
-                        value=saldo_texto_str,
-                        delta_color=("normal" if saldo_banco_horas_minutos >= 0 else "inverse")
-                    )
+                    # Métrica Customizada para Almoço/Intervalo
+                    almoco_html = f"""
+                    <div class="metric-custom metric-almoco">
+                        <div class="label">Tempo de {termo_intervalo_real}</div>
+                        <div class="value">{duracao_almoco_minutos_real:.0f}min</div>
+                    </div>
+                    """
+                    col3.markdown(almoco_html, unsafe_allow_html=True)
 
-                    if duracao_almoco_minutos_real > 0:
-                        st.markdown(f'<p style="text-align: center; margin-top: 1rem;"><b>Tempo de {termo_intervalo_real}:</b> {duracao_almoco_minutos_real:.0f}min</p>', unsafe_allow_html=True)
-                
+                    # Métrica Customizada para Saldo do Dia
+                    saldo_css_class = "metric-saldo-pos" if saldo_banco_horas_minutos >= 0 else "metric-saldo-neg"
+                    sinal = "+" if saldo_banco_horas_minutos >= 0 else "-"
+                    saldo_html = f"""
+                    <div class="metric-custom {saldo_css_class}">
+                        <div class="label">Saldo do Dia</div>
+                        <div class="value">{sinal} {formatar_duracao(abs(saldo_banco_horas_minutos))}</div>
+                    </div>
+                    """
+                    col4.markdown(saldo_html, unsafe_allow_html=True)
+
                 # Exibe os avisos (se houver)
                 st.markdown(warnings_html, unsafe_allow_html=True)
             
