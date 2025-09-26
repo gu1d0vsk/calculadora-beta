@@ -150,6 +150,11 @@ st.markdown("""
         color: inherit !important;
     }
 
+    /* Estilo para centralizar texto dentro das seções de resultado */
+    .section-container {
+        text-align: center;
+    }
+
     /* Estilos para a métrica customizada (agora usada para todos os quadros) */
     .metric-custom {
         background-color: #F0F2F6; /* Cor de fundo padrão */
@@ -210,12 +215,10 @@ st.markdown("""
     }
 
     /* Estilos gerais */
+    /* AVISO: As classes 'st-emotion-cache-*' são geradas pelo Streamlit e podem quebrar em futuras atualizações. */
+    /* Foram mantidas para preservar o estilo visual, mas o ideal é substituí-las por seletores mais estáveis. */
     .st-emotion-cache-1anq8dj {border-radius: 1.25rem; }
-    .st-emotion-cache-zh2fnc {align-self: center;}
-    .st-emotion-cache-1weic72 {justify-content: center;}
-    .st-emotion-cache-467cry h3 { text-align: center; } /* Centraliza os headers */
-    .st-emotion-cache-467cry p { text-align: center; }
-    
+    .st-emotion-cache-ubko3j svg, .st-emotion-cache-gquqoo { display: none !important; }
     .st-bv {    font-weight: 600;}
     .st-ay {    font-size: 1.3rem;}
     .st-aw {    border-bottom-right-radius: 1.5rem;}
@@ -260,7 +263,7 @@ if st.session_state.show_results:
             hora_entrada = datetime.datetime.strptime(formatar_hora_input(entrada_str), "%H:%M")
 
             # --- Construção do HTML de Previsões ---
-            results_html = "<div>" # Container para os resultados
+            results_html = "<div class='section-container'>" # Container para os resultados
             results_html += "<h3>Previsões de Saída</h3>"
             limite_saida = hora_entrada.replace(hour=20, minute=0, second=0, microsecond=0)
             duracao_almoço_previsao = 0
@@ -355,7 +358,7 @@ if st.session_state.show_results:
 
                 if saida_real_str:
                     st.markdown("<hr>", unsafe_allow_html=True)
-                    st.markdown("<h3>Resumo do Dia</h3>", unsafe_allow_html=True)
+                    st.markdown("<div class='section-container'><h3>Resumo do Dia</h3></div>", unsafe_allow_html=True)
                     
                     # Layout das métricas com grid responsivo
                     saldo_css_class = "metric-saldo-pos" if saldo_banco_horas_minutos >= 0 else "metric-saldo-neg"
@@ -405,6 +408,4 @@ if st.session_state.show_results:
             st.error(f"Ocorreu um erro inesperado: {e}")
         finally:
             st.session_state.show_results = False # Reseta para a próxima interação
-
-
 
