@@ -238,8 +238,9 @@ st.markdown("""
 st.markdown('<p class="main-title">Calculadora de Jornada de Trabalho</p>', unsafe_allow_html=True)
 st.markdown('<p class="sub-title">Informe seus horários para calcular a jornada diária</p>', unsafe_allow_html=True)
 
-# Layout dos campos de entrada
-with st.container():
+# Layout dos campos de entrada com colunas para limitar a largura
+col_buffer_1, col_main, col_buffer_2 = st.columns([1, 6, 1])
+with col_main:
     entrada_str = st.text_input("Entrada", key="entrada")
     col1, col2 = st.columns(2)
     with col1:
@@ -248,8 +249,8 @@ with st.container():
         retorno_almoco_str = st.text_input("Volta Almoço", key="retorno_almoco")
     saida_real_str = st.text_input("Saída", key="saida_real")
 
-# Botão centralizado via CSS
-calculate_clicked = st.button("Calcular")
+    # Botão centralizado via CSS
+    calculate_clicked = st.button("Calcular")
 
 # Placeholder para os resultados
 results_placeholder = st.empty()
