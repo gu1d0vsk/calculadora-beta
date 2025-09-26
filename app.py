@@ -140,36 +140,27 @@ st.markdown("""
         margin: 0.5rem 0 0 0;
     }
 
-    /* Estilo para os containers das métricas padrão */
+    /* Remove estilos padrão que podem causar conflito */
     div[data-testid="stMetric"] {
-        background-color: #F0F2F6; /* Cor de fundo suave */
-        border-radius: 1.5rem;
-        padding: 1rem;
-        text-align: center;
+        background-color: transparent !important;
+        padding: 0 !important;
+    }
+    div[data-testid="stMetric"] [data-testid="stMetricLabel"] p,
+    div[data-testid="stMetric"] [data-testid="stMetricValue"] {
+        color: inherit !important;
     }
 
-    /* Força a cor do texto nas métricas padrão para corrigir o tema escuro */
-    div[data-testid="stMetric"] [data-testid="stMetricLabel"] p {
-        color: #5a5a5a !important;
-    }
-    div[data-testid="stMetric"] [data-testid="stMetricValue"] {
-        color: #31333f !important;
-    }
-    
-    /* Centraliza o valor principal da métrica padrão */
-    div[data-testid="stMetric"] div:nth-child(2) {
-        justify-content: center;
-    }
-    
-    /* Estilos para a métrica de saldo customizada */
+    /* Estilos para a métrica customizada (agora usada para todos os quadros) */
     .metric-custom {
+        background-color: #F0F2F6; /* Cor de fundo padrão */
         border-radius: 1.5rem;
         padding: 1rem;
         text-align: center;
-        height: 100%; /* Garante a mesma altura das outras métricas */
+        height: 100%;
         display: flex;
         flex-direction: column;
         justify-content: center;
+        color: #31333f; /* Cor do texto padrão */
     }
     .metric-almoco {
         background-color: #E8E8E8; /* Fundo mais escuro para o almoço */
@@ -345,9 +336,23 @@ if st.session_state.show_results:
                     # Layout das métricas
                     col1, col2, col3, col4 = st.columns(4)
                     
-                    # Métricas Padrão
-                    col1.metric(label="Total Trabalhado", value=formatar_duracao(trabalho_liquido_minutos))
-                    col2.metric(label="Tempo no Núcleo", value=formatar_duracao(tempo_nucleo_minutos))
+                    # Métrica Customizada para Total Trabalhado
+                    total_trabalhado_html = f"""
+                    <div class="metric-custom">
+                        <div class="label">Total Trabalhado</div>
+                        <div class="value">{formatar_duracao(trabalho_liquido_minutos)}</div>
+                    </div>
+                    """
+                    col1.markdown(total_trabalhado_html, unsafe_allow_html=True)
+
+                    # Métrica Customizada para Tempo no Núcleo
+                    tempo_nucleo_html = f"""
+                    <div class="metric-custom">
+                        <div class="label">Tempo no Núcleo</div>
+                        <div class="value">{formatar_duracao(tempo_nucleo_minutos)}</div>
+                    </div>
+                    """
+                    col2.markdown(tempo_nucleo_html, unsafe_allow_html=True)
 
                     # Métrica Customizada para Almoço/Intervalo
                     almoco_html = f"""
@@ -391,4 +396,5 @@ if st.session_state.show_results:
             st.error(f"Ocorreu um erro inesperado: {e}")
         finally:
             st.session_state.show_results = False # Reseta para a próxima interação
+
 
