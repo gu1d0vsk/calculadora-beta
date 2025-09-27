@@ -190,7 +190,7 @@ st.markdown("""
     }
     .metric-custom .value {
         font-size: 1.5rem; /* 24px */
-        font-weight: 600;
+        font-weight: 900;
         color: #31333f;
     }
     .metric-custom .details {
@@ -238,11 +238,6 @@ st.markdown("""
         
         .summary-grid-container {
             grid-template-columns: repeat(2, 1fr); /* Passa para 2 colunas */
-        }
-    }
-    @media (max-width: 400px) {
-        .summary-grid-container {
-            grid-template-columns: 1fr; /* Passa para 1 coluna */
         }
     }
 
