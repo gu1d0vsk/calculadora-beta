@@ -164,7 +164,7 @@ st.markdown("""
     /* Estilos para a métrica customizada (agora usada para todos os quadros) */
     .metric-custom {
         background-color: #F0F2F6; /* Cor de fundo padrão */
-        border-radius: 1.5rem;
+        border-radius: 4rem;
         padding: 1rem;
         text-align: center;
         height: 100%;
