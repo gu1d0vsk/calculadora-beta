@@ -416,56 +416,59 @@ if st.session_state.show_results:
         finally:
             st.session_state.show_results = False # Reseta para a próxima interação
 
-
-# --- JavaScript para navegação com "Enter" ---
-enter_navigation_js = """
+# --- JavaScript for auto-tab functionality ---
+auto_tab_js = """
 <script>
-    function setupEnterNavigation() {
-        // Encontra os inputs que ainda não foram processados
-        const inputs = Array.from(window.parent.document.querySelectorAll('.main div[data-testid="stTextInput"] input:not([data-enter-nav-ready])'));
-        const calculateButton = window.parent.document.querySelector('.main div[data-testid="stButton"] button');
+    function setupAutoTab() {
+        const doc = window.parent.document;
+        // Encontra todos os inputs que ainda não foram processados
+        const inputs = Array.from(doc.querySelectorAll('.main div[data-testid="stTextInput"] input:not([data-autotab-ready])'));
+        const calculateButton = doc.querySelector('.main div[data-testid="stButton"] button');
 
-        if (inputs.length === 0 || !calculateButton) {
-            // Tenta de novo, pois o Streamlit pode estar renderizando os elementos.
-            setTimeout(setupEnterNavigation, 200);
-            return;
+        if (inputs.length === 0) {
+            return; // Nenhum input novo para processar
         }
 
-        const allInputs = Array.from(window.parent.document.querySelectorAll('.main div[data-testid="stTextInput"] input'));
+        const allInputs = Array.from(doc.querySelectorAll('.main div[data-testid="stTextInput"] input'));
 
-        allInputs.forEach((input, index) => {
-            // Se o listener já foi adicionado, pula.
-            if (input.dataset.enterNavReady) {
-                return;
-            }
-
-            input.addEventListener('keydown', (event) => {
-                if (event.key === 'Enter') {
-                    event.preventDefault();
-
-                    const currentInputs = Array.from(window.parent.document.querySelectorAll('.main div[data-testid="stTextInput"] input'));
-                    const currentIndex = currentInputs.indexOf(event.target);
-                    const isLastInput = (currentIndex === currentInputs.length - 1);
+        inputs.forEach(input => {
+            input.addEventListener('input', (event) => {
+                const value = event.target.value;
+                
+                // Verifica se o valor tem 4 dígitos (ignorando os dois pontos)
+                if (value.replace(/:/g, '').length === 4) {
+                    const currentIndex = allInputs.indexOf(event.target);
+                    const isLastInput = (currentIndex === allInputs.length - 1);
 
                     if (isLastInput) {
-                        const btn = window.parent.document.querySelector('.main div[data-testid="stButton"] button');
-                        if (btn) btn.click();
+                        // Se for o último input, clica no botão de calcular
+                        if (calculateButton) {
+                            calculateButton.click();
+                        }
                     } else {
-                        if (currentIndex + 1 < currentInputs.length) {
-                           currentInputs[currentIndex + 1].focus();
+                        // Senão, move o foco para o próximo input
+                        if (currentIndex + 1 < allInputs.length) {
+                           allInputs[currentIndex + 1].focus();
                         }
                     }
                 }
             });
 
-            // Marca o input como processado para não adicionar o listener de novo
-            input.dataset.enterNavReady = 'true';
+            // Marca este input como processado para não adicionar o listener novamente
+            input.dataset.autotabReady = 'true';
         });
     }
 
-    // Inicia a configuração e deixa ela se reagendar se necessário.
-    setupEnterNavigation();
+    // Executa a função repetidamente para capturar elementos que são adicionados depois pelo Streamlit
+    const autoTabInterval = setInterval(() => {
+        const mainContainer = window.parent.document.querySelector('.main');
+        if (!mainContainer) {
+            clearInterval(autoTabInterval); // Para o script se o container principal sumir
+            return;
+        }
+        setupAutoTab();
+    }, 250);
 </script>
 """
-st.components.v1.html(enter_navigation_js, height=0)
+st.components.v1.html(auto_tab_js, height=0)
 
