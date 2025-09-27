@@ -226,7 +226,10 @@ st.markdown("""
     /* Responsividade para grids */
     @media (max-width: 640px) {
         .predictions-grid-container {
-            grid-template-columns: 1fr; /* Passa para 1 coluna */
+            grid-template-columns: repeat(2, 1fr); /* Duas colunas */
+        }
+        .predictions-grid-container .metric-padrao {
+            grid-column: 1 / -1; /* Ocupa a largura toda */
         }
         .summary-grid-container {
             grid-template-columns: repeat(2, 1fr); /* Passa para 2 colunas */
@@ -318,15 +321,15 @@ if st.session_state.show_results:
             <div class='section-container'>
                 <h3>Previsões de Saída</h3>
                 <div class="predictions-grid-container">
-                    <div class="metric-custom metric-minimo">
-                        <div class="label">Mínimo {texto_desc_5h}</div>
-                        <div class="value">{hora_saida_5h.strftime('%H:%M')}</div>
-                        <div class="details">({minutos_intervalo_5h:.0f}min de intervalo)</div>
-                    </div>
                     <div class="metric-custom metric-padrao">
                         <div class="label">Jornada Padrão {texto_desc_8h}</div>
                         <div class="value">{hora_saida_8h.strftime('%H:%M')}</div>
                         <div class="details">({minutos_intervalo_demais:.0f}min de almoço)</div>
+                    </div>
+                    <div class="metric-custom metric-minimo">
+                        <div class="label">Mínimo {texto_desc_5h}</div>
+                        <div class="value">{hora_saida_5h.strftime('%H:%M')}</div>
+                        <div class="details">({minutos_intervalo_5h:.0f}min de intervalo)</div>
                     </div>
                     <div class="metric-custom metric-maximo">
                         <div class="label">Máximo {texto_desc_10h}</div>
