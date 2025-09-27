@@ -172,6 +172,8 @@ st.markdown("""
         flex-direction: column;
         justify-content: center;
         color: #31333f; /* Cor do texto padrão */
+        max-width: 200px;
+        margin: 0 auto;
     }
     .metric-almoco {
         background-color: #E8E8E8; /* Fundo mais escuro para o almoço */
@@ -180,8 +182,8 @@ st.markdown("""
     .metric-saldo-pos { background-color: rgba(92, 228, 136, 0.6); }
     .metric-saldo-neg { background-color: rgba(255, 108, 108, 0.6); }
     .metric-minimo { background-color: rgba(0, 255, 255, 0.6); } /* Ciano */
-    .metric-padrao { background-color: rgba(92, 228, 136, 0.6); } /* Verde */
-    .metric-maximo { background-color: rgba(255, 165, 0, 0.6); } /* Laranja */
+    .metric-padrao { background-color: rgb(0, 80, 81); } 
+    .metric-maximo { background-color: rgb(221, 79, 5); } 
     
     .metric-custom .label {
         font-size: 0.875rem; /* 14px */
