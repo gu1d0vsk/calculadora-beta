@@ -179,7 +179,7 @@ st.markdown("""
     /* Cores para caixas de saldo e previsões */
     .metric-saldo-pos { background-color: rgba(92, 228, 136, 0.6); }
     .metric-saldo-neg { background-color: rgba(255, 108, 108, 0.6); }
-    .metric-minimo { background-color: rgba(0, 255, 255, 0.6); } /* Ciano */
+    .metric-minimo { background-color: rgb(57, 94, 94); } /* Ciano Escuro */
     .metric-padrao { background-color: rgb(0, 80, 81); } 
     .metric-maximo { background-color: rgb(221, 79, 5); } 
     
@@ -240,7 +240,6 @@ st.markdown("""
 
     /* Estilos gerais */
     .st-emotion-cache-1anq8dj {border-radius: 1.25rem; }
-    .st-emotion-cache-ubko3j svg, .st-emotion-cache-gquqoo { display: none !important; }
     .st-bv {    font-weight: 600;}
     .st-ay {    font-size: 1.3rem;}
     .st-aw {    border-bottom-right-radius: 1.5rem;}
@@ -260,9 +259,9 @@ with col_main:
     entrada_str = st.text_input("Entrada", key="entrada", help="formatos aceitos:\nHMM, HHMM ou HH:MM")
     col1, col2 = st.columns(2)
     with col1:
-        saida_almoco_str = st.text_input("Saída Almoço", key="saida_almoco")
+        saida_almoco_str = st.text_input("Saída para o Almoço", key="saida_almoco")
     with col2:
-        retorno_almoco_str = st.text_input("Volta Almoço", key="retorno_almoco")
+        retorno_almoco_str = st.text_input("Volta do Almoço", key="retorno_almoco")
     saida_real_str = st.text_input("Saída", key="saida_real")
 
     # Botão centralizado via CSS
