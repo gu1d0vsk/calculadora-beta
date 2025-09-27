@@ -241,13 +241,13 @@ st.markdown('<p class="sub-title">Informe seus horários para calcular a jornada
 # Layout dos campos de entrada com colunas para limitar a largura
 col_buffer_1, col_main, col_buffer_2 = st.columns([1, 6, 1])
 with col_main:
-    entrada_str = st.text_input("Entrada", key="entrada")
+    entrada_str = st.text_input("Entrada", key="entrada", max_chars=4)
     col1, col2 = st.columns(2)
     with col1:
-        saida_almoco_str = st.text_input("Saída Almoço", key="saida_almoco")
+        saida_almoco_str = st.text_input("Saída Almoço", key="saida_almoco", max_chars=4)
     with col2:
-        retorno_almoco_str = st.text_input("Volta Almoço", key="retorno_almoco")
-    saida_real_str = st.text_input("Saída", key="saida_real")
+        retorno_almoco_str = st.text_input("Volta Almoço", key="retorno_almoco", max_chars=4)
+    saida_real_str = st.text_input("Saída", key="saida_real", max_chars=4)
 
     # Botão centralizado via CSS
     calculate_clicked = st.button("Calcular")
