@@ -415,3 +415,47 @@ if st.session_state.show_results:
             st.error(f"Ocorreu um erro inesperado: {e}")
         finally:
             st.session_state.show_results = False # Reseta para a próxima interação
+
+
+# --- JavaScript para navegação com "Enter" ---
+enter_navigation_js = """
+<script>
+    function setupEnterNavigation() {
+        // Encontra todos os inputs de texto dentro da coluna principal
+        const inputs = Array.from(window.parent.document.querySelectorAll('.main div[data-testid="stTextInput"] input'));
+        // Encontra o botão de calcular
+        const calculateButton = window.parent.document.querySelector('.main div[data-testid="stButton"] button');
+
+        if (inputs.length < 4 || !calculateButton) {
+            // Se os elementos não foram encontrados, tenta novamente em 100ms
+            setTimeout(setupEnterNavigation, 100);
+            return;
+        }
+
+        inputs.forEach((input, index) => {
+            input.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault(); // Impede o comportamento padrão do Enter
+
+                    const isLastInput = (index === inputs.length - 1);
+
+                    if (isLastInput) {
+                        // Se for o último input, clica no botão de calcular
+                        calculateButton.click();
+                    } else {
+                        // Senão, foca no próximo input da lista
+                        inputs[index + 1].focus();
+                    }
+                }
+            });
+        });
+    }
+
+    // Inicia a configuração após um pequeno atraso para garantir que o DOM esteja pronto
+    window.addEventListener('load', () => {
+        setTimeout(setupEnterNavigation, 100);
+    });
+</script>
+"""
+st.components.v1.html(enter_navigation_js, height=0)
+
