@@ -174,11 +174,11 @@ st.markdown("""
         color: #31333f; /* Cor do texto padrão */
     }
     .metric-almoco {
-        background-color: #E8E8E8; /* Fundo mais escuro para o almoço */
+        background-color: rgb(255, 201, 173); /* Fundo para o almoço */
     }
     /* Cores para caixas de saldo e previsões */
-    .metric-saldo-pos { background-color: rgba(92, 228, 136, 0.6); }
-    .metric-saldo-neg { background-color: rgba(255, 108, 108, 0.6); }
+    .metric-saldo-pos { background-color: rgb(84, 198, 121); }
+    .metric-saldo-neg { background-color: rgb(255, 108, 108); }
     .metric-minimo { background-color: rgb(57, 94, 94); } /* Ciano Escuro */
     .metric-padrao { background-color: rgb(0, 80, 81); } 
     .metric-maximo { background-color: rgb(221, 79, 5); } 
