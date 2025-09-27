@@ -172,8 +172,6 @@ st.markdown("""
         flex-direction: column;
         justify-content: center;
         color: #31333f; /* Cor do texto padrão */
-        max-width: 200px;
-        margin: 0 auto;
     }
     .metric-almoco {
         background-color: #E8E8E8; /* Fundo mais escuro para o almoço */
