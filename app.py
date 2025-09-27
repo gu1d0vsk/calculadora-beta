@@ -329,17 +329,17 @@ if st.session_state.show_results:
                     <div class="metric-custom metric-minimo">
                         <div class="label">Mínimo {texto_desc_5h}</div>
                         <div class="value">{hora_saida_5h.strftime('%H:%M')}</div>
-                        <div class="details">({minutos_intervalo_5h:.0f}min de intervalo)</div>
+                        <div class="details">{minutos_intervalo_5h:.0f}min de intervalo</div>
                     </div>
                     <div class="metric-custom metric-padrao">
                         <div class="label">Jornada Padrão {texto_desc_8h}</div>
                         <div class="value">{hora_saida_8h.strftime('%H:%M')}</div>
-                        <div class="details">({minutos_intervalo_demais:.0f}min de almoço)</div>
+                        <div class="details">{minutos_intervalo_demais:.0f}min de almoço</div>
                     </div>
                     <div class="metric-custom metric-maximo">
                         <div class="label">Máximo {texto_desc_10h}</div>
                         <div class="value">{hora_saida_10h.strftime('%H:%M')}</div>
-                        <div class="details">({minutos_intervalo_demais:.0f}min de almoço)</div>
+                        <div class="details">{minutos_intervalo_demais:.0f}min de almoço</div>
                     </div>
                 </div>
             </div>
