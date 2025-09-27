@@ -421,40 +421,50 @@ if st.session_state.show_results:
 enter_navigation_js = """
 <script>
     function setupEnterNavigation() {
-        // Encontra todos os inputs de texto dentro da coluna principal
-        const inputs = Array.from(window.parent.document.querySelectorAll('.main div[data-testid="stTextInput"] input'));
-        // Encontra o botão de calcular
+        // Encontra os inputs que ainda não foram processados
+        const inputs = Array.from(window.parent.document.querySelectorAll('.main div[data-testid="stTextInput"] input:not([data-enter-nav-ready])'));
         const calculateButton = window.parent.document.querySelector('.main div[data-testid="stButton"] button');
 
-        if (inputs.length < 4 || !calculateButton) {
-            // Se os elementos não foram encontrados, tenta novamente em 100ms
-            setTimeout(setupEnterNavigation, 100);
+        if (inputs.length === 0 || !calculateButton) {
+            // Tenta de novo, pois o Streamlit pode estar renderizando os elementos.
+            setTimeout(setupEnterNavigation, 200);
             return;
         }
 
-        inputs.forEach((input, index) => {
+        const allInputs = Array.from(window.parent.document.querySelectorAll('.main div[data-testid="stTextInput"] input'));
+
+        allInputs.forEach((input, index) => {
+            // Se o listener já foi adicionado, pula.
+            if (input.dataset.enterNavReady) {
+                return;
+            }
+
             input.addEventListener('keydown', (event) => {
                 if (event.key === 'Enter') {
-                    event.preventDefault(); // Impede o comportamento padrão do Enter
+                    event.preventDefault();
 
-                    const isLastInput = (index === inputs.length - 1);
+                    const currentInputs = Array.from(window.parent.document.querySelectorAll('.main div[data-testid="stTextInput"] input'));
+                    const currentIndex = currentInputs.indexOf(event.target);
+                    const isLastInput = (currentIndex === currentInputs.length - 1);
 
                     if (isLastInput) {
-                        // Se for o último input, clica no botão de calcular
-                        calculateButton.click();
+                        const btn = window.parent.document.querySelector('.main div[data-testid="stButton"] button');
+                        if (btn) btn.click();
                     } else {
-                        // Senão, foca no próximo input da lista
-                        inputs[index + 1].focus();
+                        if (currentIndex + 1 < currentInputs.length) {
+                           currentInputs[currentIndex + 1].focus();
+                        }
                     }
                 }
             });
+
+            // Marca o input como processado para não adicionar o listener de novo
+            input.dataset.enterNavReady = 'true';
         });
     }
 
-    // Inicia a configuração após um pequeno atraso para garantir que o DOM esteja pronto
-    window.addEventListener('load', () => {
-        setTimeout(setupEnterNavigation, 100);
-    });
+    // Inicia a configuração e deixa ela se reagendar se necessário.
+    setupEnterNavigation();
 </script>
 """
 st.components.v1.html(enter_navigation_js, height=0)
