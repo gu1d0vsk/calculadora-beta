@@ -89,9 +89,10 @@ st.markdown("""
 
     /* Estiliza o botão de cálculo */
     div[data-testid="stButton"] > button {
-        background-color: rgb(92, 228, 136);
+        background-color: rgb(221, 79, 5);
         color: #FFFFFF;
         width: 100%;
+        border-radius: 4rem;
     }
     /* Arredonda as caixas de input e centraliza os labels */
     div[data-testid="stTextInput"] input {
