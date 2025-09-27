@@ -141,7 +141,10 @@ st.markdown("""
         margin: 0.5rem 0 0 0;
     }
 
-    
+    /* Oculta o ícone de âncora/link nos cabeçalhos de forma mais específica */
+    div[data-testid="stHeading"] a {
+        display: none !important;
+    }
 
     /* Remove estilos padrão que podem causar conflito */
     div[data-testid="stMetric"] {
