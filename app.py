@@ -176,12 +176,13 @@ st.markdown("""
     .metric-almoco {
         background-color: #E8E8E8; /* Fundo mais escuro para o almoço */
     }
-    .metric-saldo-pos {
-        background-color: rgba(92, 228, 136, 0.6);
-    }
-    .metric-saldo-neg {
-        background-color: rgba(255, 108, 108, 0.6);
-    }
+    /* Cores para caixas de saldo e previsões */
+    .metric-saldo-pos { background-color: rgba(92, 228, 136, 0.6); }
+    .metric-saldo-neg { background-color: rgba(255, 108, 108, 0.6); }
+    .metric-minimo { background-color: rgba(0, 255, 255, 0.6); } /* Ciano */
+    .metric-padrao { background-color: rgba(92, 228, 136, 0.6); } /* Verde */
+    .metric-maximo { background-color: rgba(255, 165, 0, 0.6); } /* Laranja */
+    
     .metric-custom .label {
         font-size: 0.875rem; /* 14px */
         margin-bottom: 0.25rem;
@@ -192,37 +193,52 @@ st.markdown("""
         font-weight: 600;
         color: #31333f;
     }
-    .metric-saldo-pos .value, .metric-saldo-neg .value {
+    .metric-custom .details {
+        font-size: 0.75rem; /* 12px */
+        margin-top: 0.25rem;
+        color: #5a5a5a;
+    }
+
+    /* Cor de texto branca para caixas coloridas */
+    .metric-saldo-pos .value, .metric-saldo-neg .value,
+    .metric-minimo .value, .metric-padrao .value, .metric-maximo .value {
         color: #FFFFFF;
     }
-    .metric-saldo-pos .label, .metric-saldo-neg .label {
+    .metric-saldo-pos .label, .metric-saldo-neg .label,
+    .metric-minimo .label, .metric-padrao .label, .metric-maximo .label,
+    .metric-minimo .details, .metric-padrao .details, .metric-maximo .details {
         color: rgba(255, 255, 255, 0.85);
     }
 
-    /* Container para as métricas responsivas */
-    .metrics-grid-container {
+    /* Container para as métricas de previsão */
+    .predictions-grid-container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+    }
+    /* Container para as métricas de resumo */
+    .summary-grid-container {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 0.75rem; /* Espaçamento entre os quadros */
     }
 
-    /* Em telas médias, passa para 2 colunas */
+    /* Responsividade para grids */
     @media (max-width: 640px) {
-        .metrics-grid-container {
-            grid-template-columns: repeat(2, 1fr);
+        .predictions-grid-container {
+            grid-template-columns: 1fr; /* Passa para 1 coluna */
+        }
+        .summary-grid-container {
+            grid-template-columns: repeat(2, 1fr); /* Passa para 2 colunas */
         }
     }
-
-    /* Em telas pequenas, passa para 1 coluna */
     @media (max-width: 400px) {
-        .metrics-grid-container {
-            grid-template-columns: 1fr;
+        .summary-grid-container {
+            grid-template-columns: 1fr; /* Passa para 1 coluna */
         }
     }
 
     /* Estilos gerais */
-    /* AVISO: As classes 'st-emotion-cache-*' são geradas pelo Streamlit e podem quebrar em futuras atualizações. */
-    /* Foram mantidas para preservar o estilo visual, mas o ideal é substituí-las por seletores mais estáveis. */
     .st-emotion-cache-1anq8dj {border-radius: 1.25rem; }
     .st-emotion-cache-ubko3j svg, .st-emotion-cache-gquqoo { display: none !important; }
     .st-bv {    font-weight: 600;}
@@ -241,7 +257,7 @@ st.markdown('<p class="sub-title">Informe seus horários para calcular a jornada
 # Layout dos campos de entrada com colunas para limitar a largura
 col_buffer_1, col_main, col_buffer_2 = st.columns([1, 6, 1])
 with col_main:
-    entrada_str = st.text_input("Entrada", key="entrada", help="formatos aceitos: HMM, HHMM ou HH:MM)")
+    entrada_str = st.text_input("Entrada", key="entrada", help="formatos aceitos:\nHMM, HHMM ou HH:MM")
     col1, col2 = st.columns(2)
     with col1:
         saida_almoco_str = st.text_input("Saída Almoço", key="saida_almoco")
@@ -269,9 +285,7 @@ if st.session_state.show_results:
         try:
             hora_entrada = datetime.datetime.strptime(formatar_hora_input(entrada_str), "%H:%M")
 
-            # --- Construção do HTML de Previsões ---
-            results_html = "<div class='section-container'>" # Container para os resultados
-            results_html += "<h3>Previsões de Saída</h3>"
+            # --- Lógica de cálculo das previsões ---
             limite_saida = hora_entrada.replace(hour=20, minute=0, second=0, microsecond=0)
             duracao_almoço_previsao = 0
             if saida_almoco_str and retorno_almoco_str:
@@ -300,14 +314,29 @@ if st.session_state.show_results:
             texto_desc_8h = f"({formatar_duracao(duracao_8h_min)})" if hora_saida_8h_calculada > limite_saida else "(8h)"
             texto_desc_10h = f"({formatar_duracao(duracao_10h_min)})" if hora_saida_10h_calculada > limite_saida else "(10h)"
 
-            results_html += f"""
-            <p>
-            <b>Mínimo {texto_desc_5h}:</b> {hora_saida_5h.strftime('%H:%M')} ({minutos_intervalo_5h:.0f}min de intervalo)<br>
-            <b>Jornada Padrão {texto_desc_8h}:</b> {hora_saida_8h.strftime('%H:%M')} ({minutos_intervalo_demais:.0f}min de almoço)<br>
-            <b>Máximo {texto_desc_10h}:</b> {hora_saida_10h.strftime('%H:%M')} ({minutos_intervalo_demais:.0f}min de almoço)
-            </p>
+            # --- Construção do HTML de Previsões ---
+            predictions_html = f"""
+            <div class='section-container'>
+                <h3>Previsões de Saída</h3>
+                <div class="predictions-grid-container">
+                    <div class="metric-custom metric-minimo">
+                        <div class="label">Mínimo {texto_desc_5h}</div>
+                        <div class="value">{hora_saida_5h.strftime('%H:%M')}</div>
+                        <div class="details">({minutos_intervalo_5h:.0f}min de intervalo)</div>
+                    </div>
+                    <div class="metric-custom metric-padrao">
+                        <div class="label">Jornada Padrão {texto_desc_8h}</div>
+                        <div class="value">{hora_saida_8h.strftime('%H:%M')}</div>
+                        <div class="details">({minutos_intervalo_demais:.0f}min de almoço)</div>
+                    </div>
+                    <div class="metric-custom metric-maximo">
+                        <div class="label">Máximo {texto_desc_10h}</div>
+                        <div class="value">{hora_saida_10h.strftime('%H:%M')}</div>
+                        <div class="details">({minutos_intervalo_demais:.0f}min de almoço)</div>
+                    </div>
+                </div>
+            </div>
             """
-            results_html += "</div>"
             
             # --- Lógica para o Resumo do Dia ---
             warnings_html = ""
@@ -361,7 +390,7 @@ if st.session_state.show_results:
             
             # --- Seção de Renderização ---
             with results_placeholder.container():
-                st.markdown(f'<div class="results-container">{results_html}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="results-container">{predictions_html}</div>', unsafe_allow_html=True)
 
                 if saida_real_str:
                     st.markdown("<hr>", unsafe_allow_html=True)
@@ -371,8 +400,8 @@ if st.session_state.show_results:
                     saldo_css_class = "metric-saldo-pos" if saldo_banco_horas_minutos >= 0 else "metric-saldo-neg"
                     sinal = "+" if saldo_banco_horas_minutos >= 0 else "-"
                     
-                    metrics_grid_html = f"""
-                    <div class="metrics-grid-container">
+                    summary_grid_html = f"""
+                    <div class="summary-grid-container">
                         <div class="metric-custom">
                             <div class="label">Total Trabalhado</div>
                             <div class="value">{formatar_duracao(trabalho_liquido_minutos)}</div>
@@ -391,7 +420,7 @@ if st.session_state.show_results:
                         </div>
                     </div>
                     """
-                    st.markdown(metrics_grid_html, unsafe_allow_html=True)
+                    st.markdown(summary_grid_html, unsafe_allow_html=True)
 
                 # Exibe os avisos (se houver)
                 st.markdown(warnings_html, unsafe_allow_html=True)
