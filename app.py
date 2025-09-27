@@ -94,9 +94,9 @@ st.markdown("""
         text-align: center;
     }
     .main div[data-testid="stTextInput"] > label {
-        text-align: center;
+        text-align: center !important; /* Força a centralização para sobrescrever temas */
         width: 100%;
-        display: block; /* Garante que o alinhamento de texto funcione */
+        display: block;
     }
 
     /* Animação de fade-in para os resultados */
@@ -224,7 +224,7 @@ st.markdown("""
     /* AVISO: As classes 'st-emotion-cache-*' são geradas pelo Streamlit e podem quebrar em futuras atualizações. */
     /* Foram mantidas para preservar o estilo visual, mas o ideal é substituí-las por seletores mais estáveis. */
     .st-emotion-cache-1anq8dj {border-radius: 1.25rem; }
-    
+    .st-emotion-cache-ubko3j svg, .st-emotion-cache-gquqoo { display: none !important; }
     .st-bv {    font-weight: 600;}
     .st-ay {    font-size: 1.3rem;}
     .st-aw {    border-bottom-right-radius: 1.5rem;}
