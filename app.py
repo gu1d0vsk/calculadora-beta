@@ -56,6 +56,11 @@ st.set_page_config(page_title="Calculadora de Jornada", layout="centered")
 # Injeção de CSS para customização
 st.markdown("""
 <style>
+    /* Diminui o padding superior da página */
+    div.block-container {
+        padding-top: 4rem;
+    }
+
     /* Limita a largura do container principal */
     .main .block-container {
         max-width: 800px;
