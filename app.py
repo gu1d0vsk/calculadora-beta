@@ -246,15 +246,6 @@ st.markdown("""
             grid-template-columns: repeat(2, 1fr); /* Passa para 2 colunas */
         }
     }
-
-    /* Estilos gerais */
-    .st-emotion-cache-1anq8dj {border-radius: 1.25rem; }
-    .st-bv {    font-weight: 600;}
-    .st-ay {    font-size: 1.3rem;}
-    .st-aw {    border-bottom-right-radius: 1.5rem;}
-    .st-av {    border-top-right-radius: 1.5rem;}
-    .st-au {    border-bottom-left-radius: 1.5rem;}
-    .st-at {    border-top-left-radius: 1.5rem;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -423,7 +414,7 @@ if st.session_state.show_results:
                             <div class="value">{duracao_almoco_minutos_real:.0f}min</div>
                         </div>
                         <div class="metric-custom {saldo_css_class}">
-                            <div class="label">Saldo do Dia</div>
+                            <div class.label">Saldo do Dia</div>
                             <div class="value">{sinal} {formatar_duracao(abs(saldo_banco_horas_minutos))}</div>
                         </div>
                     </div>
