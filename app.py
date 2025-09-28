@@ -140,6 +140,7 @@ st.markdown("""
     /* Estilos para os botões */
     div[data-testid="stHorizontalBlock"] > div:nth-of-type(1) div[data-testid="stButton"] > button {
         background-color: rgb(221, 79, 5); /* Cor do botão Calcular */
+        color: #FFFFFF;
         border-radius: 4rem;
     }
     div[data-testid="stHorizontalBlock"] > div:nth-of-type(2) div[data-testid="stButton"] > button {
@@ -353,14 +354,12 @@ if events_clicked:
 
 if st.session_state.show_events:
     with events_placeholder.container():
-        st.markdown("---")
         eventos = verificar_eventos_proximos()
         if eventos:
             for evento in eventos:
                 st.markdown(f"<div class='event-list-item'>{evento}</div>", unsafe_allow_html=True)
         else:
             st.info("Nenhum evento próximo nos próximos 3 dias.")
-        st.markdown("---")
 
 
 # Placeholder para os resultados do cálculo
