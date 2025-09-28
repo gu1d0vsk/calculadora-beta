@@ -138,25 +138,14 @@ st.markdown("""
     }
 
     /* Estilos para os botões */
-    /* Container dos botões para manter duas colunas no mobile */
-    div[data-testid="stHorizontalBlock"]:has(div > div[data-testid="stButton"]) {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.75rem;
-    }
-    /* Sobrescreve a largura da coluna do Streamlit para o grid funcionar */
-    div[data-testid="stHorizontalBlock"]:has(div > div[data-testid="stButton"]) > div {
-        width: auto !important;
-    }
-
     div[data-testid="stHorizontalBlock"] > div:nth-of-type(1) div[data-testid="stButton"] > button {
-        background-color: rgb(221, 79, 5); /* Cor do botão Calcular */
-        color: #FFFFFF;
+        background-color: rgb(221, 79, 5) !important; /* Cor do botão Calcular */
+        color: #FFFFFF !important;
         border-radius: 4rem;
     }
     div[data-testid="stHorizontalBlock"] > div:nth-of-type(2) div[data-testid="stButton"] > button {
-        background-color: rgb(0, 80, 81); /* Cor do botão Próximos Eventos */
-        color: #FFFFFF;
+        background-color: rgb(0, 80, 81) !important; /* Cor do botão Próximos Eventos */
+        color: #FFFFFF !important;
         border-radius: 4rem;
     }
 
