@@ -15,7 +15,7 @@ def obter_mensagem_do_dia():
         3: "Quinta-feira: a sexta está te adicionando.",
         4: "Enfim sextou, qual a boa do fds?",
         5: "É sábado 😴",
-        6: "Domingo 💤, qual plano de amanhã?"
+        6: "Domingo 💤"
     }
     return mensagens.get(hoje, "Calculadora de Jornada")
 
