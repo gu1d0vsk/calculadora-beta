@@ -170,7 +170,7 @@ st.markdown("""
     /* Estilos para o ícone de notificação com tooltip */
     .event-tooltip-container {
         position: absolute;
-        top: 2rem;
+        top: 5rem;
         right: 2rem;
         z-index: 1000;
     }
