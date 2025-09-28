@@ -183,8 +183,8 @@ st.markdown("""
     
     /* Estilos para notificação de eventos */
     .event-notification {
-        background-color: rgba(57, 94, 94, 0.2);
-        border: 1px solid rgb(57, 94, 94);
+        background-color: rgba(221, 79, 5, 0.2);
+        border: 1px solid rgb(221, 79, 5);
         border-radius: 1.5rem;
         padding: 0.75rem;
         text-align: center;
