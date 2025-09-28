@@ -130,7 +130,7 @@ st.markdown("""
     .sub-title {
         color: gray;
         text-align: center;
-        font-size: 1.5rem !important;
+        font-size: 1.25rem !important;
     }
 
     /* Centraliza e anima o botão para evitar o 'salto' */
@@ -325,15 +325,15 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-mensagem_do_dia = obter_mensagem_do_dia()
-st.markdown(f'<p class="main-title">{mensagem_do_dia}</p>', unsafe_allow_html=True)
-st.markdown('<p class="sub-title">Informe seus horários para calcular a jornada diária</p>', unsafe_allow_html=True)
-
 # --- Seção de Avisos de Eventos ---
 mensagens_eventos = verificar_eventos_proximos()
 if mensagens_eventos:
     for msg in mensagens_eventos:
         st.markdown(f'<div class="event-notification">{msg}</div>', unsafe_allow_html=True)
+
+mensagem_do_dia = obter_mensagem_do_dia()
+st.markdown(f'<p class="main-title">{mensagem_do_dia}</p>', unsafe_allow_html=True)
+st.markdown('<p class="sub-title">Informe seus horários para calcular a jornada diária</p>', unsafe_allow_html=True)
 
 # Layout dos campos de entrada com colunas para limitar a largura
 col_buffer_1, col_main, col_buffer_2 = st.columns([1, 6, 1])
@@ -525,4 +525,5 @@ if st.session_state.show_results:
             st.error(f"Ocorreu um erro inesperado: {e}")
         finally:
             st.session_state.show_results = False # Reseta para a próxima recarga
+
 
