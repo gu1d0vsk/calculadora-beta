@@ -26,7 +26,7 @@ def verificar_eventos_proximos():
     eventos_agrupados = {}
 
     # Agrupa todos os eventos por data para evitar sobrescrita
-    todos_os_dicionarios = [FERIADOS_2025, DATAS_PAGAMENTO_VA_VR, DATAS_LIMITE_BENEFICIOS, DATAS_PAGAMENTO_SALARIO, DATAS_PAGAMENTO_13, DATAS_ADIANTAMENTO_SALARIO, CESTA_NATALINA]
+    todos_os_dicionarios = [FERIADOS_2025, DATAS_PAGAMENTO_VA_VR, DATAS_LIMITE_BENEFICIOS, DATAS_PAGAMENTO_SALARIO, DATAS_PAGamento_13, DATAS_ADIANTAMENTO_SALARIO, CESTA_NATALINA]
     for d in todos_os_dicionarios:
         for data, nome in d.items():
             if data not in eventos_agrupados:
@@ -243,25 +243,48 @@ st.markdown("""
         opacity: 1;
     }
 
-    /* Estilos para alertas customizados */
-    .custom-warning, .custom-error {
-        border-radius: 1.5rem;
-        padding: 1rem;
-        margin-top: 1rem;
-        text-align: center;
+    /* Estilos para o ícone de AVISO com tooltip (inline) */
+    .warning-tooltip-container {
+        display: inline-block;
+        position: relative;
+        margin-left: 10px;
+        vertical-align: middle;
     }
-    .custom-warning {
-        background-color: rgba(255, 170, 0, 0.15);
-        border: 1px solid #ffaa00;
-        color: #31333f;
+    .warning-tooltip-icon {
+        font-size: 1.25rem;
+        cursor: pointer;
     }
-    .custom-error {
-        background-color: rgba(255, 108, 108, 0.15);
-        border: 1px solid rgb(255, 108, 108);
-        color: rgb(255, 75, 75);
+    .warning-tooltip-text {
+        visibility: hidden;
+        width: 320px;
+        background-color: #333;
+        color: #fff;
+        text-align: left;
+        border-radius: 8px;
+        padding: 10px;
+        position: absolute;
+        z-index: 1;
+        bottom: 150%;
+        left: 50%;
+        margin-left: -160px; /* Metade da largura para centralizar */
+        opacity: 0;
+        transition: opacity 0.3s;
+        font-size: 0.875rem;
+        line-height: 1.4;
     }
-    .custom-error p {
-        margin: 0.5rem 0 0 0;
+    .warning-tooltip-text::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: #333 transparent transparent transparent;
+    }
+    .warning-tooltip-container:hover .warning-tooltip-text {
+        visibility: visible;
+        opacity: 1;
     }
 
     /* Oculta o ícone de âncora/link nos cabeçalhos de forma mais específica */
@@ -478,7 +501,7 @@ if st.session_state.show_results:
             """
             
             # --- Lógica para o Resumo do Dia ---
-            warnings_html = ""
+            tooltip_warnings = ""
             if saida_real_str:
                 hora_saida_real = datetime.datetime.strptime(formatar_hora_input(saida_real_str), "%H:%M")
                 if hora_saida_real < hora_entrada:
@@ -504,28 +527,26 @@ if st.session_state.show_results:
                 saldo_banco_horas_minutos = trabalho_liquido_minutos - 480
                 tempo_nucleo_minutos = calcular_tempo_nucleo(hora_entrada, hora_saida_real, saida_almoco, retorno_almoco)
                 
-                # --- Construção dos Avisos ---
+                # --- Construção dos Avisos para Tooltip ---
+                lista_de_avisos_final = []
                 if tempo_nucleo_minutos < 300:
-                    warnings_html += '<div class="custom-warning">Atenção: Não cumpriu as 5h obrigatórias no período núcleo.</div>'
+                    lista_de_avisos_final.append("⚠️ Atenção: Não cumpriu as 5h obrigatórias no período núcleo.")
 
-                lista_de_avisos = []
+                lista_de_permanencia = []
                 if min_intervalo_real > 0 and duracao_almoco_minutos_real < min_intervalo_real:
-                    lista_de_avisos.append(f"{termo_intervalo_real.capitalize()} foi inferior a {min_intervalo_real} minutos")
+                    lista_de_permanencia.append(f"{termo_intervalo_real.capitalize()} foi inferior a {min_intervalo_real} minutos")
                 if trabalho_liquido_minutos > 600:
-                    lista_de_avisos.append("Jornada de trabalho excedeu 10 horas")
+                    lista_de_permanencia.append("Jornada de trabalho excedeu 10 horas")
                 if hora_saida_real.time() > datetime.time(20, 0):
-                    lista_de_avisos.append("Saída registrada após as 20h")
+                    lista_de_permanencia.append("Saída registrada após as 20h")
 
-                if lista_de_avisos:
-                    motivo_header = "Motivo" if len(lista_de_avisos) == 1 else "Motivos"
-                    motivos_texto = "<br>".join(lista_de_avisos)
-                    warnings_html += f"""
-                    <div class="custom-error">
-                        <b>‼️ PERMANÊNCIA NÃO AUTORIZADA ‼️</b>
-                        <p><b>{motivo_header}:</b></p>
-                        <p>{motivos_texto}</p>
-                    </div>
-                    """
+                if lista_de_permanencia:
+                    motivo_header = "Motivo" if len(lista_de_permanencia) == 1 else "Motivos"
+                    permanencia_str = f"<b>‼️ PERMANÊNCIA NÃO AUTORIZADA ‼️</b><br><b>{motivo_header}:</b><br>" + "<br>".join(lista_de_permanencia)
+                    lista_de_avisos_final.append(permanencia_str)
+                
+                tooltip_warnings = "<br><br>".join(lista_de_avisos_final)
+
             
             # --- Seção de Renderização ---
             with results_placeholder.container():
@@ -533,8 +554,19 @@ if st.session_state.show_results:
 
                 if saida_real_str:
                     st.markdown("<hr>", unsafe_allow_html=True)
-                    st.markdown("<div class='section-container'><h3>Resumo do Dia</h3></div>", unsafe_allow_html=True)
                     
+                    # Constrói o título do Resumo do Dia com ou sem o ícone de aviso
+                    resumo_title_html = "<h3>Resumo do Dia"
+                    if tooltip_warnings:
+                        resumo_title_html += f"""
+                            <span class="warning-tooltip-container">
+                                <span class="warning-tooltip-icon">⚠️</span>
+                                <div class="warning-tooltip-text">{tooltip_warnings}</div>
+                            </span>
+                        """
+                    resumo_title_html += "</h3>"
+                    st.markdown(f"<div class='section-container'>{resumo_title_html}</div>", unsafe_allow_html=True)
+
                     # Layout das métricas com grid responsivo
                     saldo_css_class = "metric-saldo-pos" if saldo_banco_horas_minutos >= 0 else "metric-saldo-neg"
                     sinal = "+" if saldo_banco_horas_minutos >= 0 else "-"
@@ -561,9 +593,6 @@ if st.session_state.show_results:
                     """
                     st.markdown(summary_grid_html, unsafe_allow_html=True)
 
-                # Exibe os avisos (se houver)
-                st.markdown(warnings_html, unsafe_allow_html=True)
-            
             # Script para rolagem suave (opcional, mas bom para UX)
             scroll_script = """
                 <script>
