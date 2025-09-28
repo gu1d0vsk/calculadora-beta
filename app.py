@@ -6,6 +6,19 @@ from mensagens import obter_mensagem_do_dia
 
 # --- Funções de Lógica ---
 
+def obter_artigo(nome_evento):
+    """Determina o artigo correto (o/a) para um nome de evento."""
+    nome_lower = nome_evento.lower()
+    # Palavras-chave femininas que geralmente definem o gênero da frase
+    femininas = [
+        "confraternização", "paixão", "independência", "república", 
+        "consciência", "compensação", "volta", "saída", "data", 
+        "parcela", "cesta", "jornada"
+    ]
+    if any(palavra in nome_lower for palavra in femininas):
+        return "a"
+    return "o"
+
 def verificar_eventos_proximos():
     """Verifica se há eventos nos próximos 3 dias e retorna mensagens."""
     hoje = datetime.date.today()
@@ -31,9 +44,14 @@ def verificar_eventos_proximos():
             else:
                 emoji = "🗓️"
 
-            # Cria um nome de evento combinado e mais limpo
-            nomes_limpos = [s.split('(')[0].strip() for s in lista_nomes]
-            nome_evento_final = " e ".join(nomes_limpos)
+            # Adiciona o artigo apropriado para cada evento e os combina
+            nomes_com_artigo = []
+            for nome in lista_nomes:
+                nome_limpo = nome.split('(')[0].strip()
+                artigo = obter_artigo(nome_limpo)
+                nomes_com_artigo.append(f"{artigo} {nome_limpo}")
+            
+            nome_evento_final = " e ".join(nomes_com_artigo)
 
             if delta.days == 0:
                 mensagem = f"{emoji} Hoje é {nome_evento_final}!"
