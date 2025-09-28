@@ -42,7 +42,7 @@ DATAS_PAGAMENTO_VA_VR = {
 }
 
 DATAS_LIMITE_BENEFICIOS = {
-    datetime.date(2025, 1, 10): "Data limite para benefícios (Janeiro)",
+    datetime.date(2025, 1, 10): "data limite para soliciarações e alterações de benefícios (Janeiro)",
     datetime.date(2025, 2, 10): "Data limite para benefícios (Fevereiro)",
     datetime.date(2025, 3, 11): "Data limite para benefícios (Março)",
     datetime.date(2025, 4, 10): "Data limite para benefícios (Abril)",
@@ -51,7 +51,7 @@ DATAS_LIMITE_BENEFICIOS = {
     datetime.date(2025, 7, 10): "Data limite para benefícios (Julho)",
     datetime.date(2025, 8, 11): "Data limite para benefícios (Agosto)",
     datetime.date(2025, 9, 10): "Data limite para benefícios (Setembro)",
-    datetime.date(2025, 10, 10): "Data limite para benefícios (Outubro)",
+    datetime.date(2025, 10, 10): "data limite para soliciarações e alterações de benefícios (Outubro)",
     datetime.date(2025, 11, 10): "Data limite para benefícios (Novembro)",
     datetime.date(2025, 12, 10): "Data limite para benefícios (Dezembro)",
 }
