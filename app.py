@@ -73,6 +73,27 @@ DATAS_PAGAMENTO_SALARIO = {
     datetime.date(2025, 12, 30): "Pagamento de Salário (Dezembro)",
 }
 
+DATAS_PAGAMENTO_13 = {
+    datetime.date(2025, 1, 10): "Adiantamento 1ª parcela do 13º Salário",
+    datetime.date(2025, 11, 28): "13º Salário (para quem não pediu adiantamento)",
+    datetime.date(2025, 12, 19): "2ª parcela do 13º Salário",
+}
+
+DATAS_ADIANTAMENTO_SALARIO = {
+    datetime.date(2025, 1, 15): "Adiantamento Salarial (Janeiro)",
+    datetime.date(2025, 2, 14): "Adiantamento Salarial (Fevereiro)",
+    datetime.date(2025, 3, 14): "Adiantamento Salarial (Março)",
+    datetime.date(2025, 4, 15): "Adiantamento Salarial (Abril)",
+    datetime.date(2025, 5, 15): "Adiantamento Salarial (Maio)",
+    datetime.date(2025, 6, 13): "Adiantamento Salarial (Junho)",
+    datetime.date(2025, 7, 15): "Adiantamento Salarial (Julho)",
+    datetime.date(2025, 8, 15): "Adiantamento Salarial (Agosto)",
+    datetime.date(2025, 9, 15): "Adiantamento Salarial (Setembro)",
+    datetime.date(2025, 10, 15): "Adiantamento Salarial (Outubro)",
+    datetime.date(2025, 11, 14): "Adiantamento Salarial (Novembro)",
+    datetime.date(2025, 12, 12): "Adiantamento Salarial (Dezembro)",
+}
+
 # --- Funções de Lógica ---
 
 def verificar_eventos_proximos():
@@ -82,7 +103,7 @@ def verificar_eventos_proximos():
     eventos_agrupados = {}
 
     # Agrupa todos os eventos por data para evitar sobrescrita
-    todos_os_dicionarios = [FERIADOS_2025, DATAS_PAGAMENTO_VA_VR, DATAS_LIMITE_BENEFICIOS, DATAS_PAGAMENTO_SALARIO]
+    todos_os_dicionarios = [FERIADOS_2025, DATAS_PAGAMENTO_VA_VR, DATAS_LIMITE_BENEFICIOS, DATAS_PAGAMENTO_SALARIO, DATAS_PAGAMENTO_13, DATAS_ADIANTAMENTO_SALARIO]
     for d in todos_os_dicionarios:
         for data, nome in d.items():
             if data not in eventos_agrupados:
@@ -93,7 +114,7 @@ def verificar_eventos_proximos():
         delta = data_evento - hoje
         if 0 <= delta.days <= 3:
             # Determina o emoji com base na prioridade do evento
-            if any("Crédito" in s or "Pagamento" in s for s in lista_nomes):
+            if any("Crédito" in s or "Pagamento" in s or "13º" in s or "Adiantamento" in s for s in lista_nomes):
                 emoji = "💰"
             elif any("Data limite" in s for s in lista_nomes):
                 emoji = "❗️"
@@ -245,7 +266,12 @@ st.markdown("""
         text-align: center;
         margin-top: 1rem;
         margin-bottom: 0.5rem;
-        color: #ef9a49;
+        color: #005051; /* Cor para o tema claro (padrão) */
+    }
+
+    /* Streamlit adiciona a classe 'theme-dark' em um elemento pai quando o tema escuro está ativo */
+    .theme-dark .event-notification {
+        color: #dd4f05; /* Cor para o tema escuro */
     }
 
     /* Estilos para alertas customizados */
@@ -578,5 +604,6 @@ if st.session_state.show_results:
         except Exception as e:
             st.error(f"Ocorreu um erro inesperado: {e}")
         finally:
-            st.session_state.show_results = False # Reseta para a próxima interação
+            st.session_state.show_results = False # Reseta para a próxima recarga
+
 
