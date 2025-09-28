@@ -79,26 +79,37 @@ def verificar_eventos_proximos():
     """Verifica se há eventos nos próximos 3 dias e retorna mensagens."""
     hoje = datetime.date.today()
     mensagens = []
+    eventos_agrupados = {}
 
-    # Junta todos os eventos
-    todos_eventos = {**FERIADOS_2025, **DATAS_PAGAMENTO_VA_VR, **DATAS_LIMITE_BENEFICIOS, **DATAS_PAGAMENTO_SALARIO}
+    # Agrupa todos os eventos por data para evitar sobrescrita
+    todos_os_dicionarios = [FERIADOS_2025, DATAS_PAGamento_VA_VR, DATAS_LIMITE_BENEFICIOS, DATAS_PAGAMENTO_SALARIO]
+    for d in todos_os_dicionarios:
+        for data, nome in d.items():
+            if data not in eventos_agrupados:
+                eventos_agrupados[data] = []
+            eventos_agrupados[data].append(nome)
 
-    for data_evento, nome_evento in sorted(todos_eventos.items()):
+    for data_evento, lista_nomes in sorted(eventos_agrupados.items()):
         delta = data_evento - hoje
         if 0 <= delta.days <= 3:
-            if "Crédito do VA/VR" in nome_evento or "Pagamento de Salário" in nome_evento:
+            # Determina o emoji com base na prioridade do evento
+            if any("Crédito" in s or "Pagamento" in s for s in lista_nomes):
                 emoji = "💰"
-            elif "Data limite" in nome_evento:
+            elif any("Data limite" in s for s in lista_nomes):
                 emoji = "❗️"
             else:
                 emoji = "🗓️"
 
+            # Cria um nome de evento combinado e mais limpo
+            nomes_limpos = [s.split('(')[0].strip() for s in lista_nomes]
+            nome_evento_final = " e ".join(nomes_limpos)
+
             if delta.days == 0:
-                mensagem = f"{emoji} Hoje é {nome_evento}!"
+                mensagem = f"{emoji} Hoje é {nome_evento_final}!"
             elif delta.days == 1:
-                mensagem = f"{emoji} Amanhã é {nome_evento}!"
+                mensagem = f"{emoji} Amanhã é {nome_evento_final}!"
             else:
-                mensagem = f"{emoji} Faltam {delta.days} dias para {nome_evento}!"
+                mensagem = f"{emoji} Faltam {delta.days} dias para {nome_evento_final}!"
             mensagens.append(mensagem)
     return mensagens
 
