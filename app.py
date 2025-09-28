@@ -2,8 +2,23 @@ import streamlit as st
 import datetime
 import time
 from eventos import *
+import requests
+import xml.etree.ElementTree as ET
 
 # --- Funções de Lógica ---
+
+@st.cache_data(ttl=3600) # Cache para 1 hora para não sobrecarregar o site
+def fetch_rss_titles(url):
+    """Busca e retorna os títulos de um feed RSS."""
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()  # Lança um erro para status ruins (404, 500, etc.)
+        root = ET.fromstring(response.content)
+        titles = [item.find('title').text for item in root.findall('.//item')]
+        return " • ".join(titles) if titles else "Nenhuma notícia encontrada."
+    except (requests.RequestException, ET.ParseError) as e:
+        print(f"Erro ao buscar RSS: {e}")
+        return "Não foi possível carregar as notícias da Finep no momento."
 
 def obter_mensagem_do_dia():
     """Retorna uma mensagem engraçada baseada no dia da semana."""
@@ -15,7 +30,7 @@ def obter_mensagem_do_dia():
         3: "Quinta-feira: a sexta está te adicionando.",
         4: "Enfim sextou, qual a boa do fds?",
         5: "É sábado 😴",
-        6: "Domingo 💤"
+        6: "Domingo 💤, qual plano de amanhã?"
     }
     return mensagens.get(hoje, "Calculadora de Jornada")
 
@@ -272,6 +287,41 @@ st.markdown("""
         color: #5a5a5a;
     }
 
+    /* Estilos para o Ticker de Notícias RSS */
+    .rss-ticker-container {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #f0f2f6; /* Cinza claro para tema light */
+        padding: 8px 0;
+        overflow: hidden;
+        white-space: nowrap;
+        box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+        z-index: 999;
+    }
+
+    .rss-ticker-content {
+        display: inline-block;
+        color: #5a5a5a; /* Cinza escuro para o texto */
+        padding-left: 100%;
+        animation: ticker-scroll 90s linear infinite;
+    }
+
+    @keyframes ticker-scroll {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-100%); }
+    }
+
+    /* Ajuste para tema escuro */
+    body.dark .rss-ticker-container {
+        background-color: #262730; /* Cinza escuro para tema dark */
+    }
+     body.dark .rss-ticker-content {
+        color: #a0a0a0; /* Cinza mais claro para o texto no tema dark */
+    }
+
+
     /* Cor de texto branca para caixas coloridas */
     .metric-saldo-pos .value, .metric-saldo-neg .value,
     .metric-minimo .value, .metric-padrao .value, .metric-maximo .value {
@@ -526,4 +576,12 @@ if st.session_state.show_results:
         finally:
             st.session_state.show_results = False # Reseta para a próxima recarga
 
+# --- Seção de Ticker RSS ---
+rss_url = "http://www.finep.gov.br/component/ninjarsssyndicator/?feed_id=1&format=raw"
+news_titles = fetch_rss_titles(rss_url)
+st.markdown(f"""
+<div class="rss-ticker-container">
+    <div class="rss-ticker-content">{news_titles}</div>
+</div>
+""", unsafe_allow_html=True)
 
