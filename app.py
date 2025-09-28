@@ -5,16 +5,27 @@ import time
 # --- Dados de Eventos ---
 FERIADOS_2025 = {
     datetime.date(2025, 1, 1): "Confraternização Universal",
+    datetime.date(2025, 1, 20): "Dia de São Sebastião (RJ)",
+    datetime.date(2025, 3, 3): "Ponto Facultativo de Carnaval",
     datetime.date(2025, 3, 4): "Carnaval",
+    datetime.date(2025, 3, 5): "Ponto Facultativo de Carnaval",
     datetime.date(2025, 4, 18): "Paixão de Cristo",
     datetime.date(2025, 4, 21): "Tiradentes",
+    datetime.date(2025, 4, 23): "Dia de São Jorge (RJ)",
     datetime.date(2025, 5, 1): "Dia do Trabalho",
+    datetime.date(2025, 5, 2): "Compensação (Dia Ponte)",
     datetime.date(2025, 6, 19): "Corpus Christi",
+    datetime.date(2025, 6, 20): "Compensação (Dia Ponte)",
     datetime.date(2025, 9, 7): "Independência do Brasil",
     datetime.date(2025, 10, 12): "Nossa Senhora Aparecida",
     datetime.date(2025, 11, 2): "Finados",
     datetime.date(2025, 11, 15): "Proclamação da República",
+    datetime.date(2025, 11, 20): "Dia da Consciência Negra",
+    datetime.date(2025, 11, 21): "Compensação (Dia Ponte)",
+    datetime.date(2025, 12, 24): "Ponto Facultativo de Natal",
     datetime.date(2025, 12, 25): "Natal",
+    datetime.date(2025, 12, 26): "Compensação (Dia Ponte)",
+    datetime.date(2025, 12, 31): "Ponto Facultativo de Ano Novo",
 }
 
 # --- Funções de Lógica ---
