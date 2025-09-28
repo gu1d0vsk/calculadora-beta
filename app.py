@@ -43,6 +43,36 @@ DATAS_PAGAMENTO_VA_VR = {
     datetime.date(2025, 12, 30): "Crédito do VA/VR (Ref. Janeiro/26)",
 }
 
+DATAS_LIMITE_BENEFICIOS = {
+    datetime.date(2025, 1, 10): "Data limite para benefícios (Janeiro)",
+    datetime.date(2025, 2, 10): "Data limite para benefícios (Fevereiro)",
+    datetime.date(2025, 3, 11): "Data limite para benefícios (Março)",
+    datetime.date(2025, 4, 10): "Data limite para benefícios (Abril)",
+    datetime.date(2025, 5, 12): "Data limite para benefícios (Maio)",
+    datetime.date(2025, 6, 10): "Data limite para benefícios (Junho)",
+    datetime.date(2025, 7, 10): "Data limite para benefícios (Julho)",
+    datetime.date(2025, 8, 11): "Data limite para benefícios (Agosto)",
+    datetime.date(2025, 9, 10): "Data limite para benefícios (Setembro)",
+    datetime.date(2025, 10, 10): "Data limite para benefícios (Outubro)",
+    datetime.date(2025, 11, 10): "Data limite para benefícios (Novembro)",
+    datetime.date(2025, 12, 10): "Data limite para benefícios (Dezembro)",
+}
+
+DATAS_PAGAMENTO_SALARIO = {
+    datetime.date(2025, 1, 30): "Pagamento de Salário (Janeiro)",
+    datetime.date(2025, 2, 28): "Pagamento de Salário (Fevereiro)",
+    datetime.date(2025, 3, 28): "Pagamento de Salário (Março)",
+    datetime.date(2025, 4, 30): "Pagamento de Salário (Abril)",
+    datetime.date(2025, 5, 30): "Pagamento de Salário (Maio)",
+    datetime.date(2025, 6, 30): "Pagamento de Salário (Junho)",
+    datetime.date(2025, 7, 30): "Pagamento de Salário (Julho)",
+    datetime.date(2025, 8, 29): "Pagamento de Salário (Agosto)",
+    datetime.date(2025, 9, 30): "Pagamento de Salário (Setembro)",
+    datetime.date(2025, 10, 30): "Pagamento de Salário (Outubro)",
+    datetime.date(2025, 11, 28): "Pagamento de Salário (Novembro)",
+    datetime.date(2025, 12, 30): "Pagamento de Salário (Dezembro)",
+}
+
 # --- Funções de Lógica ---
 
 def verificar_eventos_proximos():
@@ -50,14 +80,16 @@ def verificar_eventos_proximos():
     hoje = datetime.date.today()
     mensagens = []
 
-    # Junta os feriados e as datas de pagamento
-    todos_eventos = {**FERIADOS_2025, **DATAS_PAGAMENTO_VA_VR}
+    # Junta todos os eventos
+    todos_eventos = {**FERIADOS_2025, **DATAS_PAGAMENTO_VA_VR, **DATAS_LIMITE_BENEFICIOS, **DATAS_PAGAMENTO_SALARIO}
 
-    for data_evento, nome_evento in todos_eventos.items():
+    for data_evento, nome_evento in sorted(todos_eventos.items()):
         delta = data_evento - hoje
         if 0 <= delta.days <= 3:
-            if "Crédito do VA/VR" in nome_evento:
+            if "Crédito do VA/VR" in nome_evento or "Pagamento de Salário" in nome_evento:
                 emoji = "💰"
+            elif "Data limite" in nome_evento:
+                emoji = "❗️"
             else:
                 emoji = "🗓️"
 
@@ -307,7 +339,6 @@ st.markdown("""
         grid-template-columns: repeat(4, 1fr);
         gap: 0.75rem; /* Espaçamento entre os quadros */
     }
-    
 
     /* Responsividade para grids */
     @media (max-width: 640px) {
@@ -326,13 +357,14 @@ st.markdown("""
             grid-template-columns: repeat(2, 1fr); /* Passa para 2 colunas */
         }
     }
-            .st-bv {    font-weight: 800;}
-    .st-ay {    font-size: 1.0rem;}
+
+    /* Estilos gerais para classes instáveis do Streamlit */
+    .st-bv {    font-weight: 800;}
+    .st-ay {    font-size: 1.3rem;}
     .st-aw {    border-bottom-right-radius: 1.5rem;}
     .st-av {    border-top-right-radius: 1.5rem;}
     .st-au {    border-bottom-left-radius: 1.5rem;}
     .st-at {    border-top-left-radius: 1.5rem;}
-    
 </style>
 """, unsafe_allow_html=True)
 
