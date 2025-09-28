@@ -2,7 +2,38 @@ import streamlit as st
 import datetime
 import time
 
+# --- Dados de Eventos ---
+FERIADOS_2025 = {
+    datetime.date(2025, 1, 1): "Confraternização Universal",
+    datetime.date(2025, 3, 4): "Carnaval",
+    datetime.date(2025, 4, 18): "Paixão de Cristo",
+    datetime.date(2025, 4, 21): "Tiradentes",
+    datetime.date(2025, 5, 1): "Dia do Trabalho",
+    datetime.date(2025, 6, 19): "Corpus Christi",
+    datetime.date(2025, 9, 7): "Independência do Brasil",
+    datetime.date(2025, 10, 12): "Nossa Senhora Aparecida",
+    datetime.date(2025, 11, 2): "Finados",
+    datetime.date(2025, 11, 15): "Proclamação da República",
+    datetime.date(2025, 12, 25): "Natal",
+}
+
 # --- Funções de Lógica ---
+
+def verificar_eventos_proximos():
+    """Verifica se há feriados nos próximos 3 dias e retorna mensagens."""
+    hoje = datetime.date.today()
+    mensagens = []
+    for data_evento, nome_evento in FERIADOS_2025.items():
+        delta = data_evento - hoje
+        if 0 <= delta.days <= 3:
+            if delta.days == 0:
+                mensagem = f"🗓️ Hoje é {nome_evento}!"
+            elif delta.days == 1:
+                mensagem = f"🗓️ Amanhã é {nome_evento}!"
+            else:
+                mensagem = f"🗓️ Faltam {delta.days} dias para {nome_evento}!"
+            mensagens.append(mensagem)
+    return mensagens
 
 def formatar_hora_input(input_str):
     """Formata a entrada de hora (HHMM ou HH:MM) para o formato HH:MM."""
@@ -124,6 +155,18 @@ st.markdown("""
     @keyframes fadeInSmooth {
         from { opacity: 0; }
         to { opacity: 1; }
+    }
+    
+    /* Estilos para notificação de eventos */
+    .event-notification {
+        background-color: rgba(57, 94, 94, 0.2);
+        border: 1px solid rgb(57, 94, 94);
+        border-radius: 1.5rem;
+        padding: 0.75rem;
+        text-align: center;
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
+        color: #31333f;
     }
 
     /* Estilos para alertas customizados */
@@ -252,6 +295,12 @@ st.markdown("""
 
 st.markdown('<p class="main-title">Calculadora de Jornada de Trabalho</p>', unsafe_allow_html=True)
 st.markdown('<p class="sub-title">Informe seus horários para calcular a jornada diária</p>', unsafe_allow_html=True)
+
+# --- Seção de Avisos de Eventos ---
+mensagens_eventos = verificar_eventos_proximos()
+if mensagens_eventos:
+    for msg in mensagens_eventos:
+        st.markdown(f'<div class="event-notification">{msg}</div>', unsafe_allow_html=True)
 
 # Layout dos campos de entrada com colunas para limitar a largura
 col_buffer_1, col_main, col_buffer_2 = st.columns([1, 6, 1])
@@ -414,7 +463,7 @@ if st.session_state.show_results:
                             <div class="value">{duracao_almoco_minutos_real:.0f}min</div>
                         </div>
                         <div class="metric-custom {saldo_css_class}">
-                            <div class.label">Saldo do Dia</div>
+                            <div class="label">Saldo do Dia</div>
                             <div class="value">{sinal} {formatar_duracao(abs(saldo_banco_horas_minutos))}</div>
                         </div>
                     </div>
