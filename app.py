@@ -327,7 +327,7 @@ st.markdown("""
         }
     }
             .st-bv {    font-weight: 800;}
-    .st-ay {    font-size: 1.3rem;}
+    .st-ay {    font-size: 1.0rem;}
     .st-aw {    border-bottom-right-radius: 1.5rem;}
     .st-av {    border-top-right-radius: 1.5rem;}
     .st-au {    border-bottom-left-radius: 1.5rem;}
