@@ -367,21 +367,22 @@ if events_clicked:
 with events_placeholder.container():
     visible_class = "visible" if st.session_state.show_events else ""
     event_html_content = ""
-    if st.session_state.show_events:
-        eventos = verificar_eventos_proximos()
-        if eventos:
-            event_items_html = ""
-            for evento in eventos:
-                event_items_html += f"<div class='event-list-item'>{evento}</div>"
-            event_html_content = event_items_html
-        else:
-            # Replicando a estrutura do st.info para consistência visual
-            event_html_content = '<div style="text-align: center; padding: 1rem; border: 1px solid #9AD8E1; background-color: #F0F8FF; border-radius: 0.5rem; color: #0E4953;">Nenhum evento próximo nos próximos 12 dias.</div>'
+    
+    # Sempre prepara o conteúdo dos eventos para a animação funcionar corretamente
+    eventos = verificar_eventos_proximos()
+    if eventos:
+        event_items_html = ""
+        for evento in eventos:
+            event_items_html += f"<div class='event-list-item'>{evento}</div>"
+        event_html_content = event_items_html
+    else:
+        # Mensagem para quando não há eventos
+        event_html_content = '<div class="event-list-item" style="border: 1px solid #9AD8E1; background-color: #F0F8FF; color: #0E4953;">Nenhum evento próximo nos próximos 12 dias.</div>'
 
     st.markdown(f"""
-    <div class="event-list-wrapper {visible_class}">
+    <div id="events-wrapper" class="event-list-wrapper {visible_class}">
         <div class="event-list-container">
-            {event_html_content}
+            {event_html_content if st.session_state.show_events else ""}
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -390,12 +391,13 @@ with events_placeholder.container():
 if events_clicked and st.session_state.show_events:
     st.components.v1.html("""
         <script>
+            // Adiciona um pequeno atraso para dar tempo à animação CSS de começar
             setTimeout(function() {
-                const eventsEl = window.parent.document.querySelector('.event-list-container');
+                const eventsEl = window.parent.document.getElementById('events-wrapper');
                 if (eventsEl) {
                     eventsEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
-            }, 100);
+            }, 50); // 50ms de atraso
         </script>
     """, height=0)
 
