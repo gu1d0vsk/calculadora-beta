@@ -161,11 +161,11 @@ st.markdown("""
         display: block;
     }
 
-    /* Animação de fade-in para os resultados e lista de eventos */
-    .results-container, .event-list-container {
-        animation: fadeIn 0.5s ease-out forwards;
+    /* Animação de fade-in para os resultados */
+    .results-container {
+        animation: fadeInResults 0.5s ease-out forwards;
     }
-    @keyframes fadeIn {
+    @keyframes fadeInResults {
         from {
             opacity: 0;
             transform: translateY(15px);
@@ -176,7 +176,19 @@ st.markdown("""
         }
     }
     
-    /* Estilos para a lista de eventos */
+    /* Estilos e animação para a lista de eventos (fade e slide) */
+    .event-list-wrapper {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: grid-template-rows 0.4s ease-in-out;
+    }
+    .event-list-wrapper.visible {
+        grid-template-rows: 1fr;
+    }
+    .event-list-container {
+        overflow: hidden;
+    }
+    
     .event-list-item {
         background-color: #cacaca3b;
         padding: 10px;
@@ -352,17 +364,40 @@ if 'show_events' not in st.session_state:
 if events_clicked:
     st.session_state.show_events = not st.session_state.show_events
 
-if st.session_state.show_events:
-    with events_placeholder.container():
+with events_placeholder.container():
+    visible_class = "visible" if st.session_state.show_events else ""
+    event_html_content = ""
+    if st.session_state.show_events:
         eventos = verificar_eventos_proximos()
         if eventos:
-            event_html = "<div class='event-list-container'>"
+            event_items_html = ""
             for evento in eventos:
-                event_html += f"<div class='event-list-item'>{evento}</div>"
-            event_html += "</div>"
-            st.markdown(event_html, unsafe_allow_html=True)
+                event_items_html += f"<div class='event-list-item'>{evento}</div>"
+            event_html_content = event_items_html
         else:
-            st.info("Nenhum evento próximo nos próximos 12 dias.")
+            # Replicando a estrutura do st.info para consistência visual
+            event_html_content = '<div style="text-align: center; padding: 1rem; border: 1px solid #9AD8E1; background-color: #F0F8FF; border-radius: 0.5rem; color: #0E4953;">Nenhum evento próximo nos próximos 12 dias.</div>'
+
+    st.markdown(f"""
+    <div class="event-list-wrapper {visible_class}">
+        <div class="event-list-container">
+            {event_html_content}
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# Adiciona script de rolagem apenas quando o botão é clicado para ABRIR a lista
+if events_clicked and st.session_state.show_events:
+    st.components.v1.html("""
+        <script>
+            setTimeout(function() {
+                const eventsEl = window.parent.document.querySelector('.event-list-container');
+                if (eventsEl) {
+                    eventsEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 100);
+        </script>
+    """, height=0)
 
 
 # Placeholder para os resultados do cálculo
