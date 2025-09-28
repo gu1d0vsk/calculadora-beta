@@ -3,24 +3,8 @@ import datetime
 import time
 from eventos import *
 from mensagens import obter_mensagem_do_dia
-import requests
-import xml.etree.ElementTree as ET
 
 # --- Funções de Lógica ---
-
-@st.cache_data(ttl=3600) # Cache para 1 hora para não sobrecarregar o site
-def fetch_rss_titles(url):
-    """Busca e retorna os títulos de um feed RSS."""
-    try:
-        response = requests.get(url, timeout=10)
-        response.raise_for_status()  # Lança um erro para status ruins (404, 500, etc.)
-        root = ET.fromstring(response.content)
-        titles = [item.find('title').text for item in root.findall('.//item')]
-        return " • ".join(titles) if titles else "Nenhuma notícia encontrada."
-    except (requests.RequestException, ET.ParseError) as e:
-        print(f"Erro ao buscar RSS: {e}")
-        return "Não foi possível carregar as notícias da Finep no momento."
-
 
 def verificar_eventos_proximos():
     """Verifica se há eventos nos próximos 3 dias e retorna mensagens."""
@@ -183,16 +167,62 @@ st.markdown("""
         to { opacity: 1; }
     }
     
-    /* Estilos para notificação de eventos */
-    .event-notification {
-        background-color: rgba(221, 79, 5, 0.2);
-        border: 1px solid rgb(221, 79, 5);
-        border-radius: 1.5rem;
-        padding: 0.75rem;
-        text-align: center;
-        margin-top: 1rem;
-        margin-bottom: 0.5rem;
-        color: #dd4f05; /* Cor fixa para a notificação */
+    /* Estilos para o ícone de notificação com tooltip */
+    .event-tooltip-container {
+        position: absolute;
+        top: 2rem;
+        right: 2rem;
+        z-index: 1000;
+    }
+
+    .event-tooltip-icon {
+        font-size: 1.75rem;
+        cursor: pointer;
+        position: relative;
+    }
+    
+    .event-tooltip-container .notification-dot {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        width: 10px;
+        height: 10px;
+        background-color: #dd4f05;
+        border-radius: 50%;
+        border: 2px solid white;
+    }
+
+    .event-tooltip-text {
+        visibility: hidden;
+        width: 300px;
+        background-color: #333;
+        color: #fff;
+        text-align: left;
+        border-radius: 8px;
+        padding: 10px;
+        position: absolute;
+        z-index: 1;
+        bottom: 130%;
+        right: 0;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        font-size: 0.875rem;
+    }
+
+    .event-tooltip-text::after { /* Flecha */
+        content: " ";
+        position: absolute;
+        top: 100%;
+        right: 15px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: #333 transparent transparent transparent;
+    }
+
+    .event-tooltip-container:hover .event-tooltip-text {
+        visibility: visible;
+        opacity: 1;
     }
 
     /* Estilos para alertas customizados */
@@ -274,40 +304,6 @@ st.markdown("""
         color: #5a5a5a;
     }
 
-    /* Estilos para o Ticker de Notícias RSS */
-    .rss-ticker-container {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background-color: transparent;
-        padding: 8px 0;
-        overflow: hidden;
-        white-space: nowrap;
-        z-index: 999;
-    }
-
-    .rss-ticker-content {
-        display: inline-block;
-        color: #5a5a5a; /* Cinza escuro para o texto */
-        padding-left: 100%;
-        animation: ticker-scroll 400s linear infinite;
-    }
-
-    @keyframes ticker-scroll {
-        0% { transform: translateX(0); }
-        100% { transform: translateX(-100%); }
-    }
-
-    /* Ajuste para tema escuro */
-    body.dark .rss-ticker-container {
-        background-color: transparent;
-    }
-     body.dark .rss-ticker-content {
-        color: #a0a0a0; /* Cinza mais claro para o texto no tema dark */
-    }
-
-
     /* Cor de texto branca para caixas coloridas */
     .metric-saldo-pos .value, .metric-saldo-neg .value,
     .metric-minimo .value, .metric-padrao .value, .metric-maximo .value {
@@ -357,11 +353,6 @@ st.markdown("""
     .st-av {    border-top-right-radius: 1.5rem;}
     .st-au {    border-bottom-left-radius: 1.5rem;}
     .st-at {    border-top-left-radius: 1.5rem;}
-    ._terminalButton_rix23_138 {display: none;}
-    ._profileContainer_gzau3_53 {
-    display: none !important;
-}
-    ._link_gzau3_10 {display: none;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -369,8 +360,16 @@ st.markdown("""
 # --- Seção de Avisos de Eventos ---
 mensagens_eventos = verificar_eventos_proximos()
 if mensagens_eventos:
-    for msg in mensagens_eventos:
-        st.markdown(f'<div class="event-notification">{msg}</div>', unsafe_allow_html=True)
+    tooltip_content = "<br>".join(mensagens_eventos)
+    st.markdown(f"""
+    <div class="event-tooltip-container">
+        <div class="event-tooltip-icon">
+            <span>🔔</span>
+            <span class="notification-dot"></span>
+        </div>
+        <div class="event-tooltip-text">{tooltip_content}</div>
+    </div>
+    """, unsafe_allow_html=True)
 
 mensagem_do_dia = obter_mensagem_do_dia()
 st.markdown(f'<p class="main-title">{mensagem_do_dia}</p>', unsafe_allow_html=True)
@@ -566,13 +565,4 @@ if st.session_state.show_results:
             st.error(f"Ocorreu um erro inesperado: {e}")
         finally:
             st.session_state.show_results = False # Reseta para a próxima recarga
-
-# --- Seção de Ticker RSS ---
-rss_url = "http://www.finep.gov.br/component/ninjarsssyndicator/?feed_id=1&format=raw"
-news_titles = fetch_rss_titles(rss_url)
-st.markdown(f"""
-<div class="rss-ticker-container">
-    <div class="rss-ticker-content">{news_titles}</div>
-</div>
-""", unsafe_allow_html=True)
 
