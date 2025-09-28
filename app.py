@@ -293,11 +293,10 @@ st.markdown("""
         bottom: 0;
         left: 0;
         width: 100%;
-        background-color: #f0f2f6; /* Cinza claro para tema light */
+        background-color: transparent;
         padding: 8px 0;
         overflow: hidden;
         white-space: nowrap;
-        box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
         z-index: 999;
     }
 
@@ -305,7 +304,7 @@ st.markdown("""
         display: inline-block;
         color: #5a5a5a; /* Cinza escuro para o texto */
         padding-left: 100%;
-        animation: ticker-scroll 90s linear infinite;
+        animation: ticker-scroll 400s linear infinite;
     }
 
     @keyframes ticker-scroll {
@@ -315,7 +314,7 @@ st.markdown("""
 
     /* Ajuste para tema escuro */
     body.dark .rss-ticker-container {
-        background-color: #262730; /* Cinza escuro para tema dark */
+        background-color: transparent;
     }
      body.dark .rss-ticker-content {
         color: #a0a0a0; /* Cinza mais claro para o texto no tema dark */
