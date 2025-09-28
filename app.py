@@ -26,7 +26,7 @@ def verificar_eventos_proximos():
     eventos_agrupados = {}
 
     # Agrupa todos os eventos por data para evitar sobrescrita
-    todos_os_dicionarios = [FERIADOS_2025, DATAS_PAGAMENTO_VA_VR, DATAS_LIMITE_BENEFICIOS, DATAS_PAGAMENTO_SALARIO, DATAS_PAGamento_13, DATAS_ADIANTAMENTO_SALARIO, CESTA_NATALINA]
+    todos_os_dicionarios = [FERIADOS_2025, DATAS_PAGAMENTO_VA_VR, DATAS_LIMITE_BENEFICIOS, DATAS_PAGAMENTO_SALARIO, DATAS_PAGAMENTO_13, DATAS_ADIANTAMENTO_SALARIO, CESTA_NATALINA]
     for d in todos_os_dicionarios:
         for data, nome in d.items():
             if data not in eventos_agrupados:
