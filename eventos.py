@@ -57,18 +57,18 @@ DATAS_LIMITE_BENEFICIOS = {
 }
 
 DATAS_PAGAMENTO_SALARIO = {
-    datetime.date(2025, 1, 30): "Pagamento de Salário (Janeiro)",
-    datetime.date(2025, 2, 28): "Pagamento de Salário (Fevereiro)",
-    datetime.date(2025, 3, 28): "Pagamento de Salário (Março)",
-    datetime.date(2025, 4, 30): "Pagamento de Salário (Abril)",
-    datetime.date(2025, 5, 30): "Pagamento de Salário (Maio)",
-    datetime.date(2025, 6, 30): "Pagamento de Salário (Junho)",
-    datetime.date(2025, 7, 30): "Pagamento de Salário (Julho)",
-    datetime.date(2025, 8, 29): "Pagamento de Salário (Agosto)",
-    datetime.date(2025, 9, 30): "Pagamento de Salário (Setembro)",
-    datetime.date(2025, 10, 30): "Pagamento de Salário (Outubro)",
-    datetime.date(2025, 11, 28): "Pagamento de Salário (Novembro)",
-    datetime.date(2025, 12, 30): "Pagamento de Salário (Dezembro)",
+    datetime.date(2025, 1, 30): "Pagamento do Salário (Janeiro)",
+    datetime.date(2025, 2, 28): "Pagamento do Salário (Fevereiro)",
+    datetime.date(2025, 3, 28): "Pagamento do Salário (Março)",
+    datetime.date(2025, 4, 30): "Pagamento do Salário (Abril)",
+    datetime.date(2025, 5, 30): "Pagamento do Salário (Maio)",
+    datetime.date(2025, 6, 30): "Pagamento do Salário (Junho)",
+    datetime.date(2025, 7, 30): "Pagamento do Salário (Julho)",
+    datetime.date(2025, 8, 29): "Pagamento do Salário (Agosto)",
+    datetime.date(2025, 9, 30): "Pagamento do Salário (Setembro)",
+    datetime.date(2025, 10, 30): "Pagamento do Salário (Outubro)",
+    datetime.date(2025, 11, 28): "Pagamento do Salário (Novembro)",
+    datetime.date(2025, 12, 30): "Pagamento do Salário (Dezembro)",
 }
 
 DATAS_PAGAMENTO_13 = {
