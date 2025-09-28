@@ -20,7 +20,7 @@ def obter_artigo(nome_evento):
     return "o"
 
 def verificar_eventos_proximos():
-    """Verifica se há eventos nos próximos 3 dias e retorna mensagens."""
+    """Verifica se há eventos nos próximos 12 dias e retorna mensagens."""
     hoje = datetime.date.today()
     mensagens = []
     eventos_agrupados = {}
@@ -35,7 +35,7 @@ def verificar_eventos_proximos():
 
     for data_evento, lista_nomes in sorted(eventos_agrupados.items()):
         delta = data_evento - hoje
-        if 0 <= delta.days <= 3:
+        if 0 <= delta.days <= 12:
             # Determina o emoji com base na prioridade do evento
             if any("Crédito" in s or "Pagamento" in s or "13º" in s or "Adiantamento" in s or "Cesta" in s for s in lista_nomes):
                 emoji = "💰"
@@ -161,8 +161,8 @@ st.markdown("""
         display: block;
     }
 
-    /* Animação de fade-in para os resultados */
-    .results-container {
+    /* Animação de fade-in para os resultados e lista de eventos */
+    .results-container, .event-list-container {
         animation: fadeIn 0.5s ease-out forwards;
     }
     @keyframes fadeIn {
@@ -356,10 +356,13 @@ if st.session_state.show_events:
     with events_placeholder.container():
         eventos = verificar_eventos_proximos()
         if eventos:
+            event_html = "<div class='event-list-container'>"
             for evento in eventos:
-                st.markdown(f"<div class='event-list-item'>{evento}</div>", unsafe_allow_html=True)
+                event_html += f"<div class='event-list-item'>{evento}</div>"
+            event_html += "</div>"
+            st.markdown(event_html, unsafe_allow_html=True)
         else:
-            st.info("Nenhum evento próximo nos próximos 3 dias.")
+            st.info("Nenhum evento próximo nos próximos 12 dias.")
 
 
 # Placeholder para os resultados do cálculo
