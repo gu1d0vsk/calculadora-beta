@@ -357,6 +357,9 @@ st.markdown("""
     .st-av {    border-top-right-radius: 1.5rem;}
     .st-au {    border-bottom-left-radius: 1.5rem;}
     .st-at {    border-top-left-radius: 1.5rem;}
+    ._terminalButton_rix23_138 {display: none !important}
+    ._profileContainer_gzau3_53 {display: none !important}
+    ._link_gzau3_10 {display: none !important}
 </style>
 """, unsafe_allow_html=True)
 
