@@ -138,6 +138,17 @@ st.markdown("""
     }
 
     /* Estilos para os botões */
+    /* Container dos botões para manter duas colunas no mobile */
+    div[data-testid="stHorizontalBlock"]:has(div > div[data-testid="stButton"]) {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+    }
+    /* Sobrescreve a largura da coluna do Streamlit para o grid funcionar */
+    div[data-testid="stHorizontalBlock"]:has(div > div[data-testid="stButton"]) > div {
+        width: auto !important;
+    }
+
     div[data-testid="stHorizontalBlock"] > div:nth-of-type(1) div[data-testid="stButton"] > button {
         background-color: rgb(221, 79, 5); /* Cor do botão Calcular */
         color: #FFFFFF;
@@ -178,14 +189,14 @@ st.markdown("""
     
     /* Estilos para a lista de eventos */
     .event-list-item {
-        background-color: #f0f2f6;
+        background-color: #cacaca3b;
         padding: 10px;
-        border-radius: 10px;
+        border-radius: 1.5rem;
         margin-bottom: 5px;
         text-align: center;
     }
     body.dark .event-list-item {
-        background-color: #262730;
+        background-color: #cacaca3b;
         color: #fafafa;
     }
 
