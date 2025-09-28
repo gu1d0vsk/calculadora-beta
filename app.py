@@ -28,21 +28,45 @@ FERIADOS_2025 = {
     datetime.date(2025, 12, 31): "Ponto Facultativo de Ano Novo",
 }
 
+DATAS_PAGAMENTO_VA_VR = {
+    datetime.date(2025, 1, 30): "Crédito do VA/VR (Ref. Fevereiro)",
+    datetime.date(2025, 2, 28): "Crédito do VA/VR (Ref. Março)",
+    datetime.date(2025, 3, 28): "Crédito do VA/VR (Ref. Abril)",
+    datetime.date(2025, 4, 30): "Crédito do VA/VR (Ref. Maio)",
+    datetime.date(2025, 5, 30): "Crédito do VA/VR (Ref. Junho)",
+    datetime.date(2025, 6, 30): "Crédito do VA/VR (Ref. Julho)",
+    datetime.date(2025, 7, 30): "Crédito do VA/VR (Ref. Agosto)",
+    datetime.date(2025, 8, 29): "Crédito do VA/VR (Ref. Setembro)",
+    datetime.date(2025, 9, 30): "Crédito do VA/VR (Ref. Outubro)",
+    datetime.date(2025, 10, 30): "Crédito do VA/VR (Ref. Novembro)",
+    datetime.date(2025, 11, 28): "Crédito do VA/VR (Ref. Dezembro)",
+    datetime.date(2025, 12, 30): "Crédito do VA/VR (Ref. Janeiro/26)",
+}
+
 # --- Funções de Lógica ---
 
 def verificar_eventos_proximos():
-    """Verifica se há feriados nos próximos 3 dias e retorna mensagens."""
+    """Verifica se há eventos nos próximos 3 dias e retorna mensagens."""
     hoje = datetime.date.today()
     mensagens = []
-    for data_evento, nome_evento in FERIADOS_2025.items():
+
+    # Junta os feriados e as datas de pagamento
+    todos_eventos = {**FERIADOS_2025, **DATAS_PAGAMENTO_VA_VR}
+
+    for data_evento, nome_evento in todos_eventos.items():
         delta = data_evento - hoje
         if 0 <= delta.days <= 3:
-            if delta.days == 0:
-                mensagem = f"🗓️ Hoje é {nome_evento}!"
-            elif delta.days == 1:
-                mensagem = f"🗓️ Amanhã é {nome_evento}!"
+            if "Crédito do VA/VR" in nome_evento:
+                emoji = "💰"
             else:
-                mensagem = f"🗓️ Faltam {delta.days} dias para {nome_evento}!"
+                emoji = "🗓️"
+
+            if delta.days == 0:
+                mensagem = f"{emoji} Hoje é {nome_evento}!"
+            elif delta.days == 1:
+                mensagem = f"{emoji} Amanhã é {nome_evento}!"
+            else:
+                mensagem = f"{emoji} Faltam {delta.days} dias para {nome_evento}!"
             mensagens.append(mensagem)
     return mensagens
 
