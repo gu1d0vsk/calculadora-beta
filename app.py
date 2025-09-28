@@ -2,6 +2,7 @@ import streamlit as st
 import datetime
 import time
 from eventos import *
+from mensagens import obter_mensagem_do_dia
 import requests
 import xml.etree.ElementTree as ET
 
@@ -19,20 +20,6 @@ def fetch_rss_titles(url):
     except (requests.RequestException, ET.ParseError) as e:
         print(f"Erro ao buscar RSS: {e}")
         return "Não foi possível carregar as notícias da Finep no momento."
-
-def obter_mensagem_do_dia():
-    """Retorna uma mensagem engraçada baseada no dia da semana."""
-    hoje = datetime.date.today().weekday() # Segunda é 0 e Domingo é 6
-    mensagens = {
-        0: "Segundou, EBA!'",
-        1: "Terça, a segunda-feira da semana.",
-        2: "Quarta-feira, semana praticamente encerrada.",
-        3: "Quinta-feira: a sexta está te adicionando.",
-        4: "Enfim sextou, qual a boa do fds?",
-        5: "É sábado 😴",
-        6: "Domingo 💤, qual plano de amanhã?"
-    }
-    return mensagens.get(hoje, "Calculadora de Jornada")
 
 
 def verificar_eventos_proximos():
