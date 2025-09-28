@@ -94,6 +94,10 @@ DATAS_ADIANTAMENTO_SALARIO = {
     datetime.date(2025, 12, 12): "Adiantamento Salarial (Dezembro)",
 }
 
+CESTA_NATALINA = {
+    datetime.date(2025, 12, 19): "Cesta Natalina",
+}
+
 # --- Funções de Lógica ---
 
 def verificar_eventos_proximos():
@@ -103,7 +107,7 @@ def verificar_eventos_proximos():
     eventos_agrupados = {}
 
     # Agrupa todos os eventos por data para evitar sobrescrita
-    todos_os_dicionarios = [FERIADOS_2025, DATAS_PAGAMENTO_VA_VR, DATAS_LIMITE_BENEFICIOS, DATAS_PAGAMENTO_SALARIO, DATAS_PAGAMENTO_13, DATAS_ADIANTAMENTO_SALARIO]
+    todos_os_dicionarios = [FERIADOS_2025, DATAS_PAGAMENTO_VA_VR, DATAS_LIMITE_BENEFICIOS, DATAS_PAGAMENTO_SALARIO, DATAS_PAGAMENTO_13, DATAS_ADIANTAMENTO_SALARIO, CESTA_NATALINA]
     for d in todos_os_dicionarios:
         for data, nome in d.items():
             if data not in eventos_agrupados:
@@ -114,7 +118,7 @@ def verificar_eventos_proximos():
         delta = data_evento - hoje
         if 0 <= delta.days <= 3:
             # Determina o emoji com base na prioridade do evento
-            if any("Crédito" in s or "Pagamento" in s or "13º" in s or "Adiantamento" in s for s in lista_nomes):
+            if any("Crédito" in s or "Pagamento" in s or "13º" in s or "Adiantamento" in s or "Cesta" in s for s in lista_nomes):
                 emoji = "💰"
             elif any("Data limite" in s for s in lista_nomes):
                 emoji = "❗️"
@@ -266,12 +270,7 @@ st.markdown("""
         text-align: center;
         margin-top: 1rem;
         margin-bottom: 0.5rem;
-        color: #005051; /* Cor para o tema claro (padrão) */
-    }
-
-    /* Streamlit adiciona a classe 'theme-dark' em um elemento pai quando o tema escuro está ativo */
-    .theme-dark .event-notification {
-        color: #dd4f05; /* Cor para o tema escuro */
+        color: #dd4f05; /* Cor fixa para a notificação */
     }
 
     /* Estilos para alertas customizados */
@@ -605,5 +604,4 @@ if st.session_state.show_results:
             st.error(f"Ocorreu um erro inesperado: {e}")
         finally:
             st.session_state.show_results = False # Reseta para a próxima recarga
-
 
