@@ -5,6 +5,21 @@ from eventos import *
 
 # --- Funções de Lógica ---
 
+def obter_mensagem_do_dia():
+    """Retorna uma mensagem engraçada baseada no dia da semana."""
+    hoje = datetime.date.today().weekday() # Segunda é 0 e Domingo é 6
+    mensagens = {
+        0: "Segundou com S de 'Socorro, já?'",
+        1: "Terça, a segunda-feira da semana.",
+        2: "Quarta-feira! O camelo da semana está passando.",
+        3: "Quinta-feira: a sexta está te adicionando.",
+        4: "Enfim sextou, qual a boa do fds?",
+        5: "Sabadou! Hoje o cálculo é de descanso.",
+        6: "Domingo, dia de pensar no que não fez."
+    }
+    return mensagens.get(hoje, "Calculadora de Jornada")
+
+
 def verificar_eventos_proximos():
     """Verifica se há eventos nos próximos 3 dias e retorna mensagens."""
     hoje = datetime.date.today()
@@ -310,7 +325,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-st.markdown('<p class="main-title">Calculadora de Jornada de Trabalho</p>', unsafe_allow_html=True)
+mensagem_do_dia = obter_mensagem_do_dia()
+st.markdown(f'<p class="main-title">{mensagem_do_dia}</p>', unsafe_allow_html=True)
 st.markdown('<p class="sub-title">Informe seus horários para calcular a jornada diária</p>', unsafe_allow_html=True)
 
 # --- Seção de Avisos de Eventos ---
