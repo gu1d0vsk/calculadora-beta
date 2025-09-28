@@ -137,21 +137,17 @@ st.markdown("""
         font-size: 1.25rem !important;
     }
 
-    /* Centraliza e anima o botão para evitar o 'salto' */
-    div[data-testid="stButton"] {
-        display: flex;
-        justify-content: center;
-        opacity: 0;
-        animation: fadeInSmooth 0.5s ease-out 0.1s forwards;
-    }
-
-    /* Estiliza o botão de cálculo */
-    div[data-testid="stButton"] > button {
-        background-color: rgb(221, 79, 5);
-        color: #FFFFFF;
-        width: 100%;
+    /* Estilos para os botões */
+    div[data-testid="stHorizontalBlock"] > div:nth-of-type(1) div[data-testid="stButton"] > button {
+        background-color: rgb(221, 79, 5); /* Cor do botão Calcular */
         border-radius: 4rem;
     }
+    div[data-testid="stHorizontalBlock"] > div:nth-of-type(2) div[data-testid="stButton"] > button {
+        background-color: rgb(0, 80, 81); /* Cor do botão Próximos Eventos */
+        color: #FFFFFF;
+        border-radius: 4rem;
+    }
+
     /* Arredonda as caixas de input e centraliza os labels */
     div[data-testid="stTextInput"] input {
         border-radius: 1.5rem !important;
@@ -179,68 +175,17 @@ st.markdown("""
         }
     }
     
-    /* Animação de fade-in para o botão */
-    @keyframes fadeInSmooth {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-    
-    /* Estilos para o ícone de notificação com tooltip */
-    .event-tooltip-container {
-        position: absolute;
-        top: 9rem;
-        right: 2rem;
-        z-index: 1000;
-    }
-
-    .event-tooltip-icon {
-        font-size: 1.75rem;
-        cursor: pointer;
-        position: relative;
-    }
-    
-    .event-tooltip-container .notification-dot {
-        position: absolute;
-        top: 2px;
-        right: 2px;
-        width: 10px;
-        height: 10px;
-        background-color: #dd4f05;
-        border-radius: 50%;
-        border: 2px solid white;
-    }
-
-    .event-tooltip-text {
-        visibility: hidden;
-        width: 300px;
-        background-color: #333;
-        color: #fff;
-        text-align: left;
-        border-radius: 8px;
+    /* Estilos para a lista de eventos */
+    .event-list-item {
+        background-color: #f0f2f6;
         padding: 10px;
-        position: absolute;
-        z-index: 1;
-        bottom: 130%;
-        right: 0;
-        opacity: 0;
-        transition: opacity 0.3s ease-in-out;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        font-size: 0.875rem;
+        border-radius: 10px;
+        margin-bottom: 5px;
+        text-align: center;
     }
-
-    .event-tooltip-text::after { /* Flecha */
-        content: " ";
-        position: absolute;
-        top: 100%;
-        right: 15px;
-        border-width: 5px;
-        border-style: solid;
-        border-color: #333 transparent transparent transparent;
-    }
-
-    .event-tooltip-container:hover .event-tooltip-text {
-        visibility: visible;
-        opacity: 1;
+    body.dark .event-list-item {
+        background-color: #262730;
+        color: #fafafa;
     }
 
     /* Estilos para alertas customizados */
@@ -362,11 +307,6 @@ st.markdown("""
         .summary-grid-container {
             grid-template-columns: repeat(2, 1fr); /* Passa para 2 colunas */
         }
-
-        .event-tooltip-container {
-            top: 10rem;
-            right: 1.5rem;
-        }
     }
 
     /* Estilos gerais para classes instáveis do Streamlit */
@@ -379,20 +319,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-
-# --- Seção de Avisos de Eventos ---
-mensagens_eventos = verificar_eventos_proximos()
-if mensagens_eventos:
-    tooltip_content = "<br>".join(mensagens_eventos)
-    st.markdown(f"""
-    <div class="event-tooltip-container">
-        <div class="event-tooltip-icon">
-            <span>🔔</span>
-            <span class="notification-dot"></span>
-        </div>
-        <div class="event-tooltip-text">{tooltip_content}</div>
-    </div>
-    """, unsafe_allow_html=True)
 
 mensagem_do_dia = obter_mensagem_do_dia()
 st.markdown(f'<p class="main-title">{mensagem_do_dia}</p>', unsafe_allow_html=True)
@@ -409,10 +335,35 @@ with col_main:
         retorno_almoco_str = st.text_input("Volta do Almoço", key="retorno_almoco")
     saida_real_str = st.text_input("Saída", key="saida_real")
 
-    # Botão centralizado via CSS
-    calculate_clicked = st.button("Calcular")
+    # Layout dos botões
+    col_calc, col_events = st.columns(2)
+    with col_calc:
+        calculate_clicked = st.button("Calcular", use_container_width=True)
+    with col_events:
+        events_clicked = st.button("Próximos Eventos", use_container_width=True)
 
-# Placeholder para os resultados
+# Placeholder para a lista de eventos
+events_placeholder = st.empty()
+
+# Lógica para mostrar/ocultar eventos
+if 'show_events' not in st.session_state:
+    st.session_state.show_events = False
+if events_clicked:
+    st.session_state.show_events = not st.session_state.show_events
+
+if st.session_state.show_events:
+    with events_placeholder.container():
+        st.markdown("---")
+        eventos = verificar_eventos_proximos()
+        if eventos:
+            for evento in eventos:
+                st.markdown(f"<div class='event-list-item'>{evento}</div>", unsafe_allow_html=True)
+        else:
+            st.info("Nenhum evento próximo nos próximos 3 dias.")
+        st.markdown("---")
+
+
+# Placeholder para os resultados do cálculo
 results_placeholder = st.empty()
 
 if 'show_results' not in st.session_state:
