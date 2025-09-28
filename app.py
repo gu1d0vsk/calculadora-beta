@@ -188,7 +188,7 @@ st.markdown("""
     /* Estilos para o ícone de notificação com tooltip */
     .event-tooltip-container {
         position: absolute;
-        top: 5rem;
+        top: 9rem;
         right: 2rem;
         z-index: 1000;
     }
@@ -297,7 +297,7 @@ st.markdown("""
         color: #31333f; /* Cor do texto padrão */
     }
     .metric-almoco {
-        background-color: rgb(255, 201, 173); /* Fundo para o almoço */
+        background-color: #F0F2F6; 
     }
     /* Cores para caixas de saldo e previsões */
     .metric-saldo-pos { background-color: rgb(84, 198, 121); }
@@ -361,6 +361,11 @@ st.markdown("""
         
         .summary-grid-container {
             grid-template-columns: repeat(2, 1fr); /* Passa para 2 colunas */
+        }
+
+        .event-tooltip-container {
+            top: 10rem;
+            right: 1.5rem;
         }
     }
 
