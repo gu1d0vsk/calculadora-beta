@@ -164,6 +164,7 @@ st.markdown("""
     div[data-testid="stTextInput"] input {
         border-radius: 1.5rem !important;
         text-align: center;
+        font-weight: 600;
     }
     .main div[data-testid="stTextInput"] > label {
         text-align: center !important; /* Força a centralização para sobrescrever temas */
@@ -201,7 +202,7 @@ st.markdown("""
         text-align: center;
         margin-top: 1rem;
         margin-bottom: 0.5rem;
-        color: #31333f;
+        color: #ef9a49;
     }
 
     /* Estilos para alertas customizados */
