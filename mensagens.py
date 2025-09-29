@@ -8,7 +8,7 @@ def obter_mensagem_do_dia():
         1: "Terça-feira 📌",
         2: "Quarta-feira, semana praticamente encerrada.",
         3: "Quinta-feira 📆",
-        4: "Sextou!",
+        4: "Sextou! Quem fez, fez.",
         5: "Sábado",
         6: "Domingo"
     }
