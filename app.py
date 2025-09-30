@@ -471,7 +471,17 @@ if st.session_state.show_results:
                 if hora_saida_real < hora_entrada:
                     raise ValueError("A Saída deve ser depois da Entrada.")
 
-                saida_almoco, retorno_almoco, duracao_almoco_minutos_real = None, None, 0
+                # Define os limites de tempo de trabalho (7h às 20h)
+                limite_inicio_jornada = hora_entrada.replace(hour=7, minute=0, second=0, microsecond=0)
+                limite_fim_jornada = hora_entrada.replace(hour=20, minute=0, second=0, microsecond=0)
+
+                # Ajusta a entrada e saída para estarem dentro dos limites permitidos (clipping)
+                entrada_valida = max(hora_entrada, limite_inicio_jornada)
+                saida_valida = min(hora_saida_real, limite_fim_jornada)
+
+                # Calcula a duração do almoço original
+                duracao_almoco_minutos_real = 0
+                saida_almoco, retorno_almoco = None, None
                 if saida_almoco_str and retorno_almoco_str:
                     saida_almoco = datetime.datetime.strptime(formatar_hora_input(saida_almoco_str), "%H:%M")
                     retorno_almoco = datetime.datetime.strptime(formatar_hora_input(retorno_almoco_str), "%H:%M")
@@ -479,8 +489,21 @@ if st.session_state.show_results:
                         raise ValueError("A volta do almoço deve ser depois da saída para o almoço.")
                     duracao_almoco_minutos_real = (retorno_almoco - saida_almoco).total_seconds() / 60
 
-                trabalho_bruto_minutos = (hora_saida_real - hora_entrada).total_seconds() / 60
-                tempo_trabalhado_efetivo = trabalho_bruto_minutos - duracao_almoco_minutos_real
+                # Calcula o tempo de almoço que de fato ocorreu DENTRO da jornada válida (7h-20h)
+                almoco_efetivo_minutos = 0
+                if saida_almoco and retorno_almoco:
+                    inicio_almoco_valido = max(saida_almoco, entrada_valida)
+                    fim_almoco_valido = min(retorno_almoco, saida_valida)
+                    if fim_almoco_valido > inicio_almoco_valido:
+                        almoco_efetivo_minutos = (fim_almoco_valido - inicio_almoco_valido).total_seconds() / 60
+
+                # Calcula o tempo bruto trabalhado DENTRO da jornada válida
+                trabalho_bruto_minutos = 0
+                if saida_valida > entrada_valida:
+                    trabalho_bruto_minutos = (saida_valida - entrada_valida).total_seconds() / 60
+
+                # O tempo efetivamente trabalhado é o tempo bruto MENOS o almoço que ocorreu nesse período
+                tempo_trabalhado_efetivo = trabalho_bruto_minutos - almoco_efetivo_minutos
 
                 if tempo_trabalhado_efetivo > 360: min_intervalo_real, termo_intervalo_real = 30, "almoço"
                 elif tempo_trabalhado_efetivo > 240: min_intervalo_real, termo_intervalo_real = 15, "intervalo"
@@ -492,11 +515,13 @@ if st.session_state.show_results:
                     valor_almoco_display = f"{min_intervalo_real:.0f}min*"
                     footnote = f"<p style='font-size: 0.75rem; color: gray; text-align: center; margin-top: 1rem;'>*O tempo de {termo_intervalo_real} foi de {duracao_almoco_minutos_real:.0f}min, mas para o cálculo da hora trabalhada foi considerado o valor mínimo para a jornada.</p>"
 
-
-                duracao_almoço_para_calculo = max(min_intervalo_real, duracao_almoco_minutos_real)
+                # O almoço para cálculo agora usa o tempo de almoço efetivo, não o real
+                duracao_almoço_para_calculo = max(min_intervalo_real, almoco_efetivo_minutos)
                 trabalho_liquido_minutos = trabalho_bruto_minutos - duracao_almoço_para_calculo
                 saldo_banco_horas_minutos = trabalho_liquido_minutos - 480
-                tempo_nucleo_minutos = calcular_tempo_nucleo(hora_entrada, hora_saida_real, saida_almoco, retorno_almoco)
+                
+                # Tempo no núcleo também precisa usar os horários válidos
+                tempo_nucleo_minutos = calcular_tempo_nucleo(entrada_valida, saida_valida, saida_almoco, retorno_almoco)
                 
                 # --- Construção dos Avisos ---
                 if tempo_nucleo_minutos < 300:
