@@ -500,6 +500,8 @@ if st.session_state.show_results:
                     warnings_html += '<div class="custom-warning">Atenção: Não cumpriu as 5h obrigatórias no período núcleo.</div>'
 
                 lista_de_permanencia = []
+                if hora_entrada.time() < datetime.time(7, 0):
+                    lista_de_permanencia.append("A entrada foi registrada antes das 7h")
                 if min_intervalo_real > 0 and duracao_almoco_minutos_real < min_intervalo_real:
                     lista_de_permanencia.append(f"O {termo_intervalo_real} foi inferior a {min_intervalo_real} minutos")
                 if trabalho_liquido_minutos > 600:
