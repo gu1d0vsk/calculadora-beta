@@ -581,4 +581,3 @@ if st.session_state.show_results:
         finally:
             st.session_state.show_results = False # Reseta para a próxima recarga
 
-
