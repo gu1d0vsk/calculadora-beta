@@ -457,6 +457,7 @@ if st.session_state.show_results:
             
             # --- Lógica para o Resumo do Dia ---
             footnote = ""
+            warnings_html = ""
             if saida_real_str:
                 hora_saida_real = datetime.datetime.strptime(formatar_hora_input(saida_real_str), "%H:%M")
                 if hora_saida_real < hora_entrada:
@@ -490,7 +491,6 @@ if st.session_state.show_results:
                 tempo_nucleo_minutos = calcular_tempo_nucleo(hora_entrada, hora_saida_real, saida_almoco, retorno_almoco)
                 
                 # --- Construção dos Avisos ---
-                warnings_html = ""
                 if tempo_nucleo_minutos < 300:
                     warnings_html += '<div class="custom-warning">Atenção: Não cumpriu as 5h obrigatórias no período núcleo.</div>'
 
