@@ -76,10 +76,11 @@ def formatar_hora_input(input_str):
     return f"{input_str[:2]}:{input_str[2:]}"
 
 def calcular_tempo_nucleo(entrada, saida, saida_almoco, retorno_almoco):
-    """Calcula o tempo trabalhado dentro do horário núcleo (9h às 18h)."""
+    """Calcula o tempo trabalhado dentro do horário núcleo (9h às 18h), descontando o almoço."""
     nucleo_inicio = entrada.replace(hour=9, minute=0, second=0, microsecond=0)
     nucleo_fim = entrada.replace(hour=18, minute=0, second=0, microsecond=0)
     
+    # Período efetivamente trabalhado dentro do núcleo
     inicio_trabalho_nucleo = max(entrada, nucleo_inicio)
     fim_trabalho_nucleo = min(saida, nucleo_fim)
     
@@ -87,18 +88,19 @@ def calcular_tempo_nucleo(entrada, saida, saida_almoco, retorno_almoco):
         return 0
         
     tempo_bruto_nucleo_segundos = (fim_trabalho_nucleo - inicio_trabalho_nucleo).total_seconds()
-    tempo_bruto_nucleo_minutos = tempo_bruto_nucleo_segundos / 60
     
-    tempo_almoco_nucleo_minutos = 0
+    tempo_almoco_no_nucleo_segundos = 0
     if saida_almoco and retorno_almoco:
-        inicio_almoco_nucleo = max(saida_almoco, nucleo_inicio)
-        fim_almoco_nucleo = min(retorno_almoco, nucleo_fim)
-        if inicio_almoco_nucleo < fim_almoco_nucleo:
-            tempo_almoco_nucleo_segundos = (fim_almoco_nucleo - inicio_almoco_nucleo).total_seconds()
-            tempo_almoco_nucleo_minutos = tempo_almoco_nucleo_segundos / 60
+        # Calcula a sobreposição (interseção) do almoço com o período TRABALHADO no núcleo
+        inicio_almoco_sobreposicao = max(inicio_trabalho_nucleo, saida_almoco)
+        fim_almoco_sobreposicao = min(fim_trabalho_nucleo, retorno_almoco)
+        
+        if fim_almoco_sobreposicao > inicio_almoco_sobreposicao:
+            tempo_almoco_no_nucleo_segundos = (fim_almoco_sobreposicao - inicio_almoco_sobreposicao).total_seconds()
             
-    tempo_liquido_nucleo = tempo_bruto_nucleo_minutos - tempo_almoco_nucleo_minutos
-    return max(0, tempo_liquido_nucleo)
+    tempo_liquido_nucleo_segundos = tempo_bruto_nucleo_segundos - tempo_almoco_no_nucleo_segundos
+    
+    return max(0, tempo_liquido_nucleo_segundos / 60)
 
 def formatar_duracao(minutos):
     """Formata uma duração em minutos para o formato Xh Ymin."""
