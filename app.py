@@ -456,7 +456,7 @@ if st.session_state.show_results:
             """
             
             # --- Lógica para o Resumo do Dia ---
-            warnings_html = ""
+            footnote = ""
             if saida_real_str:
                 hora_saida_real = datetime.datetime.strptime(formatar_hora_input(saida_real_str), "%H:%M")
                 if hora_saida_real < hora_entrada:
@@ -477,12 +477,20 @@ if st.session_state.show_results:
                 elif tempo_trabalhado_efetivo > 240: min_intervalo_real, termo_intervalo_real = 15, "intervalo"
                 else: min_intervalo_real, termo_intervalo_real = 0, "intervalo"
 
+                # Lógica da nota de rodapé
+                valor_almoco_display = f"{duracao_almoco_minutos_real:.0f}min"
+                if min_intervalo_real > 0 and duracao_almoco_minutos_real < min_intervalo_real:
+                    valor_almoco_display = f"{min_intervalo_real:.0f}min*"
+                    footnote = f"<p style='font-size: 0.75rem; color: gray; text-align: center; margin-top: 1rem;'>*O tempo de {termo_intervalo_real} foi de {duracao_almoco_minutos_real:.0f}min, mas para o cálculo da hora trabalhada foi considerado o valor mínimo para a jornada.</p>"
+
+
                 duracao_almoço_para_calculo = max(min_intervalo_real, duracao_almoco_minutos_real)
                 trabalho_liquido_minutos = trabalho_bruto_minutos - duracao_almoço_para_calculo
                 saldo_banco_horas_minutos = trabalho_liquido_minutos - 480
                 tempo_nucleo_minutos = calcular_tempo_nucleo(hora_entrada, hora_saida_real, saida_almoco, retorno_almoco)
                 
                 # --- Construção dos Avisos ---
+                warnings_html = ""
                 if tempo_nucleo_minutos < 300:
                     warnings_html += '<div class="custom-warning">Atenção: Não cumpriu as 5h obrigatórias no período núcleo.</div>'
 
@@ -529,7 +537,7 @@ if st.session_state.show_results:
                         </div>
                         <div class="metric-custom metric-almoco">
                             <div class="label">Tempo de {termo_intervalo_real}</div>
-                            <div class="value">{duracao_almoco_minutos_real:.0f}min</div>
+                            <div class="value">{valor_almoco_display}</div>
                         </div>
                         <div class="metric-custom {saldo_css_class}">
                             <div class="label">Saldo do Dia</div>
@@ -538,6 +546,7 @@ if st.session_state.show_results:
                     </div>
                     """
                     st.markdown(summary_grid_html, unsafe_allow_html=True)
+                    st.markdown(footnote, unsafe_allow_html=True)
 
                 # Exibe os avisos (se houver)
                 st.markdown(warnings_html, unsafe_allow_html=True)
