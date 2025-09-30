@@ -336,6 +336,9 @@ mensagem_do_dia = obter_mensagem_do_dia()
 st.markdown(f'<p class="main-title">{mensagem_do_dia}</p>', unsafe_allow_html=True)
 st.markdown('<p class="sub-title">Informe seus horários para calcular a jornada diária</p>', unsafe_allow_html=True)
 
+# Verifica eventos próximos ANTES de renderizar os botões
+mensagens_eventos = verificar_eventos_proximos()
+
 # Layout dos campos de entrada com colunas para limitar a largura
 col_buffer_1, col_main, col_buffer_2 = st.columns([1, 6, 1])
 with col_main:
@@ -352,7 +355,9 @@ with col_main:
     with col_calc:
         calculate_clicked = st.button("Calcular", use_container_width=True)
     with col_events:
-        events_clicked = st.button("Próximos Eventos", use_container_width=True)
+        # Adiciona um indicador se houver eventos
+        event_button_text = "Próximos Eventos 🗓️" if mensagens_eventos else "Próximos Eventos"
+        events_clicked = st.button(event_button_text, use_container_width=True)
 
 # Placeholder para a lista de eventos
 events_placeholder = st.empty()
@@ -365,17 +370,15 @@ if events_clicked:
 
 if st.session_state.show_events:
     with events_placeholder.container():
-        eventos = verificar_eventos_proximos()
-        
-        # Envolve a lista em um container com a classe 'visible' para a animação
-        event_html = "<div class='event-list-container visible'>"
-        if eventos:
-            for evento in eventos:
+        # Reutiliza a variável `mensagens_eventos` já calculada
+        if mensagens_eventos:
+            event_html = "<div class='event-list-container visible'>"
+            for evento in mensagens_eventos:
                 event_html += f"<div class='event-list-item'>{evento}</div>"
+            event_html += "</div>"
+            st.markdown(event_html, unsafe_allow_html=True)
         else:
-            event_html += '<div class="event-list-item" style="border: 1px solid #9AD8E1; background-color: #F0F8FF; color: #0E4953;">Nenhum evento próximo nos próximos 12 dias.</div>'
-        event_html += "</div>"
-        st.markdown(event_html, unsafe_allow_html=True)
+            st.info("Nenhum evento próximo nos próximos 12 dias.")
 
         # Script de rolagem
         st.components.v1.html("""
@@ -577,4 +580,5 @@ if st.session_state.show_results:
             st.error(f"Ocorreu um erro inesperado: {e}")
         finally:
             st.session_state.show_results = False # Reseta para a próxima recarga
+
 
