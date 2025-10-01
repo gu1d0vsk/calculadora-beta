@@ -325,8 +325,8 @@ st.markdown("""
     .st-av {    border-top-right-radius: 1.5rem;}
     .st-au {    border-bottom-left-radius: 1.5rem;}
     .st-at {    border-top-left-radius: 1.5rem;}
-    .st-emotion-cache-yinll1 svg {        display: none;} 
-    .st-emotion-cache-yinll1 svg { display: none;}
+    .st-emotion-cache-yinll1 svg { display: none; } 
+    .st-emotion-cache-ubko3j svg { display: none; }
 </style>
 """, unsafe_allow_html=True)
 
