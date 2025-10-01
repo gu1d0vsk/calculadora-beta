@@ -139,23 +139,16 @@ st.markdown("""
         font-size: 1.25rem !important;
     }
 
-    /* Container dos botões principais */
-    .main-buttons-container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.75rem;
-    }
-
-    /* Estilos para os botões principais */
-    .main-buttons-container div[data-testid="stButton"] > button {
-        border-radius: 4rem;
-        color: #FFFFFF !important;
-    }
-    .main-buttons-container > div:nth-of-type(1) div[data-testid="stButton"] > button {
+    /* Estilos para os botões */
+    div[data-testid="stHorizontalBlock"] > div:nth-of-type(1) div[data-testid="stButton"] > button {
         background-color: rgb(221, 79, 5) !important; /* Cor do botão Calcular */
+        color: #FFFFFF !important;
+        border-radius: 4rem;
     }
-    .main-buttons-container > div:nth-of-type(2) div[data-testid="stButton"] > button {
+    div[data-testid="stHorizontalBlock"] > div:nth-of-type(2) div[data-testid="stButton"] > button {
         background-color: rgb(0, 80, 81) !important; /* Cor do botão Próximos Eventos */
+        color: #FFFFFF !important;
+        border-radius: 4rem;
     }
 
     /* Arredonda as caixas de input e centraliza os labels */
@@ -169,20 +162,6 @@ st.markdown("""
         width: 100%;
         display: block;
     }
-    
-    /* Estilo para o botão de prever */
-    .predict-button button {
-        border: none !important;
-        background-color: transparent !important;
-        color: #888;
-        font-size: 1.75rem;
-        padding: 0 !important;
-        margin-top: 1.75rem; /* Alinhamento vertical */
-    }
-    .predict-button button:hover {
-        color: #dd4f05 !important;
-    }
-
 
     /* Animação de fade-in para os resultados */
     .results-container {
@@ -346,9 +325,8 @@ st.markdown("""
     .st-av {    border-top-right-radius: 1.5rem;}
     .st-au {    border-bottom-left-radius: 1.5rem;}
     .st-at {    border-top-left-radius: 1.5rem;}
-    .st-emotion-cache-yinll1 svg, .st-emotion-cache-ubko3j svg {
-        display: none;
-    } 
+    .st-emotion-cache-yinll1 svg { display: none; } 
+    .st-emotion-cache-ubko3j svg { display: none; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -363,14 +341,7 @@ mensagens_eventos = verificar_eventos_proximos()
 # Layout dos campos de entrada com colunas para limitar a largura
 col_buffer_1, col_main, col_buffer_2 = st.columns([1, 6, 1])
 with col_main:
-    col_entrada, col_prever = st.columns([5, 1])
-    with col_entrada:
-        entrada_str = st.text_input("Entrada", key="entrada", help="formatos aceitos:\nHMM, HHMM ou HH:MM")
-    with col_prever:
-        st.markdown('<div class="predict-button">', unsafe_allow_html=True)
-        prever_clicked = st.button("🔮", help="Calcular previsões de saída")
-        st.markdown('</div>', unsafe_allow_html=True)
-
+    entrada_str = st.text_input("Entrada", key="entrada", help="formatos aceitos:\nHMM, HHMM ou HH:MM")
     col1, col2 = st.columns(2)
     with col1:
         saida_almoco_str = st.text_input("Saída para o Almoço", key="saida_almoco")
@@ -379,7 +350,6 @@ with col_main:
     saida_real_str = st.text_input("Saída", key="saida_real")
 
     # Layout dos botões
-    st.markdown('<div class="main-buttons-container">', unsafe_allow_html=True)
     col_calc, col_events = st.columns(2)
     with col_calc:
         calculate_clicked = st.button("Calcular", use_container_width=True)
@@ -387,8 +357,6 @@ with col_main:
         # Adiciona um indicador se houver eventos
         event_button_text = "Próximos Eventos 🗓️" if mensagens_eventos else "Próximos Eventos"
         events_clicked = st.button(event_button_text, use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
 
 # Placeholder para a lista de eventos
 events_placeholder = st.empty()
@@ -430,7 +398,7 @@ results_placeholder = st.empty()
 if 'show_results' not in st.session_state:
     st.session_state.show_results = False
 
-if calculate_clicked or prever_clicked:
+if calculate_clicked:
     st.session_state.show_results = True
 
 if st.session_state.show_results:
