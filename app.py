@@ -3,9 +3,42 @@ import datetime
 import time
 from eventos import *
 from mensagens import obter_mensagem_do_dia
-import pytz # Importa a biblioteca de fuso horário
+import requests
+import pytz
 
 # --- Funções de Lógica ---
+
+@st.cache_data(ttl=3600) # Cache de 1 hora para não sobrecarregar a API
+def get_weather_forecast(exit_time):
+    """Busca a previsão de chuva para um horário específico no Rio de Janeiro."""
+    try:
+        # Coordenadas para Praia do Flamengo, 200, Rio de Janeiro
+        lat = -22.93
+        lon = -43.17
+        fuso_horario_brasil = "America/Sao_Paulo"
+
+        url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly=precipitation_probability&timezone={fuso_horario_brasil}"
+
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+
+        hourly_data = data['hourly']
+        times = hourly_data['time']
+        probabilities = hourly_data['precipitation_probability']
+
+        # Formata a hora de saída para corresponder ao formato da API (YYYY-MM-DDTHH:00)
+        target_time_str = exit_time.strftime('%Y-%m-%dT%H:00')
+
+        if target_time_str in times:
+            index = times.index(target_time_str)
+            rain_prob = probabilities[index]
+            if rain_prob >= 40: # Limite de 40% para o aviso
+                return f"☔ Leve o guarda-chuva! Há {rain_prob}% de chance de chuva por volta das {exit_time.strftime('%H:%M')}."
+        return "" # Retorna string vazia se não houver chuva prevista ou o horário não for encontrado
+    except Exception as e:
+        print(f"Erro ao buscar previsão do tempo: {e}")
+        return "" # Retorna string vazia em caso de erro
 
 def obter_artigo(nome_evento):
     """Determina o artigo correto (o/a) para um nome de evento."""
@@ -548,6 +581,12 @@ if st.session_state.show_results:
                         <p>{motivos_texto}</p>
                     </div>
                     """
+                
+                # Aviso de Chuva
+                weather_warning = get_weather_forecast(saida_valida)
+                if weather_warning:
+                    warnings_html += f'<div class="custom-warning">{weather_warning}</div>'
+
             
             # --- Seção de Renderização ---
             with results_placeholder.container():
@@ -606,5 +645,4 @@ if st.session_state.show_results:
             st.error(f"Ocorreu um erro inesperado: {e}")
         finally:
             st.session_state.show_results = False # Reseta para a próxima recarga
-
 
