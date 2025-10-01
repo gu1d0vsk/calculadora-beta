@@ -327,8 +327,8 @@ st.markdown("""
     .st-at {    border-top-left-radius: 1.5rem;}
     .st-emotion-cache-yinll1 svg { display: none; } 
     .st-emotion-cache-ubko3j svg { display: none; }
-    ._profileImage_gzau3_78._darkThemeShadow_gzau3_91 {  display: none;}
-._container_gzau3_1._viewerBadge_nim44_23 {  display: none;}
+    ._profileImage_gzau3_78._darkThemeShadow_gzau3_91 {  display: none !important;}
+._container_gzau3_1._viewerBadge_nim44_23 {  display: none !important;}
 
 </style>
 """, unsafe_allow_html=True)
