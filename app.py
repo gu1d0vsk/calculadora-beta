@@ -42,7 +42,7 @@ def get_weather_forecast(exit_time):
             index = times.index(target_time_str)
             rain_prob = probabilities[index]
             # Limite alterado para 0% para fins de teste de estilo
-            if rain_prob >= 40%:
+            if rain_prob >= 40:
                 return f"☔ Leve o guarda-chuva! Há {rain_prob}% de chance de chuva por volta das {exit_time.strftime('%H:%M')}."
         return "" # Retorna string vazia se não houver chuva prevista ou o horário não for encontrado
     except Exception as e:
