@@ -33,13 +33,15 @@ def get_weather_forecast(exit_time):
         if target_time_str in times:
             index = times.index(target_time_str)
             rain_prob = probabilities[index]
-            # Limite alterado para 0% para fins de teste de estilo
-            if rain_prob >= 0: 
+            # Limite de 40% para o aviso. Mude para 0 para testar o estilo.
+            if rain_prob >= 40: 
                 return f"☔ Leve o guarda-chuva! Há {rain_prob}% de chance de chuva por volta das {exit_time.strftime('%H:%M')}."
         return "" # Retorna string vazia se não houver chuva prevista ou o horário não for encontrado
+    except requests.exceptions.RequestException:
+        return "🌧️ Não foi possível obter a previsão do tempo. Verifique sua conexão."
     except Exception as e:
         print(f"Erro ao buscar previsão do tempo: {e}")
-        return "" # Retorna string vazia em caso de erro
+        return "🌧️ Ocorreu um erro ao buscar a previsão do tempo."
 
 def obter_artigo(nome_evento):
     """Determina o artigo correto (o/a) para um nome de evento."""
