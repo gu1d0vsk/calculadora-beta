@@ -27,6 +27,7 @@ def get_weather_forecast(exit_time):
         times = hourly_data['time']
         probabilities = hourly_data['precipitation_probability']
 
+        # --- INÍCIO DA CORREÇÃO ---
         # Combina a data de hoje (com fuso horário) com a hora de saída informada
         fuso = pytz.timezone(fuso_horario_brasil)
         hoje = datetime.datetime.now(fuso).date()
@@ -35,27 +36,26 @@ def get_weather_forecast(exit_time):
 
         # Formata a hora de saída para corresponder ao formato da API (YYYY-MM-DDTHH:00)
         target_time_str = timestamp_completo.strftime('%Y-%m-%dT%H:00')
+        # --- FIM DA CORREÇÃO ---
 
         if target_time_str in times:
             index = times.index(target_time_str)
             rain_prob = probabilities[index]
-            # Limite de 40% para o aviso. Mude para 0 para testar o estilo.
-            if rain_prob >= 40: 
+            # Limite alterado para 0% para fins de teste de estilo
+            if rain_prob >= 0:
                 return f"☔ Leve o guarda-chuva! Há {rain_prob}% de chance de chuva por volta das {exit_time.strftime('%H:%M')}."
         return "" # Retorna string vazia se não houver chuva prevista ou o horário não for encontrado
-    except requests.exceptions.RequestException:
-        return "🌧️ Não foi possível obter a previsão do tempo. Verifique sua conexão."
     except Exception as e:
         print(f"Erro ao buscar previsão do tempo: {e}")
-        return "🌧️ Ocorreu um erro ao buscar a previsão do tempo."
+        return "" # Retorna string vazia em caso de erro
 
 def obter_artigo(nome_evento):
     """Determina o artigo correto (o/a) para um nome de evento."""
     nome_lower = nome_evento.lower()
     # Palavras-chave femininas que geralmente definem o gênero da frase
     femininas = [
-        "confraternização", "paixão", "independência", "república", 
-        "consciência", "compensação", "volta", "saída", "data", 
+        "confraternização", "paixão", "independência", "república",
+        "consciência", "compensação", "volta", "saída", "data",
         "parcela", "cesta", "jornada"
     ]
     if any(palavra in nome_lower for palavra in femininas):
@@ -94,7 +94,7 @@ def verificar_eventos_proximos():
                 nome_limpo = nome.split('(')[0].strip()
                 artigo = obter_artigo(nome_limpo)
                 nomes_com_artigo.append(f"{artigo} {nome_limpo}")
-            
+
             nome_evento_final = " e ".join(nomes_com_artigo)
 
             if delta.days == 0:
@@ -111,39 +111,39 @@ def formatar_hora_input(input_str):
     input_str = input_str.strip()
     if ':' in input_str:
         return input_str
-    
+
     if len(input_str) == 3:
         input_str = '0' + input_str
     if len(input_str) != 4 or not input_str.isdigit():
         raise ValueError("Formato de hora inválido.")
-    
+
     return f"{input_str[:2]}:{input_str[2:]}"
 
 def calcular_tempo_nucleo(entrada, saida, saida_almoco, retorno_almoco):
     """Calcula o tempo trabalhado dentro do horário núcleo (9h às 18h), descontando o almoço."""
     nucleo_inicio = entrada.replace(hour=9, minute=0, second=0, microsecond=0)
     nucleo_fim = entrada.replace(hour=18, minute=0, second=0, microsecond=0)
-    
+
     # Período efetivamente trabalhado dentro do núcleo
     inicio_trabalho_nucleo = max(entrada, nucleo_inicio)
     fim_trabalho_nucleo = min(saida, nucleo_fim)
-    
+
     if inicio_trabalho_nucleo >= fim_trabalho_nucleo:
         return 0
-        
+
     tempo_bruto_nucleo_segundos = (fim_trabalho_nucleo - inicio_trabalho_nucleo).total_seconds()
-    
+
     tempo_almoco_no_nucleo_segundos = 0
     if saida_almoco and retorno_almoco:
         # Calcula a sobreposição (interseção) do almoço com o período TRABALHADO no núcleo
         inicio_almoco_sobreposicao = max(inicio_trabalho_nucleo, saida_almoco)
         fim_almoco_sobreposicao = min(fim_trabalho_nucleo, retorno_almoco)
-        
+
         if fim_almoco_sobreposicao > inicio_almoco_sobreposicao:
             tempo_almoco_no_nucleo_segundos = (fim_almoco_sobreposicao - inicio_almoco_sobreposicao).total_seconds()
-            
+
     tempo_liquido_nucleo_segundos = tempo_bruto_nucleo_segundos - tempo_almoco_no_nucleo_segundos
-    
+
     return max(0, tempo_liquido_nucleo_segundos / 60)
 
 def formatar_duracao(minutos):
@@ -654,4 +654,3 @@ if st.session_state.show_results:
             st.error(f"Ocorreu um erro inesperado: {e}")
         finally:
             st.session_state.show_results = False # Reseta para a próxima recarga
-
