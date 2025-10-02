@@ -187,7 +187,7 @@ st.markdown("""
     body.dark .event-list-item { background-color: #cacaca3b; color: #fafafa; }
     /* Estilos para alertas customizados */
     .custom-warning, .custom-error { border-radius: 1.5rem; padding: 1rem; margin-top: 1rem; text-align: center; }
-    .custom-warning { background-color: rgba(255, 170, 0, 0.15); border: 1px solid #ffaa00; color: #ffbf3f; }
+    .custom-warning { background-color: rgba(255, 170, 0, 0.15); border: 1px solid #ffaa0000; color: rgb(247, 185, 61, 0); }
     .custom-error { background-color: rgba(255, 108, 108, 0.15); border: 1px solid rgb(255, 108, 108); color: rgb(255, 75, 75); }
     .custom-error p { margin: 0.5rem 0 0 0; }
     /* Oculta o ícone de âncora/link nos cabeçalhos de forma mais específica */
