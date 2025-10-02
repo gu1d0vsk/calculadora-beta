@@ -251,7 +251,7 @@ st.markdown("""
     .custom-warning {
         background-color: rgba(255, 170, 0, 0.15);
         border: 1px solid #ffaa00;
-        color: #31333f;
+        color: #ffbf3f; /* <<< COR DO TEXTO ALTERADA */
     }
     .custom-error {
         background-color: rgba(255, 108, 108, 0.15);
