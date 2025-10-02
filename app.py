@@ -183,8 +183,8 @@ st.markdown("""
     .event-list-container.visible { animation: fadeIn 0.5s ease-out forwards; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
     /* Estilos para a lista de eventos */
-    .event-list-item { background-color: #cacaca3b; padding: 10px; border-radius: 1.5rem; margin-bottom: 5px; text-align: center; }
-    body.dark .event-list-item { background-color: #cacaca3b; color: #fafafa; }
+    .event-list-item { background-color: #cacaca3b00; padding: 10px; border-radius: 1.5rem; margin-bottom: 5px; text-align: center; }
+    body.dark .event-list-item { background-color: #cacaca3b00; color: #fafafa; }
     /* Estilos para alertas customizados */
     .custom-warning, .custom-error { border-radius: 1.5rem; padding: 1rem; margin-top: 1rem; text-align: center; }
     .custom-warning { background-color: rgba(255, 170, 0, 0); border: 1px solid #ffaa0000; color: rgb(247, 185, 61); }
