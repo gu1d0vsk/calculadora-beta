@@ -27,8 +27,14 @@ def get_weather_forecast(exit_time):
         times = hourly_data['time']
         probabilities = hourly_data['precipitation_probability']
 
+        # Combina a data de hoje (com fuso horário) com a hora de saída informada
+        fuso = pytz.timezone(fuso_horario_brasil)
+        hoje = datetime.datetime.now(fuso).date()
+        hora_saida = exit_time.time()
+        timestamp_completo = datetime.datetime.combine(hoje, hora_saida)
+
         # Formata a hora de saída para corresponder ao formato da API (YYYY-MM-DDTHH:00)
-        target_time_str = exit_time.strftime('%Y-%m-%dT%H:00')
+        target_time_str = timestamp_completo.strftime('%Y-%m-%dT%H:00')
 
         if target_time_str in times:
             index = times.index(target_time_str)
