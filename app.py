@@ -30,7 +30,7 @@ def get_weather_forecast(exit_time):
         if target_time_str in times:
             index = times.index(target_time_str)
             rain_prob = probabilities[index]
-            if rain_prob >= 0:
+            if rain_prob >= 40:
                 return f"☔ Leve o guarda-chuva! Há {rain_prob}% de chance de chuva por volta das {exit_time.strftime('%H:%M')}."
         return ""
     except Exception as e:
