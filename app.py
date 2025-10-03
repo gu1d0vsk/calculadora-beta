@@ -62,21 +62,42 @@ def get_weather_icon(wmo_code):
 # FUNÇÃO DE CLIMA DIÁRIO ATUALIZADA
 @st.cache_data(ttl=10800) # Cache de 3 horas
 def get_daily_weather():
-    """Busca a previsão de temperatura e ícone para o dia no Rio de Janeiro."""
+    """Busca a previsão de temperatura, chuva, UV e ícone para o dia no Rio de Janeiro."""
     try:
         lat = -22.93
         lon = -43.17
         fuso_horario_brasil = "America/Sao_Paulo"
-        url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone={fuso_horario_brasil}&forecast_days=1"
+        
+        # URL ATUALIZADA para incluir chance de chuva e índice UV
+        url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,uv_index_max&timezone={fuso_horario_brasil}&forecast_days=1"
+
         response = requests.get(url, timeout=10)
         response.raise_for_status()
         data = response.json()
+
+        # Extraindo todos os dados
         daily_data = data['daily']
         temp_min = daily_data['temperature_2m_min'][0]
         temp_max = daily_data['temperature_2m_max'][0]
         weather_code = daily_data['weather_code'][0]
+        rain_prob = daily_data['precipitation_probability_max'][0]
+        uv_index = daily_data['uv_index_max'][0]
+
         icon = get_weather_icon(weather_code)
-        return f"{icon} Hoje no Rio: Mínima de {temp_min:.0f}°C e Máxima de {temp_max:.0f}°C"
+
+        # Construindo o texto parte por parte
+        forecast_parts = [
+            f"{icon} Hoje no Rio: Mínima de {temp_min:.0f}°C e Máxima de {temp_max:.0f}°C",
+            f"💧 {rain_prob:.0f}%"
+        ]
+
+        # Adiciona o alerta de UV apenas se for alto (>= 6)
+        if uv_index >= 6:
+            forecast_parts.append(f"🥵 UV Alto ({uv_index:.1f})")
+
+        # Juntando tudo com um separador
+        return " | ".join(forecast_parts)
+        
     except Exception as e:
         print(f"Erro ao buscar previsão diária: {e}")
         return ""
@@ -220,7 +241,7 @@ st.markdown("""
         .predictions-grid-container { grid-template-columns: repeat(2, 1fr); }
         .predictions-grid-container .metric-minimo { order: 2; }
         .predictions-grid-container .metric-padrao { order: 1; grid-column: 1 / -1; }
-        .predictions-grid-container .metric-maximo { order: 3; }
+        .predictions_grid-container .metric-maximo { order: 3; }
         .summary-grid-container { grid-template-columns: repeat(2, 1fr); }
     }
     /* Estilos gerais para classes instáveis do Streamlit */
