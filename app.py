@@ -210,6 +210,17 @@ st.markdown("""
         .predictions-grid-container .metric-maximo { order: 3; }
         .summary-grid-container { grid-template-columns: repeat(2, 1fr); }
     }
+
+    /* Estilos gerais para classes instáveis do Streamlit */
+    .st-bv {    font-weight: 800;}
+    .st-ay {    font-size: 1.3rem;}
+    .st-aw {    border-bottom-right-radius: 1.5rem;}
+    .st-av {    border-top-right-radius: 1.5rem;}
+    .st-au {    border-bottom-left-radius: 1.5rem;}
+    .st-at {    border-top-left-radius: 1.5rem;}
+    .st-emotion-cache-yinll1 svg { display: none; } 
+    .st-emotion-cache-ubko3j svg { display: none; }
+
 </style>
 """, unsafe_allow_html=True)
 
