@@ -356,10 +356,14 @@ if st.session_state.show_results:
                 if tempo_trabalhado_efetivo > 360: min_intervalo_real, termo_intervalo_real = 30, "almoço"
                 elif tempo_trabalhado_efetivo > 240: min_intervalo_real, termo_intervalo_real = 15, "intervalo"
                 else: min_intervalo_real, termo_intervalo_real = 0, "intervalo"
+                
+                # --- LÓGICA ALTERADA ---
                 valor_almoco_display = f"{duracao_almoco_minutos_real:.0f}min"
                 if min_intervalo_real > 0 and duracao_almoco_minutos_real < min_intervalo_real:
-                    valor_almoco_display = f"{min_intervalo_real:.0f}min*"
-                    footnote = f"<p style='font-size: 0.75rem; color: gray; text-align: center; margin-top: 1rem;'>*O tempo de {termo_intervalo_real} foi de {duracao_almoco_minutos_real:.0f}min, mas para o cálculo da hora trabalhada foi considerado o valor mínimo para a jornada.</p>"
+                    valor_almoco_display = f"{duracao_almoco_minutos_real:.0f}min*"
+                    footnote = f"<p style='font-size: 0.75rem; color: gray; text-align: center; margin-top: 1rem;'>*Seu tempo de {termo_intervalo_real} foi menor que o mínimo de {min_intervalo_real} minutos. Para o cálculo do saldo, foi considerado o valor mínimo obrigatório.</p>"
+                # --- FIM DA LÓGICA ALTERADA ---
+                
                 duracao_almoço_para_calculo = max(min_intervalo_real, almoco_efetivo_minutos)
                 trabalho_liquido_minutos = trabalho_bruto_minutos - duracao_almoço_para_calculo
                 saldo_banco_horas_minutos = trabalho_liquido_minutos - 480
