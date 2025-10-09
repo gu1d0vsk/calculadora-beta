@@ -116,7 +116,9 @@ def verificar_eventos_proximos():
     hoje = datetime.datetime.now(fuso_horario_brasil).date()
     mensagens = []
     eventos_agrupados = {}
-    todos_os_dicionarios = [FERIADOS_2025, DATAS_PAGAMENTO_VA_VR, DATAS_LIMITE_BENEFICIOS, DATAS_PAGamento_SALARIO, DATAS_PAGAMENTO_13, DATAS_ADIANTAMENTO_SALARIO, CESTA_NATALINA]
+    # --- LINHA CORRIGIDA ---
+    todos_os_dicionarios = [FERIADOS_2025, DATAS_PAGAMENTO_VA_VR, DATAS_LIMITE_BENEFICIOS, DATAS_PAGAMENTO_SALARIO, DATAS_PAGAMENTO_13, DATAS_ADIANTAMENTO_SALARIO, CESTA_NATALINA]
+    # --- FIM DA CORREÇÃO ---
     for d in todos_os_dicionarios:
         for data, nome in d.items():
             if data not in eventos_agrupados:
@@ -221,7 +223,6 @@ st.markdown("""
     .predictions-grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
     .summary-grid-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
     
-    /* --- NOVOS ESTILOS --- */
     .predictions-wrapper {
         transition: opacity 0.4s ease-out, transform 0.4s ease-out, padding 0.4s ease-out;
     }
@@ -231,7 +232,6 @@ st.markdown("""
         padding-bottom: 1rem;
         margin-bottom: 1rem;
     }
-    /* --- FIM DOS NOVOS ESTILOS --- */
 
     @media (max-width: 640px) {
         .predictions-grid-container { grid-template-columns: repeat(2, 1fr); }
@@ -306,9 +306,7 @@ if st.session_state.show_results:
         try:
             hora_entrada = datetime.datetime.strptime(formatar_hora_input(entrada_str), "%H:%M")
             
-            # --- LÓGICA DE FOCO (INÍCIO) ---
             predictions_container_class = "predictions-wrapper"
-            # --- LÓGICA DE FOCO (FIM) ---
 
             limite_saida = hora_entrada.replace(hour=20, minute=0, second=0, microsecond=0)
             duracao_almoço_previsao = 0
@@ -361,9 +359,7 @@ if st.session_state.show_results:
             footnote = ""
             warnings_html = ""
             if saida_real_str:
-                # --- LÓGICA DE FOCO (INÍCIO) ---
                 predictions_container_class += " de-emphasized"
-                # --- LÓGICA DE FOCO (FIM) ---
                 
                 hora_saida_real = datetime.datetime.strptime(formatar_hora_input(saida_real_str), "%H:%M")
                 if hora_saida_real < hora_entrada:
