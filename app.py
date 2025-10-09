@@ -85,8 +85,6 @@ def get_daily_weather():
             f"💧 {rain_prob:.0f}%"
         ]
         
-        # --- LÓGICA ALTERADA ---
-        # Adiciona a informação de UV do meio-dia com classificação e emoji
         uv_value = uv_index_midday
         if uv_value <= 2:
             uv_text = f"😎 UV ao meio-dia: {uv_value:.1f} (Baixo)"
@@ -100,7 +98,6 @@ def get_daily_weather():
             uv_text = f"‼️ UV ao meio-dia: {uv_value:.1f} (Extremo)"
         
         forecast_parts.append(uv_text)
-        # --- FIM DA LÓGICA ALTERADA ---
             
         return " | ".join(forecast_parts)
     except Exception as e:
@@ -119,7 +116,7 @@ def verificar_eventos_proximos():
     hoje = datetime.datetime.now(fuso_horario_brasil).date()
     mensagens = []
     eventos_agrupados = {}
-    todos_os_dicionarios = [FERIADOS_2025, DATAS_PAGAMENTO_VA_VR, DATAS_LIMITE_BENEFICIOS, DATAS_PAGAMENTO_SALARIO, DATAS_PAGAMENTO_13, DATAS_ADIANTAMENTO_SALARIO, CESTA_NATALINA]
+    todos_os_dicionarios = [FERIADOS_2025, DATAS_PAGAMENTO_VA_VR, DATAS_LIMITE_BENEFICIOS, DATAS_PAGamento_SALARIO, DATAS_PAGAMENTO_13, DATAS_ADIANTAMENTO_SALARIO, CESTA_NATALINA]
     for d in todos_os_dicionarios:
         for data, nome in d.items():
             if data not in eventos_agrupados:
@@ -223,6 +220,19 @@ st.markdown("""
     .metric-saldo-pos .label, .metric-saldo-neg .label, .metric-minimo .label, .metric-padrao .label, .metric-maximo .label, .metric-minimo .details, .metric-padrao .details, .metric-maximo .details { color: rgba(255, 255, 255, 0.85); }
     .predictions-grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
     .summary-grid-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
+    
+    /* --- NOVOS ESTILOS --- */
+    .predictions-wrapper {
+        transition: opacity 0.4s ease-out, transform 0.4s ease-out, padding 0.4s ease-out;
+    }
+    .predictions-wrapper.de-emphasized {
+        opacity: 0.5;
+        transform: scale(0.98);
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+    }
+    /* --- FIM DOS NOVOS ESTILOS --- */
+
     @media (max-width: 640px) {
         .predictions-grid-container { grid-template-columns: repeat(2, 1fr); }
         .predictions-grid-container .metric-minimo { order: 2; }
@@ -296,6 +306,10 @@ if st.session_state.show_results:
         try:
             hora_entrada = datetime.datetime.strptime(formatar_hora_input(entrada_str), "%H:%M")
             
+            # --- LÓGICA DE FOCO (INÍCIO) ---
+            predictions_container_class = "predictions-wrapper"
+            # --- LÓGICA DE FOCO (FIM) ---
+
             limite_saida = hora_entrada.replace(hour=20, minute=0, second=0, microsecond=0)
             duracao_almoço_previsao = 0
             if saida_almoco_str and retorno_almoco_str:
@@ -337,7 +351,6 @@ if st.session_state.show_results:
             texto_desc_8h = f"({formatar_duracao(duracao_8h_min)})" if hora_saida_8h_calculada > limite_saida else "(8h)"
             texto_desc_10h = f"({formatar_duracao(duracao_10h_min)})" if hora_saida_10h_calculada > limite_saida else "(10h)"
 
-            # --- LÓGICA ADICIONADA PARA O TERMO CORRETO ---
             if minutos_intervalo_5h >= 30:
                 termo_intervalo_5h = "almoço"
             else:
@@ -348,6 +361,10 @@ if st.session_state.show_results:
             footnote = ""
             warnings_html = ""
             if saida_real_str:
+                # --- LÓGICA DE FOCO (INÍCIO) ---
+                predictions_container_class += " de-emphasized"
+                # --- LÓGICA DE FOCO (FIM) ---
+                
                 hora_saida_real = datetime.datetime.strptime(formatar_hora_input(saida_real_str), "%H:%M")
                 if hora_saida_real < hora_entrada:
                     raise ValueError("A Saída deve ser depois da Entrada.")
@@ -404,8 +421,11 @@ if st.session_state.show_results:
                 weather_warning = get_weather_forecast(saida_valida)
                 if weather_warning:
                     warnings_html += f'<div class="custom-warning">{weather_warning}</div>'
+            
             with results_placeholder.container():
-                st.markdown(f'<div class="results-container">{predictions_html}</div>', unsafe_allow_html=True)
+                final_predictions_html = f'<div class="{predictions_container_class}">{predictions_html}</div>'
+                st.markdown(f'<div class="results-container">{final_predictions_html}</div>', unsafe_allow_html=True)
+                
                 if saida_real_str:
                     st.markdown("<hr>", unsafe_allow_html=True)
                     st.markdown("<div class='section-container'><h3>Resumo do Dia</h3></div>", unsafe_allow_html=True)
@@ -414,8 +434,10 @@ if st.session_state.show_results:
                     summary_grid_html = f"""<div class="summary-grid-container"><div class="metric-custom"><div class="label">Total Trabalhado</div><div class="value">{formatar_duracao(trabalho_liquido_minutos)}</div></div><div class="metric-custom"><div class="label">Tempo no Núcleo</div><div class="value">{formatar_duracao(tempo_nucleo_minutos)}</div></div><div class="metric-custom metric-almoco"><div class="label">Tempo de {termo_intervalo_real}</div><div class="value">{valor_almoco_display}</div></div><div class="metric-custom {saldo_css_class}"><div class="label">Saldo do Dia</div><div class="value">{sinal} {formatar_duracao(abs(saldo_banco_horas_minutos))}</div></div></div>"""
                     st.markdown(summary_grid_html, unsafe_allow_html=True)
                     st.markdown(footnote, unsafe_allow_html=True)
+
                 st.markdown(warnings_html, unsafe_allow_html=True)
             st.components.v1.html("""<script>setTimeout(function() { const resultsEl = window.parent.document.querySelector('.results-container'); if (resultsEl) { resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }, 100);</script>""", height=0)
+
         except ValueError as e:
             st.error(f"Erro: {e}")
         except Exception as e:
