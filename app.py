@@ -361,7 +361,7 @@ if st.session_state.show_results:
                 valor_almoco_display = f"{duracao_almoco_minutos_real:.0f}min"
                 if min_intervalo_real > 0 and duracao_almoco_minutos_real < min_intervalo_real:
                     valor_almoco_display = f"{duracao_almoco_minutos_real:.0f}min*"
-                    footnote = f"<p style='font-size: 0.75rem; color: gray; text-align: center; margin-top: 1rem;'>*Seu tempo de {termo_intervalo_real} foi menor que o mínimo de {min_intervalo_real} minutos. Para o cálculo do saldo, foi considerado o valor mínimo obrigatório.</p>"
+                    footnote = f"<p style='font-size: 0.75rem; color: gray; text-align: center; margin-top: 1rem;'>*Seu tempo de {termo_intervalo_real} foi menor que o mínimo de {min_intervalo_real} minutos. Para os cálculos, foi considerado o valor mínimo obrigatório.</p>"
                 # --- FIM DA LÓGICA ALTERADA ---
                 
                 duracao_almoço_para_calculo = max(min_intervalo_real, almoco_efetivo_minutos)
