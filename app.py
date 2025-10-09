@@ -116,9 +116,7 @@ def verificar_eventos_proximos():
     hoje = datetime.datetime.now(fuso_horario_brasil).date()
     mensagens = []
     eventos_agrupados = {}
-    # --- LINHA CORRIGIDA ---
     todos_os_dicionarios = [FERIADOS_2025, DATAS_PAGAMENTO_VA_VR, DATAS_LIMITE_BENEFICIOS, DATAS_PAGAMENTO_SALARIO, DATAS_PAGAMENTO_13, DATAS_ADIANTAMENTO_SALARIO, CESTA_NATALINA]
-    # --- FIM DA CORREÇÃO ---
     for d in todos_os_dicionarios:
         for data, nome in d.items():
             if data not in eventos_agrupados:
@@ -207,7 +205,7 @@ st.markdown("""
     div[data-testid="stMetric"] { background-color: transparent !important; padding: 0 !important; }
     div[data-testid="stMetric"] [data-testid="stMetricLabel"] p,
     div[data-testid="stMetric"] [data-testid="stMetricValue"] { color: inherit !important; }
-    .section-container { text-align: center; }
+    .section-container { text-align: center; margin-top: 1.5rem; }
     .metric-custom { background-color: #F0F2F6; border-radius: 4rem; padding: 1rem; text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center; color: #31333f; }
     .metric-almoco { background-color: #F0F2F6; }
     .metric-saldo-pos { background-color: rgb(84, 198, 121); }
@@ -423,7 +421,7 @@ if st.session_state.show_results:
                 st.markdown(f'<div class="results-container">{final_predictions_html}</div>', unsafe_allow_html=True)
                 
                 if saida_real_str:
-                    st.markdown("<hr>", unsafe_allow_html=True)
+                    # Linha <hr> removida daqui
                     st.markdown("<div class='section-container'><h3>Resumo do Dia</h3></div>", unsafe_allow_html=True)
                     saldo_css_class = "metric-saldo-pos" if saldo_banco_horas_minutos >= 0 else "metric-saldo-neg"
                     sinal = "+" if saldo_banco_horas_minutos >= 0 else "-"
