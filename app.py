@@ -65,13 +65,11 @@ def get_daily_weather():
         lat = -22.93
         lon = -43.17
         fuso_horario_brasil = "America/Sao_Paulo"
-        # Alterado para buscar dados diários e o UV de hora em hora
         url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max&hourly=uv_index&timezone={fuso_horario_brasil}&forecast_days=1"
         response = requests.get(url, timeout=10)
         response.raise_for_status()
         data = response.json()
         
-        # Dados diários
         daily_data = data['daily']
         temp_min = daily_data['temperature_2m_min'][0]
         temp_max = daily_data['temperature_2m_max'][0]
@@ -79,22 +77,30 @@ def get_daily_weather():
         rain_prob = daily_data['precipitation_probability_max'][0]
         icon = get_weather_icon(weather_code)
         
-        # Dados de UV por hora
         hourly_data = data['hourly']
-        uv_index_hourly = hourly_data['uv_index']
-        # Pega o valor do UV para o meio-dia (índice 12)
-        uv_index_midday = uv_index_hourly[12]
+        uv_index_midday = hourly_data['uv_index'][12]
         
         forecast_parts = [
             f"{icon} Hoje no Rio: Mínima de {temp_min:.0f}°C e Máxima de {temp_max:.0f}°C",
             f"💧 {rain_prob:.0f}%"
         ]
         
-        # Adiciona a informação de UV do meio-dia
-        uv_text = f"UV ao meio-dia: {uv_index_midday:.1f}"
-        if uv_index_midday >= 6:
-            uv_text = f"🥵 {uv_text} (Alto)"
+        # --- LÓGICA ALTERADA ---
+        # Adiciona a informação de UV do meio-dia com classificação e emoji
+        uv_value = uv_index_midday
+        if uv_value <= 2:
+            uv_text = f"😎 UV ao meio-dia: {uv_value:.1f} (Baixo)"
+        elif uv_value <= 5:
+            uv_text = f"🙂 UV ao meio-dia: {uv_value:.1f} (Moderado)"
+        elif uv_value <= 7:
+            uv_text = f"🥵 UV ao meio-dia: {uv_value:.1f} (Alto)"
+        elif uv_value <= 10:
+            uv_text = f"⚠️ UV ao meio-dia: {uv_value:.1f} (Muito Alto)"
+        else:
+            uv_text = f"‼️ UV ao meio-dia: {uv_value:.1f} (Extremo)"
+        
         forecast_parts.append(uv_text)
+        # --- FIM DA LÓGICA ALTERADA ---
             
         return " | ".join(forecast_parts)
     except Exception as e:
@@ -371,12 +377,10 @@ if st.session_state.show_results:
                 elif tempo_trabalhado_efetivo > 240: min_intervalo_real, termo_intervalo_real = 15, "intervalo"
                 else: min_intervalo_real, termo_intervalo_real = 0, "intervalo"
                 
-                # --- LÓGICA ALTERADA ---
                 valor_almoco_display = f"{duracao_almoco_minutos_real:.0f}min"
                 if min_intervalo_real > 0 and duracao_almoco_minutos_real < min_intervalo_real:
                     valor_almoco_display = f"{duracao_almoco_minutos_real:.0f}min*"
                     footnote = f"<p style='font-size: 0.75rem; color: gray; text-align: center; margin-top: 1rem;'>*Seu tempo de {termo_intervalo_real} foi menor que o mínimo de {min_intervalo_real} minutos. Para os cálculos, foi considerado o valor mínimo obrigatório.</p>"
-                # --- FIM DA LÓGICA ALTERADA ---
                 
                 duracao_almoço_para_calculo = max(min_intervalo_real, almoco_efetivo_minutos)
                 trabalho_liquido_minutos = trabalho_bruto_minutos - duracao_almoço_para_calculo
