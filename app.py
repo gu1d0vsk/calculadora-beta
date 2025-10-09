@@ -65,23 +65,37 @@ def get_daily_weather():
         lat = -22.93
         lon = -43.17
         fuso_horario_brasil = "America/Sao_Paulo"
-        url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,uv_index_max&timezone={fuso_horario_brasil}&forecast_days=1"
+        # Alterado para buscar dados diários e o UV de hora em hora
+        url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max&hourly=uv_index&timezone={fuso_horario_brasil}&forecast_days=1"
         response = requests.get(url, timeout=10)
         response.raise_for_status()
         data = response.json()
+        
+        # Dados diários
         daily_data = data['daily']
         temp_min = daily_data['temperature_2m_min'][0]
         temp_max = daily_data['temperature_2m_max'][0]
         weather_code = daily_data['weather_code'][0]
         rain_prob = daily_data['precipitation_probability_max'][0]
-        uv_index = daily_data['uv_index_max'][0]
         icon = get_weather_icon(weather_code)
+        
+        # Dados de UV por hora
+        hourly_data = data['hourly']
+        uv_index_hourly = hourly_data['uv_index']
+        # Pega o valor do UV para o meio-dia (índice 12)
+        uv_index_midday = uv_index_hourly[12]
+        
         forecast_parts = [
             f"{icon} Hoje no Rio: Mínima de {temp_min:.0f}°C e Máxima de {temp_max:.0f}°C",
             f"💧 {rain_prob:.0f}%"
         ]
-        if uv_index >= 6:
-            forecast_parts.append(f"🥵 UV Alto ({uv_index:.1f})")
+        
+        # Adiciona a informação de UV do meio-dia
+        uv_text = f"UV ao meio-dia: {uv_index_midday:.1f}"
+        if uv_index_midday >= 6:
+            uv_text = f"🥵 {uv_text} (Alto)"
+        forecast_parts.append(uv_text)
+            
         return " | ".join(forecast_parts)
     except Exception as e:
         print(f"Erro ao buscar previsão diária: {e}")
