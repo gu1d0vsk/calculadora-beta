@@ -482,18 +482,18 @@ if st.session_state.show_results:
                     if saida_valida > entrada_valida:
                          trabalho_bruto_temp = (saida_valida - entrada_valida).total_seconds() / 60
                     
-                    # LOGICA NOVA AQUI (AJUSTADA)
-                    if trabalho_bruto_temp <= 240: # Até 4h brutas (presença)
+                    # LOGICA "SMART GAP FILL" PARA SALDO 5:59
+                    if trabalho_bruto_temp <= 240: # Até 4h brutas
                         almoco_valido_minutos = 0
-                    # A mágica: Se o tempo total menos 15 min for menor ou igual a 6h (360min),
-                    # então 15 min de intervalo são suficientes para manter a jornada legal <= 6h.
-                    elif (trabalho_bruto_temp - 15) <= 360: 
-                        almoco_valido_minutos = 15 
                     else:
-                        # Se passou de 6h15 brutas, calculamos o excedente para travar em 6h líquidas
-                        necessario_para_6h = trabalho_bruto_temp - 360
-                        # O intervalo será o excedente, limitado a 30 min
-                        almoco_valido_minutos = min(necessario_para_6h, 30)
+                        # Objetivo: Manter o saldo em 359 minutos (5h 59min) para evitar o teto de 6h
+                        # Se descontar 15min já fica <= 359, então 15 tá ótimo.
+                        # Se não, descontamos o que for necessário pra chegar em 359.
+                        excedente_para_5h59 = trabalho_bruto_temp - 359
+                        
+                        # O intervalo deve ser no mínimo 15 e no máximo 30
+                        almoco_valido_minutos = max(15, excedente_para_5h59)
+                        almoco_valido_minutos = min(30, almoco_valido_minutos)
                     
                     duracao_almoco_minutos_real = almoco_valido_minutos
                 # --------------------------------------------------
