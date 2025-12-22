@@ -117,7 +117,7 @@ def verificar_eventos_proximos():
     mensagens = []
     eventos_agrupados = {}
     
-    # Lista combinada de dicionários (certifique-se que FERIADOS no eventos.py está atualizado)
+    # LISTA COM O DICIONÁRIO UNIFICADO (FERIADOS)
     todos_os_dicionarios = [FERIADOS, DATAS_PAGAMENTO_VA_VR, DATAS_LIMITE_BENEFICIOS, DATAS_PAGAMENTO_SALARIO, DATAS_PAGAMENTO_13, DATAS_ADIANTAMENTO_SALARIO, CESTA_NATALINA]
     
     for d in todos_os_dicionarios:
@@ -482,15 +482,15 @@ if st.session_state.show_results:
                     if saida_valida > entrada_valida:
                          trabalho_bruto_temp = (saida_valida - entrada_valida).total_seconds() / 60
                     
-                    # LOGICA NOVA AQUI (AJUSTADA)
-                    if trabalho_bruto_temp <= 240: # Até 4h brutas (presença)
+                    if trabalho_bruto_temp <= 240: # Até 4h brutas
                         almoco_valido_minutos = 0
-                    # A mágica: Se o tempo total menos 15 min for menor ou igual a 6h (360min),
-                    # então 15 min de intervalo são suficientes para manter a jornada legal <= 6h.
-                    elif (trabalho_bruto_temp - 15) <= 360: 
-                        almoco_valido_minutos = 15 
                     else:
-                        almoco_valido_minutos = 30
+                        # Tenta manter a jornada líquida em 6h (360min) para não obrigar 30min
+                        excedente = trabalho_bruto_temp - 360
+                        # O intervalo deve ser pelo menos 15min
+                        # E limitamos a 30min (se precisar de mais que 30 pra baixar de 6h, então assume 30 e aceita jornada > 6h)
+                        almoco_valido_minutos = max(15, excedente)
+                        almoco_valido_minutos = min(30, almoco_valido_minutos)
                     
                     duracao_almoco_minutos_real = almoco_valido_minutos
                 # --------------------------------------------------
