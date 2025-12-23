@@ -239,7 +239,7 @@ st.markdown("""
     /* Hover Calcular: Brilho Laranja */
     div[data-testid="stHorizontalBlock"] > div:nth-of-type(1) div[data-testid="stButton"] > button:hover {
         box-shadow: 0 0 12px rgba(221, 79, 5, 0.8), 0 0 20px rgba(221, 79, 5, 0.4);
-        transform: scale(1.02); /* Leve aumento */
+        transform: scale(1.0); /* Leve aumento */
     }
 
     /* Botão Próximos Eventos (Verde/Teal) */
@@ -254,7 +254,7 @@ st.markdown("""
     /* Hover Próximos Eventos: Brilho Verde */
     div[data-testid="stHorizontalBlock"] > div:nth-of-type(2) div[data-testid="stButton"] > button:hover {
         box-shadow: 0 0 12px rgba(0, 80, 81, 0.8), 0 0 20px rgba(0, 80, 81, 0.4);
-        transform: scale(1.02); /* Leve aumento */
+        transform: scale(1.0); /* Leve aumento */
     }
 
     /* ------------------------------ */
