@@ -224,8 +224,41 @@ st.markdown("""
     .main .block-container { max-width: 800px; }
     .main-title { font-size: 2.2rem !important; font-weight: bold; text-align: center; }
     .sub-title { color: gray; text-align: center; font-size: 1.25rem !important; }
-    div[data-testid="stHorizontalBlock"] > div:nth-of-type(1) div[data-testid="stButton"] > button { background-color: rgb(221, 79, 5) !important; color: #FFFFFF !important; border-radius: 4rem; border-color: transparent;}
-    div[data-testid="stHorizontalBlock"] > div:nth-of-type(2) div[data-testid="stButton"] > button { background-color: rgb(0, 80, 81) !important; color: #FFFFFF !important; border-radius: 4rem; border-color: transparent;}
+    
+    /* --- BOTÕES COM NEON SUTIL --- */
+    
+    /* Botão Calcular (Laranja) */
+    div[data-testid="stHorizontalBlock"] > div:nth-of-type(1) div[data-testid="stButton"] > button { 
+        background-color: rgb(221, 79, 5) !important; 
+        color: #FFFFFF !important; 
+        border-radius: 4rem; 
+        border-color: transparent;
+        transition: all 0.3s ease; /* Suavidade na transição */
+    }
+    
+    /* Hover Calcular: Brilho Laranja */
+    div[data-testid="stHorizontalBlock"] > div:nth-of-type(1) div[data-testid="stButton"] > button:hover {
+        box-shadow: 0 0 12px rgba(221, 79, 5, 0.8), 0 0 20px rgba(221, 79, 5, 0.4);
+        transform: scale(1.02); /* Leve aumento */
+    }
+
+    /* Botão Próximos Eventos (Verde/Teal) */
+    div[data-testid="stHorizontalBlock"] > div:nth-of-type(2) div[data-testid="stButton"] > button { 
+        background-color: rgb(0, 80, 81) !important; 
+        color: #FFFFFF !important; 
+        border-radius: 4rem; 
+        border-color: transparent;
+        transition: all 0.3s ease; /* Suavidade na transição */
+    }
+
+    /* Hover Próximos Eventos: Brilho Verde */
+    div[data-testid="stHorizontalBlock"] > div:nth-of-type(2) div[data-testid="stButton"] > button:hover {
+        box-shadow: 0 0 12px rgba(0, 80, 81, 0.8), 0 0 20px rgba(0, 80, 81, 0.4);
+        transform: scale(1.02); /* Leve aumento */
+    }
+
+    /* ------------------------------ */
+
     div[data-testid="stTextInput"] input { border-radius: 1.5rem !important; text-align: center; font-weight: 600; }
     .main div[data-testid="stTextInput"] > label { text-align: center !important; width: 100%; display: block; }
     .results-container, .event-list-container.visible { animation: fadeIn 0.5s ease-out forwards; }
@@ -487,8 +520,6 @@ if st.session_state.show_results:
                         almoco_valido_minutos = 0
                     else:
                         # Objetivo: Manter o saldo em 359 minutos (5h 59min) para evitar o teto de 6h
-                        # Se descontar 15min já fica <= 359, então 15 tá ótimo.
-                        # Se não, descontamos o que for necessário pra chegar em 359.
                         excedente_para_5h59 = trabalho_bruto_temp - 359
                         
                         # O intervalo deve ser no mínimo 15 e no máximo 30
@@ -535,9 +566,20 @@ if st.session_state.show_results:
                 
                 tempo_nucleo_minutos = calcular_tempo_nucleo(entrada_valida, saida_valida, saida_almoco, retorno_almoco)
                 
-                # Ajustes no tempo de núcleo para automático
+                # --- AJUSTE DE OTIMIZAÇÃO PARA O TEMPO DE NÚCLEO (SÓ NO AUTOMÁTICO) ---
                 if usar_intervalo_auto and duracao_almoco_minutos_real > 0:
-                    tempo_nucleo_minutos = max(0, tempo_nucleo_minutos - duracao_almoco_minutos_real)
+                    # 1. Calculamos quanto tempo o usuário passou "fora do núcleo" (antes das 9h ou depois das 18h)
+                    # O 'tempo_nucleo_minutos' calculado acima é o tempo BRUTO no núcleo (porque passamos almoco=None)
+                    tempo_bruto_nucleo = tempo_nucleo_minutos
+                    tempo_fora_nucleo = trabalho_bruto_minutos - tempo_bruto_nucleo
+                    
+                    # 2. Assumimos que o intervalo aconteceu preferencialmente fora do núcleo para não penalizar a métrica
+                    # Desconta o intervalo do tempo "livre" fora do núcleo primeiro
+                    intervalo_restante = max(0, duracao_almoco_minutos_real - tempo_fora_nucleo)
+                    
+                    # 3. Só desconta do núcleo o que não coube lá fora
+                    tempo_nucleo_minutos = max(0, tempo_bruto_nucleo - intervalo_restante)
+                # ----------------------------------------------------------------------
 
                 if tempo_nucleo_minutos < 300:
                     warnings_html += '<div class="custom-warning">Atenção: Não cumpriu as 5h obrigatórias no período núcleo.</div>'
