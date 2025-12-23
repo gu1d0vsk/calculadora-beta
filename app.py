@@ -233,7 +233,7 @@ st.markdown("""
         color: #FFFFFF !important; 
         border-radius: 4rem; 
         border-color: transparent;
-        transition: all 0.3s ease; /* Suavidade na transição */
+        transition: all 0.1s ease; /* Suavidade na transição */
     }
     
     /* Hover Calcular: Brilho Laranja */
@@ -248,7 +248,7 @@ st.markdown("""
         color: #FFFFFF !important; 
         border-radius: 4rem; 
         border-color: transparent;
-        transition: all 0.3s ease; /* Suavidade na transição */
+        transition: all 0.1s ease; /* Suavidade na transição */
     }
 
     /* Hover Próximos Eventos: Brilho Verde */
