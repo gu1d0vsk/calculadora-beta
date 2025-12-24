@@ -501,58 +501,85 @@ if st.session_state.show_results:
         finally:
             st.session_state.show_results = False
 
+# ... (Mantenha todo o código acima até a linha: st.session_state.show_results = False) ...
+
+# --- CÁLCULO DOS DADOS DO RODAPÉ ---
 daily_forecast = get_daily_weather()
-if daily_forecast:
-    st.markdown("---")
-    st.markdown(f"<p style='text-align: center; color: gray; font-size: 0.85rem;'>{daily_forecast}</p>", unsafe_allow_html=True)
 contagem_regressiva = gerar_contagem_regressiva_home_office()
+
+# Monta o conteúdo HTML do rodapé combinando as variáveis
+footer_items = []
+if daily_forecast:
+    # Remove tags P e centralização que possam vir da função original se houver, 
+    # ou usa o texto cru. Como sua função retorna texto puro com pipes, está ótimo.
+    footer_items.append(f"<span>{daily_forecast}</span>")
+
 if contagem_regressiva:
-    st.markdown(f"<p style='text-align: center; color: gray; font-size: 0.85rem;'>{contagem_regressiva}</p>", unsafe_allow_html=True)
-# --- Rodapé Personalizado ---
-# --- Rodapé Fixo via Javascript (Burlar o Transform) ---
-js_footer = """
+    footer_items.append(f"<span>{contagem_regressiva}</span>")
+
+# Une os itens com um separador visual
+footer_content = " <span style='opacity: 0.3; margin: 0 8px;'>|</span> ".join(footer_items)
+
+# Se não tiver nada, coloca um espaço vazio para não quebrar o layout
+if not footer_content:
+    footer_content = "&nbsp;"
+
+# --- INJEÇÃO DO RODAPÉ FIXO VIA JAVASCRIPT ---
+import streamlit.components.v1 as components
+
+js_footer = f"""
 <script>
-    function injectFooter() {
+    function injectFooter() {{
         var footerId = "footer-fixo-js";
         
-        // Remove rodapé antigo se já existir (para não duplicar ao recarregar)
+        // Remove rodapé antigo para atualizar
         var oldFooter = window.parent.document.getElementById(footerId);
-        if (oldFooter) { oldFooter.remove(); }
+        if (oldFooter) {{ oldFooter.remove(); }}
 
-        // Cria o elemento div do rodapé
+        // Cria o elemento
         var footer = window.parent.document.createElement("div");
         footer.id = footerId;
-        footer.innerHTML = "🧪 Teste de Rodapé: Sistema Operacional - Versão Beta"; // SEU TEXTO AQUI
         
-        // Aplica o CSS diretamente no elemento via JS
+        // Injeta o conteúdo gerado no Python (usando f-string)
+        footer.innerHTML = `{footer_content}`;
+        
+        // Estilos CSS
         footer.style.position = "fixed";
         footer.style.left = "0";
         footer.style.bottom = "0";
         footer.style.width = "100%";
         footer.style.textAlign = "center";
-        footer.style.backgroundColor = "rgba(240, 242, 246, 0.95)";
+        footer.style.backgroundColor = "rgba(240, 242, 246, 0.95)"; // Fundo quase opaco
         footer.style.color = "#555";
-        footer.style.padding = "10px 0";
-        footer.style.fontSize = "0.85rem";
+        footer.style.padding = "8px 10px"; // Padding ajustado
+        footer.style.fontSize = "0.75rem"; // Fonte menor para caber tudo
         footer.style.borderTop = "1px solid #e6e6e6";
         footer.style.zIndex = "999999";
         footer.style.backdropFilter = "blur(5px)";
+        footer.style.display = "flex";
+        footer.style.justifyContent = "center";
+        footer.style.alignItems = "center";
+        footer.style.flexWrap = "wrap"; // Permite quebrar linha no celular
+        footer.style.lineHeight = "1.4";
         footer.style.fontFamily = "sans-serif";
         
-        // Injeta no corpo do documento pai (fora do container do Streamlit que tem o transform)
+        // Injeta no corpo da página
         window.parent.document.body.appendChild(footer);
         
-        // Adiciona um espaço extra no final da página para o conteúdo não ficar escondido atrás do rodapé
+        // Ajusta o padding da página principal para o conteúdo não ficar escondido
         var mainContainer = window.parent.document.querySelector('.main .block-container');
-        if (mainContainer) {
-            mainContainer.style.paddingBottom = "5rem";
-        }
-    }
+        if (mainContainer) {{
+            mainContainer.style.paddingBottom = "4rem";
+        }}
+        
+        // Remove as linhas horizontais extras (hr) que o Streamlit coloca automaticamente no final
+        var hrs = window.parent.document.querySelectorAll('.st-emotion-cache-yfw52f hr');
+        hrs.forEach(hr => hr.style.display = 'none');
+    }}
     
-    // Executa a função
+    // Executa
     injectFooter();
 </script>
 """
 
-# Executa o script
 components.html(js_footer, height=0)
