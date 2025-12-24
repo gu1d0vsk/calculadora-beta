@@ -68,23 +68,25 @@ def get_daily_weather():
         hourly_data = data['hourly']
         uv_index_midday = hourly_data['uv_index'][12]
         
-        # Volta ao formato de lista para facilitar a junção com pipes depois
-        part1 = f"{icon} Hoje: Mín {temp_min:.0f}° e Máx {temp_max:.0f}°"
-        part2 = f"Chuva: {rain_prob:.0f}%"
-        
+        # Monta a string única da previsão (Mín/Máx | Chuva | UV)
         uv_value = uv_index_midday
         if uv_value <= 2: uv_label = "(Baixo)"
         elif uv_value <= 5: uv_label = "(Mod)"
         elif uv_value <= 7: uv_label = "(Alto)"
         elif uv_value <= 10: uv_label = "(M. Alto)"
         else: uv_label = "(Extremo)"
-        part3 = f"UV: {uv_value:.1f} {uv_label}"
         
-        return [part1, part2, part3]
+        # Retorna lista para facilitar a montagem
+        parts = [
+            f"{icon} Hoje no Rio: Mínima de {temp_min:.0f}°C e Máxima de {temp_max:.0f}°C",
+            f"{rain_prob:.0f}% de chuva",
+            f"UV ao meio-dia: {uv_value:.1f} {uv_label}"
+        ]
+        return " | ".join(parts)
         
     except Exception as e:
         print(f"Erro ao buscar previsão diária: {e}")
-        return []
+        return ""
 
 def obter_artigo(nome_evento):
     nome_lower = nome_evento.lower()
@@ -233,7 +235,7 @@ else:
     div.block-container {
         transform: translateY(0);
         transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-        padding-bottom: 120px; /* Garante que o conteúdo não fique atrás do footer */
+        padding-bottom: 120px;
     }
     .main-title, .sub-title, div[data-testid="stTextInput"], div[data-testid="stButton"], div[data-testid="stCheckbox"] {
         opacity: 0.5;
@@ -255,28 +257,26 @@ st.markdown(f"""
     .main-title {{ font-size: 2.2rem !important; font-weight: bold; text-align: center; }}
     .sub-title {{ color: gray; text-align: center; font-size: 1.25rem !important; }}
     
-    /* --- FOOTER FIXO ESTILO "CLEAN" --- */
+    /* --- FOOTER FIXO ESTILO CLEAN (TRANSPARENTE E EMPILHADO) --- */
     .fixed-footer {{
         position: fixed;
         left: 0;
         bottom: 0;
         width: 100%;
         text-align: center;
-        padding: 15px 10px;
+        padding: 20px 10px;
         font-size: 0.85rem;
         color: gray;
-        background-color: transparent; /* Fundo transparente como antes */
+        background-color: transparent;
         z-index: 999;
-        pointer-events: none; /* Deixa clicar através dele se não tiver texto */
+        pointer-events: none;
     }}
     
-    /* O conteúdo de texto dentro do footer */
     .fixed-footer-content {{
-        pointer-events: auto; /* O texto em si pode ser selecionado */
-        background-color: transparent;
+        pointer-events: auto;
         display: flex;
-        flex-direction: column;
-        gap: 5px;
+        flex-direction: column; /* Empilha verticalmente */
+        gap: 5px; /* Espaço entre as linhas */
     }}
 
     footer {{visibility: hidden;}}
@@ -342,7 +342,7 @@ st.markdown(f"""
         .predictions-grid-container .metric-maximo {{ order: 3; }}
         .summary-grid-container {{ grid-template-columns: repeat(2, 1fr); }}
     }}
-    
+    /* Estilos gerais para classes instáveis do Streamlit */
     .st-bv {{    font-weight: 800;}} .st-ay {{    font-size: 1.3rem;}} .st-aw {{    border-bottom-right-radius: 1.5rem;}} .st-av {{    border-top-right-radius: 1.5rem;}} .st-au {{    border-bottom-left-radius: 1.5rem;}} .st-at {{    border-top-left-radius: 1.5rem;}}
     .st-emotion-cache-yinll1 svg, .st-emotion-cache-ubko3j svg {{ display: none; }} 
     .st-emotion-cache-467cry hr:not([size]) {{    display: none;}} .st-emotion-cache-zh2fnc {{    place-items: center; width: auto !important;}} .st-emotion-cache-3uj0rx hr:not([size]) {{ display: none;}} .st-emotion-cache-14vh5up, a._container_gzau3_1._viewerBadge_nim44_23, .st-emotion-cache-scp8yw.e3g0k5y6, img._profileImage_gzau3_78._lightThemeShadow_gzau3_95, ._container_gzau3_1, ._profileImage_gzau3_78, .st-emotion-cache-1sss6mo {{    display: none !important;}}
@@ -519,22 +519,14 @@ if st.session_state.show_results:
             st.session_state.show_results = False
 
 # --- 5. RENDERIZAÇÃO DO FOOTER FIXO ---
-weather_data = get_daily_weather() # Retorna lista
+weather_string = get_daily_weather() # String pronta com pipes
 contagem_regressiva = gerar_contagem_regressiva_home_office()
 
-# Monta o HTML do footer com a formatação "antiga" (pipes e empilhado)
 footer_html = ""
-
-# Linha 1: Previsão do tempo (com pipes, como era antes)
-if weather_data:
-    # Juntar os itens da lista com " | "
-    weather_line = " | ".join(weather_data)
-    footer_html += f"<div>{weather_line}</div>"
-
-# Linha 2: Contagem regressiva
+if weather_string:
+    footer_html += f"<div>{weather_string}</div>"
 if contagem_regressiva:
     footer_html += f"<div>{contagem_regressiva}</div>"
 
 if footer_html:
-    # Div container fixed no bottom
     st.markdown(f'<div class="fixed-footer"><div class="fixed-footer-content">{footer_html}</div></div>', unsafe_allow_html=True)
