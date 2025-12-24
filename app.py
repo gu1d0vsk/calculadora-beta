@@ -8,7 +8,7 @@ import pytz
 
 # --- Funções de Lógica ---
 
-@st.cache_data(ttl=3600)
+@st.cache_data(ttl=3600) # Cache de 1 hora
 def get_weather_forecast(exit_time):
     try:
         lat = -22.93
@@ -47,7 +47,7 @@ def get_weather_icon(wmo_code):
     elif wmo_code in [95, 96, 99]: return "⛈️"
     else: return "🌡️"
 
-@st.cache_data(ttl=10800)
+@st.cache_data(ttl=10800) # Cache de 3 horas
 def get_daily_weather():
     try:
         lat = -22.93
@@ -68,15 +68,20 @@ def get_daily_weather():
         hourly_data = data['hourly']
         uv_index_midday = hourly_data['uv_index'][12]
         
-        uv_value = uv_index_midday
-        if uv_value <= 2: uv_text = f"UV: {uv_value:.1f} (Baixo)"
-        elif uv_value <= 5: uv_text = f"UV: {uv_value:.1f} (Mod)"
-        elif uv_value <= 7: uv_text = f"UV: {uv_value:.1f} (Alto)"
-        elif uv_value <= 10: uv_text = f"UV: {uv_value:.1f} (M. Alto)"
-        else: uv_text = f"UV: {uv_value:.1f} (Extremo)"
+        forecast_parts = [
+            f"{icon} Hoje no Rio: Mínima de {temp_min:.0f}°C e Máxima de {temp_max:.0f}°C",
+            f"💧 {rain_prob:.0f}%"
+        ]
         
-        # Retorna string formatada exatamente como antes
-        return f"{icon} Hoje no Rio: Mínima de {temp_min:.0f}°C e Máxima de {temp_max:.0f}°C | 💧 {rain_prob:.0f}% | {uv_text}"
+        uv_value = uv_index_midday
+        if uv_value <= 2: uv_text = f"😎 UV ao meio-dia: {uv_value:.1f} (Baixo)"
+        elif uv_value <= 5: uv_text = f"🙂 UV ao meio-dia: {uv_value:.1f} (Moderado)"
+        elif uv_value <= 7: uv_text = f"🥵 UV ao meio-dia: {uv_value:.1f} (Alto)"
+        elif uv_value <= 10: uv_text = f"⚠️ UV ao meio-dia: {uv_value:.1f} (Muito Alto)"
+        else: uv_text = f"‼️ UV ao meio-dia: {uv_value:.1f} (Extremo)"
+        
+        forecast_parts.append(uv_text)
+        return " | ".join(forecast_parts)
     except Exception as e:
         print(f"Erro ao buscar previsão diária: {e}")
         return ""
@@ -93,6 +98,7 @@ def verificar_eventos_proximos():
     mensagens = []
     eventos_agrupados = {}
     
+    # LISTA UNIFICADA
     todos_os_dicionarios = [FERIADOS, DATAS_PAGAMENTO_VA_VR, DATAS_LIMITE_BENEFICIOS, DATAS_PAGAMENTO_SALARIO, DATAS_PAGAMENTO_13, DATAS_ADIANTAMENTO_SALARIO, CESTA_NATALINA]
     
     for d in todos_os_dicionarios:
@@ -169,39 +175,77 @@ def formatar_duracao(minutos):
     mins = int(minutos % 60)
     return f"{horas}h {mins}min"
 
-# --- Interface do Web App ---
+# --- Interface do Web App com Streamlit ---
 st.set_page_config(page_title="Calculadora de Jornada", page_icon="🧮", layout="centered")
 
-# --- LÓGICA DE ESTADO ---
+# --- 1. RENDERIZAÇÃO DOS INPUTS E BOTÕES ---
+mensagem_do_dia = obter_mensagem_do_dia()
+st.markdown(f'<p class="main-title">{mensagem_do_dia}</p>', unsafe_allow_html=True)
+st.markdown('<p class="sub-title">Informe seus horários para calcular a jornada diária</p>', unsafe_allow_html=True)
+
+mensagens_eventos = verificar_eventos_proximos()
+
+col_buffer_1, col_main, col_buffer_2 = st.columns([1, 6, 1])
+with col_main:
+    entrada_str = st.text_input("Entrada", key="entrada", help="formatos aceitos:\nHMM, HHMM ou HH:MM")
+    usar_intervalo_auto = st.checkbox("Intervalo Automático (Mínimo)", value=True, help="Calcula o desconto automático (30min ou 15min) sem precisar digitar os horários de almoço.")
+    
+    if not usar_intervalo_auto:
+        col1, col2 = st.columns(2)
+        with col1: saida_almoco_str = st.text_input("Saída para o Almoço", key="saida_almoco")
+        with col2: retorno_almoco_str = st.text_input("Volta do Almoço", key="retorno_almoco")
+    else:
+        saida_almoco_str, retorno_almoco_str = "", ""
+
+    saida_real_str = st.text_input("Saída", key="saida_real")
+    col_calc, col_events = st.columns(2)
+    with col_calc: calculate_clicked = st.button("Calcular", use_container_width=True)
+    with col_events:
+        event_button_text = "Próximos Eventos 🗓️" if mensagens_eventos else "Próximos Eventos"
+        events_clicked = st.button(event_button_text, use_container_width=True)
+
+# --- 2. LÓGICA DE ESTADO ---
 if 'show_events' not in st.session_state: st.session_state.show_events = False
 if 'show_results' not in st.session_state: st.session_state.show_results = False
 
-# --- CSS ---
+if events_clicked: st.session_state.show_events = not st.session_state.show_events
+if calculate_clicked: st.session_state.show_results = True
+if st.session_state.show_results and not entrada_str:
+    st.warning("Por favor, preencha pelo menos o horário de entrada.")
+    st.session_state.show_results = False
+
+# --- 3. LÓGICA DE CSS DINÂMICO OTIMIZADO PARA MOBILE ---
 has_active_content = st.session_state.show_results or st.session_state.show_events
 
 if not has_active_content:
+    # Estado Inicial
     layout_css = """
     div.block-container {
-        transform: translateY(25vh);
-        transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-        padding-bottom: 50px;
+        transform: translateY(25vh); /* Desktop: Centraliza bem */
+        transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease-in-out;
     }
     @media (max-width: 640px) {
-        div.block-container { transform: translateY(10vh); }
+        div.block-container {
+            transform: translateY(10vh); /* Mobile: Sobe mais para não ficar "caído" */
+        }
     }
     """
 else:
+    # Estado Ativo: Posição original (0)
     layout_css = """
     div.block-container {
         transform: translateY(0);
         transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-        padding-bottom: 120px;
     }
+    
+    /* Reduz foco da área de input */
     .main-title, .sub-title, div[data-testid="stTextInput"], div[data-testid="stButton"], div[data-testid="stCheckbox"] {
         opacity: 0.5;
         transform: scale(0.98);
         transition: all 0.8s ease-in-out;
     }
+    
+    /* Restaura foco ao passar o mouse */
     .main-title:hover, .sub-title:hover, div[data-testid="stTextInput"]:hover, div[data-testid="stButton"]:hover, div[data-testid="stCheckbox"]:hover {
         opacity: 1;
         transform: scale(1);
@@ -210,6 +254,7 @@ else:
 
 st.markdown(f"""
 <style>
+    /* Injeta o CSS dinâmico */
     {layout_css}
 
     /* CSS GERAL */
@@ -217,32 +262,7 @@ st.markdown(f"""
     .main-title {{ font-size: 2.2rem !important; font-weight: bold; text-align: center; }}
     .sub-title {{ color: gray; text-align: center; font-size: 1.25rem !important; }}
     
-    /* --- O SEGREDO DO RODAPÉ --- */
-    /* Container invisível fixo no fundo */
-    .bottom-info {{
-        position: fixed;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        text-align: center;
-        padding-bottom: 20px; /* Margem do fundo da tela */
-        z-index: 999;
-        pointer-events: none; /* Deixa clicar no que estiver atrás */
-    }}
-    
-    /* O texto em si (estilo original) */
-    .bottom-info p {{
-        margin: 0;
-        padding: 2px 0;
-        color: gray;
-        font-size: 0.85rem;
-        background-color: transparent; /* Garante transparência */
-        pointer-events: auto; /* Permite selecionar o texto */
-    }}
-
-    footer {{visibility: hidden;}}
-    
-    /* BOTÕES COM NEON */
+    /* --- BOTÕES COM NEON (Efeito Hover) --- */
     div[data-testid="stHorizontalBlock"] > div:nth-of-type(1) div[data-testid="stButton"] > button {{ 
         background-color: rgb(221, 79, 5) !important; color: #FFFFFF !important; border-radius: 4rem; border-color: transparent;
         transition: all 0.3s ease; 
@@ -261,6 +281,7 @@ st.markdown(f"""
     div[data-testid="stTextInput"] input {{ border-radius: 1.5rem !important; text-align: center; font-weight: 600; }}
     .main div[data-testid="stTextInput"] > label {{ text-align: center !important; width: 100%; display: block; }}
     
+    /* Animação de entrada dos resultados */
     .results-container, .event-list-container.visible {{ animation: fadeIn 0.8s ease-out forwards; }}
     @keyframes fadeIn {{ from {{ opacity: 0; transform: translateY(20px); }} to {{ opacity: 1; transform: translateY(0); }} }}
     
@@ -303,55 +324,27 @@ st.markdown(f"""
         .predictions-grid-container .metric-maximo {{ order: 3; }}
         .summary-grid-container {{ grid-template-columns: repeat(2, 1fr); }}
     }}
+    /* Estilos gerais para classes instáveis do Streamlit */
+    .st-emotion-cache-yfw52f hr {{    display: none !important;}}
+    .st-bv {{    font-weight: 800;}} .st-ay {{    font-size: 1.3rem;}} .st-aw {{    border-bottom-right-radius: 1.5rem;}} .st-av {{    border-top-right-radius: 1.5rem;}} .st-au {{    border-bottom-left-radius: 1.5rem;}} .st-at {{    border-top-left-radius: 1.5rem;}}
     .st-emotion-cache-yinll1 svg, .st-emotion-cache-ubko3j svg {{ display: none; }} 
     .st-emotion-cache-467cry hr:not([size]) {{    display: none;}} .st-emotion-cache-zh2fnc {{    place-items: center; width: auto !important;}} .st-emotion-cache-3uj0rx hr:not([size]) {{ display: none;}} .st-emotion-cache-14vh5up, a._container_gzau3_1._viewerBadge_nim44_23, .st-emotion-cache-scp8yw.e3g0k5y6, img._profileImage_gzau3_78._lightThemeShadow_gzau3_95, ._container_gzau3_1, ._profileImage_gzau3_78, .st-emotion-cache-1sss6mo {{    display: none !important;}}
-    .st-emotion-cache-yfw52f hr {{ display: none !important; }}
 </style>
 """, unsafe_allow_html=True)
 
-# --- LAYOUT PRINCIPAL ---
-mensagem_do_dia = obter_mensagem_do_dia()
-st.markdown(f'<p class="main-title">{mensagem_do_dia}</p>', unsafe_allow_html=True)
-st.markdown('<p class="sub-title">Informe seus horários para calcular a jornada diária</p>', unsafe_allow_html=True)
+# --- 4. RENDERIZAÇÃO DOS CONTEÚDOS ---
 
-mensagens_eventos = verificar_eventos_proximos()
-
-col_buffer_1, col_main, col_buffer_2 = st.columns([1, 6, 1])
-with col_main:
-    entrada_str = st.text_input("Entrada", key="entrada", help="formatos aceitos:\nHMM, HHMM ou HH:MM")
-    usar_intervalo_auto = st.checkbox("Intervalo Automático (Mínimo)", value=True, help="Calcula o desconto automático (30min ou 15min) sem precisar digitar os horários de almoço.")
-    
-    if not usar_intervalo_auto:
-        col1, col2 = st.columns(2)
-        with col1: saida_almoco_str = st.text_input("Saída para o Almoço", key="saida_almoco")
-        with col2: retorno_almoco_str = st.text_input("Volta do Almoço", key="retorno_almoco")
-    else:
-        saida_almoco_str, retorno_almoco_str = "", ""
-
-    saida_real_str = st.text_input("Saída", key="saida_real")
-    col_calc, col_events = st.columns(2)
-    with col_calc: calculate_clicked = st.button("Calcular", use_container_width=True)
-    with col_events:
-        event_button_text = "Próximos Eventos 🗓️" if mensagens_eventos else "Próximos Eventos"
-        events_clicked = st.button(event_button_text, use_container_width=True)
-
-# Lógica de botões
-if events_clicked: st.session_state.show_events = not st.session_state.show_events
-if calculate_clicked: st.session_state.show_results = True
-if st.session_state.show_results and not entrada_str:
-    st.warning("Por favor, preencha pelo menos o horário de entrada.")
-    st.session_state.show_results = False
-
-# Renderização de eventos e resultados
 events_placeholder = st.empty()
 if st.session_state.show_events:
     with events_placeholder.container():
         if mensagens_eventos:
             event_html = "<div class='event-list-container visible'>"
-            for evento in mensagens_eventos: event_html += f"<div class='event-list-item'>{evento}</div>"
+            for evento in mensagens_eventos:
+                event_html += f"<div class='event-list-item'>{evento}</div>"
             event_html += "</div>"
             st.markdown(event_html, unsafe_allow_html=True)
-        else: st.info("Nenhum evento próximo nos próximos 12 dias.")
+        else:
+            st.info("Nenhum evento próximo nos próximos 12 dias.")
         st.components.v1.html("""<script>setTimeout(function() { const eventsEl = window.parent.document.querySelector('.event-list-container'); if (eventsEl) { eventsEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); } }, 50);</script>""", height=0)
 
 results_placeholder = st.empty()
@@ -359,6 +352,7 @@ if st.session_state.show_results:
     if entrada_str:
         try:
             hora_entrada = datetime.datetime.strptime(formatar_hora_input(entrada_str), "%H:%M")
+            
             limite_inicio_jornada_previsao = hora_entrada.replace(hour=7, minute=0, second=0, microsecond=0)
             entrada_valida_previsao = max(hora_entrada, limite_inicio_jornada_previsao)
             
@@ -506,15 +500,10 @@ if st.session_state.show_results:
         finally:
             st.session_state.show_results = False
 
-# --- RENDERIZAÇÃO DO RODAPÉ FIXO ---
 daily_forecast = get_daily_weather()
-contagem_regressiva = gerar_contagem_regressiva_home_office()
-
-html_content = ""
 if daily_forecast:
-    html_content += f"<p>{daily_forecast}</p>"
+    st.markdown("---")
+    st.markdown(f"<p style='text-align: center; color: gray; font-size: 0.85rem;'>{daily_forecast}</p>", unsafe_allow_html=True)
+contagem_regressiva = gerar_contagem_regressiva_home_office()
 if contagem_regressiva:
-    html_content += f"<p>{contagem_regressiva}</p>"
-
-if html_content:
-    st.markdown(f'<div class="bottom-info">{html_content}</div>', unsafe_allow_html=True)
+    st.markdown(f"<p style='text-align: center; color: gray; font-size: 0.85rem;'>{contagem_regressiva}</p>", unsafe_allow_html=True)
