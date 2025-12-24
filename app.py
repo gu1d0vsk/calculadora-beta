@@ -214,28 +214,28 @@ if st.session_state.show_results and not entrada_str:
     st.warning("Por favor, preencha pelo menos o horário de entrada.")
     st.session_state.show_results = False
 
-# --- 3. LÓGICA DE CSS DINÂMICO OTIMIZADO PARA MOBILE ---
+# --- 3. LÓGICA DE CSS DINÂMICO (COM FOOTER) ---
 has_active_content = st.session_state.show_results or st.session_state.show_events
 
 if not has_active_content:
     # Estado Inicial
     layout_css = """
     div.block-container {
-        transform: translateY(25vh); /* Desktop: Centraliza bem */
+        transform: translateY(25vh);
         transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease-in-out;
+        padding-bottom: 50px;
     }
     @media (max-width: 640px) {
-        div.block-container {
-            transform: translateY(10vh); /* Mobile: Sobe mais para não ficar "caído" */
-        }
+        div.block-container { transform: translateY(10vh); }
     }
     """
 else:
-    # Estado Ativo: Posição original (0)
+    # Estado Ativo
     layout_css = """
     div.block-container {
         transform: translateY(0);
         transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+        padding-bottom: 120px; /* Espaço extra para não cortar atrás do footer */
     }
     
     /* Reduz foco da área de input */
@@ -245,7 +245,6 @@ else:
         transition: all 0.8s ease-in-out;
     }
     
-    /* Restaura foco ao passar o mouse */
     .main-title:hover, .sub-title:hover, div[data-testid="stTextInput"]:hover, div[data-testid="stButton"]:hover, div[data-testid="stCheckbox"]:hover {
         opacity: 1;
         transform: scale(1);
@@ -262,7 +261,26 @@ st.markdown(f"""
     .main-title {{ font-size: 2.2rem !important; font-weight: bold; text-align: center; }}
     .sub-title {{ color: gray; text-align: center; font-size: 1.25rem !important; }}
     
-    /* --- BOTÕES COM NEON (Efeito Hover) --- */
+    /* FOOTER FIXO ESTILIZADO */
+    .custom-footer {{
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        background-color: transparent; /* Fundo transparente */
+        backdrop-filter: blur(5px); /* Efeito de vidro */
+        -webkit-backdrop-filter: blur(5px);
+        color: gray;
+        text-align: center;
+        padding: 15px 10px;
+        font-size: 0.85rem;
+        z-index: 999;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }}
+    /* Esconde o footer padrão do Streamlit */
+    footer {{visibility: hidden;}}
+    
+    /* BOTÕES COM NEON */
     div[data-testid="stHorizontalBlock"] > div:nth-of-type(1) div[data-testid="stButton"] > button {{ 
         background-color: rgb(221, 79, 5) !important; color: #FFFFFF !important; border-radius: 4rem; border-color: transparent;
         transition: all 0.3s ease; 
@@ -281,7 +299,6 @@ st.markdown(f"""
     div[data-testid="stTextInput"] input {{ border-radius: 1.5rem !important; text-align: center; font-weight: 600; }}
     .main div[data-testid="stTextInput"] > label {{ text-align: center !important; width: 100%; display: block; }}
     
-    /* Animação de entrada dos resultados */
     .results-container, .event-list-container.visible {{ animation: fadeIn 0.8s ease-out forwards; }}
     @keyframes fadeIn {{ from {{ opacity: 0; transform: translateY(20px); }} to {{ opacity: 1; transform: translateY(0); }} }}
     
@@ -325,7 +342,6 @@ st.markdown(f"""
         .summary-grid-container {{ grid-template-columns: repeat(2, 1fr); }}
     }}
     /* Estilos gerais para classes instáveis do Streamlit */
-    .st-emotion-cache-yfw52f hr {{    display: none !important;}}
     .st-bv {{    font-weight: 800;}} .st-ay {{    font-size: 1.3rem;}} .st-aw {{    border-bottom-right-radius: 1.5rem;}} .st-av {{    border-top-right-radius: 1.5rem;}} .st-au {{    border-bottom-left-radius: 1.5rem;}} .st-at {{    border-top-left-radius: 1.5rem;}}
     .st-emotion-cache-yinll1 svg, .st-emotion-cache-ubko3j svg {{ display: none; }} 
     .st-emotion-cache-467cry hr:not([size]) {{    display: none;}} .st-emotion-cache-zh2fnc {{    place-items: center; width: auto !important;}} .st-emotion-cache-3uj0rx hr:not([size]) {{ display: none;}} .st-emotion-cache-14vh5up, a._container_gzau3_1._viewerBadge_nim44_23, .st-emotion-cache-scp8yw.e3g0k5y6, img._profileImage_gzau3_78._lightThemeShadow_gzau3_95, ._container_gzau3_1, ._profileImage_gzau3_78, .st-emotion-cache-1sss6mo {{    display: none !important;}}
@@ -500,10 +516,19 @@ if st.session_state.show_results:
         finally:
             st.session_state.show_results = False
 
+# --- 5. RENDERIZAÇÃO DO FOOTER FIXO (PREVISÃO E CONTAGEM) ---
 daily_forecast = get_daily_weather()
-if daily_forecast:
-    st.markdown("---")
-    st.markdown(f"<p style='text-align: center; color: gray; font-size: 0.85rem;'>{daily_forecast}</p>", unsafe_allow_html=True)
 contagem_regressiva = gerar_contagem_regressiva_home_office()
+
+# Monta o conteúdo do footer
+footer_content = ""
+if daily_forecast:
+    footer_content += f"<div>{daily_forecast}</div>"
 if contagem_regressiva:
-    st.markdown(f"<p style='text-align: center; color: gray; font-size: 0.85rem;'>{contagem_regressiva}</p>", unsafe_allow_html=True)
+    # Adiciona uma margem se já houver previsão do tempo
+    margin_top = "5px" if daily_forecast else "0"
+    footer_content += f"<div style='margin-top: {margin_top};'>{contagem_regressiva}</div>"
+
+# Se houver algo para mostrar no footer, renderiza a div fixa
+if footer_content:
+    st.markdown(f'<div class="custom-footer">{footer_content}</div>', unsafe_allow_html=True)
