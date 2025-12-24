@@ -217,16 +217,64 @@ def formatar_duracao(minutos):
 # --- Interface do Web App com Streamlit ---
 st.set_page_config(page_title="Calculadora de Jornada", page_icon="🧮", layout="centered")
 
-# --- LÓGICA DE ESTADO PARA ANIMAÇÃO CSS ---
-has_active_content = False
-if 'show_results' in st.session_state and st.session_state.show_results:
-    has_active_content = True
-if 'show_events' in st.session_state and st.session_state.show_events:
-    has_active_content = True
+# --- 1. RENDERIZAÇÃO DOS INPUTS E BOTÕES PRIMEIRO ---
+# Isso garante que os botões existem antes de verificarmos se foram clicados
 
-# CSS Dinâmico: Usa padding-top para controlar a posição vertical
+mensagem_do_dia = obter_mensagem_do_dia()
+st.markdown(f'<p class="main-title">{mensagem_do_dia}</p>', unsafe_allow_html=True)
+st.markdown('<p class="sub-title">Informe seus horários para calcular a jornada diária</p>', unsafe_allow_html=True)
+
+mensagens_eventos = verificar_eventos_proximos()
+
+col_buffer_1, col_main, col_buffer_2 = st.columns([1, 6, 1])
+with col_main:
+    entrada_str = st.text_input("Entrada", key="entrada", help="formatos aceitos:\nHMM, HHMM ou HH:MM")
+    
+    usar_intervalo_auto = st.checkbox("Intervalo Automático (Mínimo)", value=True, help="Calcula o desconto automático (30min ou 15min) sem precisar digitar os horários de almoço.")
+    
+    if not usar_intervalo_auto:
+        col1, col2 = st.columns(2)
+        with col1:
+            saida_almoco_str = st.text_input("Saída para o Almoço", key="saida_almoco")
+        with col2:
+            retorno_almoco_str = st.text_input("Volta do Almoço", key="retorno_almoco")
+    else:
+        saida_almoco_str = ""
+        retorno_almoco_str = ""
+
+    saida_real_str = st.text_input("Saída", key="saida_real")
+    col_calc, col_events = st.columns(2)
+    with col_calc:
+        calculate_clicked = st.button("Calcular", use_container_width=True)
+    with col_events:
+        event_button_text = "Próximos Eventos 🗓️" if mensagens_eventos else "Próximos Eventos"
+        events_clicked = st.button(event_button_text, use_container_width=True)
+
+# --- 2. LÓGICA DE ATUALIZAÇÃO DE ESTADO ---
+# Inicializa estado se não existir
+if 'show_events' not in st.session_state:
+    st.session_state.show_events = False
+if 'show_results' not in st.session_state:
+    st.session_state.show_results = False
+
+# Atualiza estado baseado nos cliques DESTA execução
+if events_clicked:
+    st.session_state.show_events = not st.session_state.show_events
+
+if calculate_clicked:
+    st.session_state.show_results = True
+
+# Validação imediata: Se tentar calcular sem entrada, desliga o resultado e avisa
+if st.session_state.show_results and not entrada_str:
+    st.warning("Por favor, preencha pelo menos o horário de entrada.")
+    st.session_state.show_results = False
+
+# --- 3. LÓGICA DE CSS DINÂMICO (POSIÇÃO) ---
+# Agora 'has_active_content' reflete o estado REAL após o clique
+has_active_content = st.session_state.show_results or st.session_state.show_events
+
 if not has_active_content:
-    # Estado Inicial: Empurra tudo para baixo (30% da tela)
+    # Estado Inicial: Centralizado verticalmente (padding-top grande)
     layout_css = """
     div.block-container {
         padding-top: 30vh !important;
@@ -234,33 +282,34 @@ if not has_active_content:
     }
     """
 else:
-    # Estado Ativo: Volta ao topo padrão e aplica opacidade nos inputs
+    # Estado Ativo: No topo (padding-top padrão) + Opacidade nos inputs
     layout_css = """
     div.block-container {
         padding-top: 4rem !important;
         transition: all 0.8s ease-in-out;
     }
     
-    /* Reduz foco da área de input para destacar o resultado */
+    /* Reduz opacidade e escala para dar foco ao resultado */
     .main-title, .sub-title, div[data-testid="stTextInput"], div[data-testid="stButton"], div[data-testid="stCheckbox"] {
         opacity: 0.5;
         transform: scale(0.98);
         transition: all 0.8s ease-in-out;
     }
     
-    /* Restaura foco ao passar o mouse */
+    /* Restaura ao passar o mouse */
     .main-title:hover, .sub-title:hover, div[data-testid="stTextInput"]:hover, div[data-testid="stButton"]:hover, div[data-testid="stCheckbox"]:hover {
         opacity: 1;
         transform: scale(1);
     }
     """
 
+# Injeção do CSS (Layout + Neon + Estilos Gerais)
 st.markdown(f"""
 <style>
-    /* Injeta o CSS de layout dinâmico */
+    /* Layout Dinâmico */
     {layout_css}
 
-    /* CSS PADRÃO (NEON, CORES, ETC) */
+    /* Estilos Gerais */
     .main .block-container {{ max-width: 800px; }}
     .main-title {{ font-size: 2.2rem !important; font-weight: bold; text-align: center; }}
     .sub-title {{ color: gray; text-align: center; font-size: 1.25rem !important; }}
@@ -369,50 +418,13 @@ st.markdown(f"""
     ._container_gzau3_1 {{      display: none;}}
     ._profileImage_gzau3_78 {{    display: none;}}
     .st-emotion-cache-1sss6mo {{    display: none !important;}}
-    .st-emotion-cache-yfw52f hr {{ display: none;}}
 
 </style>
 """, unsafe_allow_html=True)
 
-
-mensagem_do_dia = obter_mensagem_do_dia()
-st.markdown(f'<p class="main-title">{mensagem_do_dia}</p>', unsafe_allow_html=True)
-st.markdown('<p class="sub-title">Informe seus horários para calcular a jornada diária</p>', unsafe_allow_html=True)
-
-mensagens_eventos = verificar_eventos_proximos()
-
-col_buffer_1, col_main, col_buffer_2 = st.columns([1, 6, 1])
-with col_main:
-    entrada_str = st.text_input("Entrada", key="entrada", help="formatos aceitos:\nHMM, HHMM ou HH:MM")
-    
-    # --- CHECKBOX DE INTERVALO AUTOMÁTICO ---
-    # Agora definido como True por padrão e sem o emoji
-    usar_intervalo_auto = st.checkbox("Intervalo Automático (Mínimo)", value=True, help="Calcula o desconto automático (30min ou 15min) sem precisar digitar os horários de almoço.")
-    
-    if not usar_intervalo_auto:
-        col1, col2 = st.columns(2)
-        with col1:
-            saida_almoco_str = st.text_input("Saída para o Almoço", key="saida_almoco")
-        with col2:
-            retorno_almoco_str = st.text_input("Volta do Almoço", key="retorno_almoco")
-    else:
-        saida_almoco_str = ""
-        retorno_almoco_str = ""
-    # ----------------------------------------
-
-    saida_real_str = st.text_input("Saída", key="saida_real")
-    col_calc, col_events = st.columns(2)
-    with col_calc:
-        calculate_clicked = st.button("Calcular", use_container_width=True)
-    with col_events:
-        event_button_text = "Próximos Eventos 🗓️" if mensagens_eventos else "Próximos Eventos"
-        events_clicked = st.button(event_button_text, use_container_width=True)
+# --- 4. RENDERIZAÇÃO DOS EVENTOS E RESULTADOS (CONTEÚDO FINAL) ---
 
 events_placeholder = st.empty()
-if 'show_events' not in st.session_state:
-    st.session_state.show_events = False
-if events_clicked:
-    st.session_state.show_events = not st.session_state.show_events
 if st.session_state.show_events:
     with events_placeholder.container():
         if mensagens_eventos:
@@ -426,15 +438,8 @@ if st.session_state.show_events:
         st.components.v1.html("""<script>setTimeout(function() { const eventsEl = window.parent.document.querySelector('.event-list-container'); if (eventsEl) { eventsEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); } }, 50);</script>""", height=0)
 
 results_placeholder = st.empty()
-if 'show_results' not in st.session_state:
-    st.session_state.show_results = False
-if calculate_clicked:
-    st.session_state.show_results = True
 if st.session_state.show_results:
-    if not entrada_str:
-        st.warning("Por favor, preencha pelo menos o horário de entrada.")
-        st.session_state.show_results = False
-    else:
+    if entrada_str: # Segurança extra
         try:
             hora_entrada = datetime.datetime.strptime(formatar_hora_input(entrada_str), "%H:%M")
             
@@ -447,7 +452,6 @@ if st.session_state.show_results:
             limite_saida = hora_entrada.replace(hour=20, minute=0, second=0, microsecond=0)
             duracao_almoço_previsao = 0
             
-            # Se NÃO for auto e tiver inputs, calcula a duração
             if not usar_intervalo_auto and saida_almoco_str and retorno_almoco_str:
                 saida_almoco_prev = datetime.datetime.strptime(formatar_hora_input(saida_almoco_str), "%H:%M")
                 retorno_almoco_prev = datetime.datetime.strptime(formatar_hora_input(retorno_almoco_str), "%H:%M")
@@ -541,8 +545,7 @@ if st.session_state.show_results:
                         desconto_ausencia = duracao_almoco_minutos_real - almoco_valido_minutos
 
                 else:
-                    # Lógica para automático (Assume que o almoço foi 100% válido dentro da janela)
-                    # Calcula baseado no tempo bruto para saber se precisa de 15 ou 30
+                    # Lógica para automático
                     trabalho_bruto_temp = 0
                     if saida_valida > entrada_valida:
                          trabalho_bruto_temp = (saida_valida - entrada_valida).total_seconds() / 60
@@ -551,10 +554,7 @@ if st.session_state.show_results:
                     if trabalho_bruto_temp <= 240: # Até 4h brutas
                         almoco_valido_minutos = 0
                     else:
-                        # Objetivo: Manter o saldo em 359 minutos (5h 59min) para evitar o teto de 6h
                         excedente_para_5h59 = trabalho_bruto_temp - 359
-                        
-                        # O intervalo deve ser no mínimo 15 e no máximo 30
                         almoco_valido_minutos = max(15, excedente_para_5h59)
                         almoco_valido_minutos = min(30, almoco_valido_minutos)
                     
@@ -596,16 +596,9 @@ if st.session_state.show_results:
                 
                 # --- AJUSTE DE OTIMIZAÇÃO PARA O TEMPO DE NÚCLEO (SÓ NO AUTOMÁTICO) ---
                 if usar_intervalo_auto and duracao_almoco_minutos_real > 0:
-                    # 1. Calculamos quanto tempo o usuário passou "fora do núcleo" (antes das 9h ou depois das 18h)
-                    # O 'tempo_nucleo_minutos' calculado acima é o tempo BRUTO no núcleo (porque passamos almoco=None)
                     tempo_bruto_nucleo = tempo_nucleo_minutos
                     tempo_fora_nucleo = trabalho_bruto_minutos - tempo_bruto_nucleo
-                    
-                    # 2. Assumimos que o intervalo aconteceu preferencialmente fora do núcleo para não penalizar a métrica
-                    # Desconta o intervalo do tempo "livre" fora do núcleo primeiro
                     intervalo_restante = max(0, duracao_almoco_minutos_real - tempo_fora_nucleo)
-                    
-                    # 3. Só desconta do núcleo o que não coube lá fora
                     tempo_nucleo_minutos = max(0, tempo_bruto_nucleo - intervalo_restante)
                 # ----------------------------------------------------------------------
 
