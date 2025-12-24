@@ -68,22 +68,20 @@ def get_daily_weather():
         hourly_data = data['hourly']
         uv_index_midday = hourly_data['uv_index'][12]
         
-        # Monta a string única da previsão (Mín/Máx | Chuva | UV)
-        uv_value = uv_index_midday
-        if uv_value <= 2: uv_label = "(Baixo)"
-        elif uv_value <= 5: uv_label = "(Mod)"
-        elif uv_value <= 7: uv_label = "(Alto)"
-        elif uv_value <= 10: uv_label = "(M. Alto)"
-        else: uv_label = "(Extremo)"
-        
-        # Retorna lista para facilitar a montagem
-        parts = [
+        forecast_parts = [
             f"{icon} Hoje no Rio: Mínima de {temp_min:.0f}°C e Máxima de {temp_max:.0f}°C",
-            f"{rain_prob:.0f}% de chuva",
-            f"UV ao meio-dia: {uv_value:.1f} {uv_label}"
+            f"💧 {rain_prob:.0f}%"
         ]
-        return " | ".join(parts)
         
+        uv_value = uv_index_midday
+        if uv_value <= 2: uv_text = f"😎 UV ao meio-dia: {uv_value:.1f} (Baixo)"
+        elif uv_value <= 5: uv_text = f"🙂 UV ao meio-dia: {uv_value:.1f} (Moderado)"
+        elif uv_value <= 7: uv_text = f"🥵 UV ao meio-dia: {uv_value:.1f} (Alto)"
+        elif uv_value <= 10: uv_text = f"⚠️ UV ao meio-dia: {uv_value:.1f} (Muito Alto)"
+        else: uv_text = f"‼️ UV ao meio-dia: {uv_value:.1f} (Extremo)"
+        
+        forecast_parts.append(uv_text)
+        return " | ".join(forecast_parts)
     except Exception as e:
         print(f"Erro ao buscar previsão diária: {e}")
         return ""
@@ -235,7 +233,7 @@ else:
     div.block-container {
         transform: translateY(0);
         transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-        padding-bottom: 120px;
+        padding-bottom: 150px; /* Mais espaço pro footer não cobrir conteúdo */
     }
     .main-title, .sub-title, div[data-testid="stTextInput"], div[data-testid="stButton"], div[data-testid="stCheckbox"] {
         opacity: 0.5;
@@ -257,26 +255,26 @@ st.markdown(f"""
     .main-title {{ font-size: 2.2rem !important; font-weight: bold; text-align: center; }}
     .sub-title {{ color: gray; text-align: center; font-size: 1.25rem !important; }}
     
-    /* --- FOOTER FIXO ESTILO CLEAN (TRANSPARENTE E EMPILHADO) --- */
-    .fixed-footer {{
+    /* --- FOOTER SIMPLES FIXO --- */
+    .simple-footer {{
         position: fixed;
         left: 0;
         bottom: 0;
         width: 100%;
         text-align: center;
-        padding: 20px 10px;
+        padding: 10px;
         font-size: 0.85rem;
-        color: gray;
-        background-color: transparent;
+        color: gray; 
+        background-color: transparent; /* Totalmente transparente */
         z-index: 999;
         pointer-events: none;
     }}
     
-    .fixed-footer-content {{
+    .simple-footer-content {{
         pointer-events: auto;
         display: flex;
-        flex-direction: column; /* Empilha verticalmente */
-        gap: 5px; /* Espaço entre as linhas */
+        flex-direction: column;
+        gap: 5px;
     }}
 
     footer {{visibility: hidden;}}
@@ -518,15 +516,16 @@ if st.session_state.show_results:
         finally:
             st.session_state.show_results = False
 
-# --- 5. RENDERIZAÇÃO DO FOOTER FIXO ---
-weather_string = get_daily_weather() # String pronta com pipes
+# --- 5. RENDERIZAÇÃO DO FOOTER FIXO (SIMPLES, NO FINAL DA PÁGINA) ---
+weather_string = get_daily_weather() # String única com pipes
 contagem_regressiva = gerar_contagem_regressiva_home_office()
 
-footer_html = ""
+footer_content = ""
+# Empilha as informações com uma div para cada
 if weather_string:
-    footer_html += f"<div>{weather_string}</div>"
+    footer_content += f"<div style='margin-bottom: 5px;'>{weather_string}</div>"
 if contagem_regressiva:
-    footer_html += f"<div>{contagem_regressiva}</div>"
+    footer_content += f"<div>{contagem_regressiva}</div>"
 
-if footer_html:
-    st.markdown(f'<div class="fixed-footer"><div class="fixed-footer-content">{footer_html}</div></div>', unsafe_allow_html=True)
+if footer_content:
+    st.markdown(f'<div class="fixed-footer"><div class="fixed-footer-content">{footer_content}</div></div>', unsafe_allow_html=True)
