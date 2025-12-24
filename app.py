@@ -218,43 +218,37 @@ def formatar_duracao(minutos):
 st.set_page_config(page_title="Calculadora de Jornada", page_icon="🧮", layout="centered")
 
 # --- LÓGICA DE ESTADO PARA ANIMAÇÃO CSS ---
-# Verifica se existe algum resultado ou evento sendo exibido
 has_active_content = False
 if 'show_results' in st.session_state and st.session_state.show_results:
     has_active_content = True
 if 'show_events' in st.session_state and st.session_state.show_events:
     has_active_content = True
 
-# Define o CSS dinâmico com base no estado
-# Se NÃO tem conteúdo (início), centraliza verticalmente.
-# Se TEM conteúdo, joga pro topo e aplica opacidade nos inputs.
-layout_css = ""
+# CSS Dinâmico: Usa padding-top para controlar a posição vertical
 if not has_active_content:
+    # Estado Inicial: Empurra tudo para baixo (30% da tela)
     layout_css = """
     div.block-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        min-height: 80vh; /* Ocupa quase toda a altura da tela */
-        transition: all 0.8s ease-in-out; /* Animação suave do slide */
+        padding-top: 30vh !important;
+        transition: all 0.8s ease-in-out;
     }
     """
 else:
+    # Estado Ativo: Volta ao topo padrão e aplica opacidade nos inputs
     layout_css = """
     div.block-container {
-        justify-content: flex-start;
-        padding-top: 4rem;
+        padding-top: 4rem !important;
         transition: all 0.8s ease-in-out;
     }
     
-    /* Diminui a opacidade e escala dos Inputs e Botões quando o resultado aparece */
+    /* Reduz foco da área de input para destacar o resultado */
     .main-title, .sub-title, div[data-testid="stTextInput"], div[data-testid="stButton"], div[data-testid="stCheckbox"] {
-        opacity: 0.6;
+        opacity: 0.5;
         transform: scale(0.98);
         transition: all 0.8s ease-in-out;
     }
     
-    /* Se passar o mouse, volta ao normal para poder editar */
+    /* Restaura foco ao passar o mouse */
     .main-title:hover, .sub-title:hover, div[data-testid="stTextInput"]:hover, div[data-testid="stButton"]:hover, div[data-testid="stCheckbox"]:hover {
         opacity: 1;
         transform: scale(1);
@@ -263,7 +257,7 @@ else:
 
 st.markdown(f"""
 <style>
-    /* CSS DINÂMICO INJETADO AQUI */
+    /* Injeta o CSS de layout dinâmico */
     {layout_css}
 
     /* CSS PADRÃO (NEON, CORES, ETC) */
@@ -391,6 +385,7 @@ with col_main:
     entrada_str = st.text_input("Entrada", key="entrada", help="formatos aceitos:\nHMM, HHMM ou HH:MM")
     
     # --- CHECKBOX DE INTERVALO AUTOMÁTICO ---
+    # Agora definido como True por padrão e sem o emoji
     usar_intervalo_auto = st.checkbox("Intervalo Automático (Mínimo)", value=True, help="Calcula o desconto automático (30min ou 15min) sem precisar digitar os horários de almoço.")
     
     if not usar_intervalo_auto:
