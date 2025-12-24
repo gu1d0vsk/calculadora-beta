@@ -214,11 +214,10 @@ if st.session_state.show_results and not entrada_str:
     st.warning("Por favor, preencha pelo menos o horário de entrada.")
     st.session_state.show_results = False
 
-# --- 3. LÓGICA DE CSS DINÂMICO (COM FOOTER) ---
+# --- 3. LÓGICA DE CSS DINÂMICO ---
 has_active_content = st.session_state.show_results or st.session_state.show_events
 
 if not has_active_content:
-    # Estado Inicial
     layout_css = """
     div.block-container {
         transform: translateY(25vh);
@@ -230,21 +229,17 @@ if not has_active_content:
     }
     """
 else:
-    # Estado Ativo
     layout_css = """
     div.block-container {
         transform: translateY(0);
         transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-        padding-bottom: 120px; /* Espaço extra para não cortar atrás do footer */
+        padding-bottom: 120px;
     }
-    
-    /* Reduz foco da área de input */
     .main-title, .sub-title, div[data-testid="stTextInput"], div[data-testid="stButton"], div[data-testid="stCheckbox"] {
         opacity: 0.5;
         transform: scale(0.98);
         transition: all 0.8s ease-in-out;
     }
-    
     .main-title:hover, .sub-title:hover, div[data-testid="stTextInput"]:hover, div[data-testid="stButton"]:hover, div[data-testid="stCheckbox"]:hover {
         opacity: 1;
         transform: scale(1);
@@ -253,7 +248,6 @@ else:
 
 st.markdown(f"""
 <style>
-    /* Injeta o CSS dinâmico */
     {layout_css}
 
     /* CSS GERAL */
@@ -261,23 +255,15 @@ st.markdown(f"""
     .main-title {{ font-size: 2.2rem !important; font-weight: bold; text-align: center; }}
     .sub-title {{ color: gray; text-align: center; font-size: 1.25rem !important; }}
     
-    /* FOOTER FIXO ESTILIZADO */
+    /* FOOTER FIXO */
     .custom-footer {{
-        position: fixed;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        background-color: transparent; /* Fundo transparente */
-        backdrop-filter: blur(5px); /* Efeito de vidro */
-        -webkit-backdrop-filter: blur(5px);
-        color: gray;
-        text-align: center;
-        padding: 15px 10px;
-        font-size: 0.85rem;
-        z-index: 999;
+        position: fixed; left: 0; bottom: 0; width: 100%;
+        background-color: transparent;
+        backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+        color: gray; text-align: center; padding: 15px 10px;
+        font-size: 0.85rem; z-index: 999;
         border-top: 1px solid rgba(255, 255, 255, 0.1);
     }}
-    /* Esconde o footer padrão do Streamlit */
     footer {{visibility: hidden;}}
     
     /* BOTÕES COM NEON */
@@ -345,6 +331,7 @@ st.markdown(f"""
     .st-bv {{    font-weight: 800;}} .st-ay {{    font-size: 1.3rem;}} .st-aw {{    border-bottom-right-radius: 1.5rem;}} .st-av {{    border-top-right-radius: 1.5rem;}} .st-au {{    border-bottom-left-radius: 1.5rem;}} .st-at {{    border-top-left-radius: 1.5rem;}}
     .st-emotion-cache-yinll1 svg, .st-emotion-cache-ubko3j svg {{ display: none; }} 
     .st-emotion-cache-467cry hr:not([size]) {{    display: none;}} .st-emotion-cache-zh2fnc {{    place-items: center; width: auto !important;}} .st-emotion-cache-3uj0rx hr:not([size]) {{ display: none;}} .st-emotion-cache-14vh5up, a._container_gzau3_1._viewerBadge_nim44_23, .st-emotion-cache-scp8yw.e3g0k5y6, img._profileImage_gzau3_78._lightThemeShadow_gzau3_95, ._container_gzau3_1, ._profileImage_gzau3_78, .st-emotion-cache-1sss6mo {{    display: none !important;}}
+    .st-emotion-cache-yfw52f hr {{ display: none !important; }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -516,19 +503,15 @@ if st.session_state.show_results:
         finally:
             st.session_state.show_results = False
 
-# --- 5. RENDERIZAÇÃO DO FOOTER FIXO (PREVISÃO E CONTAGEM) ---
+# --- 5. RENDERIZAÇÃO DO FOOTER FIXO ---
 daily_forecast = get_daily_weather()
 contagem_regressiva = gerar_contagem_regressiva_home_office()
 
-# Monta o conteúdo do footer
 footer_content = ""
-if daily_forecast:
-    footer_content += f"<div>{daily_forecast}</div>"
+if daily_forecast: footer_content += f"<div>{daily_forecast}</div>"
 if contagem_regressiva:
-    # Adiciona uma margem se já houver previsão do tempo
     margin_top = "5px" if daily_forecast else "0"
     footer_content += f"<div style='margin-top: {margin_top};'>{contagem_regressiva}</div>"
 
-# Se houver algo para mostrar no footer, renderiza a div fixa
 if footer_content:
     st.markdown(f'<div class="custom-footer">{footer_content}</div>', unsafe_allow_html=True)
