@@ -5,6 +5,7 @@ from eventos import *
 from mensagens import obter_mensagem_do_dia
 import requests
 import pytz
+import streamlit.components.v1 as components
 
 # --- Funções de Lógica ---
 
@@ -508,39 +509,50 @@ contagem_regressiva = gerar_contagem_regressiva_home_office()
 if contagem_regressiva:
     st.markdown(f"<p style='text-align: center; color: gray; font-size: 0.85rem;'>{contagem_regressiva}</p>", unsafe_allow_html=True)
 # --- Rodapé Personalizado ---
-st.markdown("""
-<style>
-    /* Garante um espaço no final da página para o conteúdo não ficar escondido atrás do rodapé */
-    .main .block-container {
-        padding-bottom: 5rem !important;
-    }
+# --- Rodapé Fixo via Javascript (Burlar o Transform) ---
+js_footer = """
+<script>
+    function injectFooter() {
+        var footerId = "footer-fixo-js";
+        
+        // Remove rodapé antigo se já existir (para não duplicar ao recarregar)
+        var oldFooter = window.parent.document.getElementById(footerId);
+        if (oldFooter) { oldFooter.remove(); }
 
-    /* Estilização do Rodapé Fixo */
-    .custom-footer {
-        position: fixed;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        background-color: rgba(240, 242, 246, 0.95); /* Cor de fundo compatível com o tema */
-        color: #555;
-        text-align: center;
-        padding: 10px 0;
-        font-size: 0.85rem;
-        border-top: 1px solid #e6e6e6;
-        z-index: 9999; /* Garante que fique sobre outros elementos */
-        backdrop-filter: blur(5px); /* Efeito de desfoque moderno */
-    }
-    
-    /* Ajuste para mobile se necessário */
-    @media (max-width: 640px) {
-        .custom-footer {
-            font-size: 0.75rem;
-            padding: 8px 0;
+        // Cria o elemento div do rodapé
+        var footer = window.parent.document.createElement("div");
+        footer.id = footerId;
+        footer.innerHTML = "🧪 Teste de Rodapé: Sistema Operacional - Versão Beta"; // SEU TEXTO AQUI
+        
+        // Aplica o CSS diretamente no elemento via JS
+        footer.style.position = "fixed";
+        footer.style.left = "0";
+        footer.style.bottom = "0";
+        footer.style.width = "100%";
+        footer.style.textAlign = "center";
+        footer.style.backgroundColor = "rgba(240, 242, 246, 0.95)";
+        footer.style.color = "#555";
+        footer.style.padding = "10px 0";
+        footer.style.fontSize = "0.85rem";
+        footer.style.borderTop = "1px solid #e6e6e6";
+        footer.style.zIndex = "999999";
+        footer.style.backdropFilter = "blur(5px)";
+        footer.style.fontFamily = "sans-serif";
+        
+        // Injeta no corpo do documento pai (fora do container do Streamlit que tem o transform)
+        window.parent.document.body.appendChild(footer);
+        
+        // Adiciona um espaço extra no final da página para o conteúdo não ficar escondido atrás do rodapé
+        var mainContainer = window.parent.document.querySelector('.main .block-container');
+        if (mainContainer) {
+            mainContainer.style.paddingBottom = "5rem";
         }
     }
-</style>
+    
+    // Executa a função
+    injectFooter();
+</script>
+"""
 
-<div class="custom-footer">
-    <p style='margin: 0;'>🧪 Teste de Rodapé: Sistema Operacional - Versão Beta</p>
-</div>
-""", unsafe_allow_html=True)
+# Executa o script
+components.html(js_footer, height=0)
