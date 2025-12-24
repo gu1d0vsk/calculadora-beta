@@ -369,6 +369,7 @@ st.markdown(f"""
     ._container_gzau3_1 {{      display: none;}}
     ._profileImage_gzau3_78 {{    display: none;}}
     .st-emotion-cache-1sss6mo {{    display: none !important;}}
+    .st-emotion-cache-yfw52f hr {{ display: none;}}
 
 </style>
 """, unsafe_allow_html=True)
