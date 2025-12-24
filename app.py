@@ -217,127 +217,164 @@ def formatar_duracao(minutos):
 # --- Interface do Web App com Streamlit ---
 st.set_page_config(page_title="Calculadora de Jornada", page_icon="🧮", layout="centered")
 
-st.markdown("""
+# --- LÓGICA DE ESTADO PARA ANIMAÇÃO CSS ---
+# Verifica se existe algum resultado ou evento sendo exibido
+has_active_content = False
+if 'show_results' in st.session_state and st.session_state.show_results:
+    has_active_content = True
+if 'show_events' in st.session_state and st.session_state.show_events:
+    has_active_content = True
+
+# Define o CSS dinâmico com base no estado
+# Se NÃO tem conteúdo (início), centraliza verticalmente.
+# Se TEM conteúdo, joga pro topo e aplica opacidade nos inputs.
+layout_css = ""
+if not has_active_content:
+    layout_css = """
+    div.block-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 80vh; /* Ocupa quase toda a altura da tela */
+        transition: all 0.8s ease-in-out; /* Animação suave do slide */
+    }
+    """
+else:
+    layout_css = """
+    div.block-container {
+        justify-content: flex-start;
+        padding-top: 4rem;
+        transition: all 0.8s ease-in-out;
+    }
+    
+    /* Diminui a opacidade e escala dos Inputs e Botões quando o resultado aparece */
+    .main-title, .sub-title, div[data-testid="stTextInput"], div[data-testid="stButton"], div[data-testid="stCheckbox"] {
+        opacity: 0.6;
+        transform: scale(0.98);
+        transition: all 0.8s ease-in-out;
+    }
+    
+    /* Se passar o mouse, volta ao normal para poder editar */
+    .main-title:hover, .sub-title:hover, div[data-testid="stTextInput"]:hover, div[data-testid="stButton"]:hover, div[data-testid="stCheckbox"]:hover {
+        opacity: 1;
+        transform: scale(1);
+    }
+    """
+
+st.markdown(f"""
 <style>
-   
-    div.block-container { padding-top: 4rem; }
-    .main .block-container { max-width: 800px; }
-    .main-title { font-size: 2.2rem !important; font-weight: bold; text-align: center; }
-    .sub-title { color: gray; text-align: center; font-size: 1.25rem !important; }
+    /* CSS DINÂMICO INJETADO AQUI */
+    {layout_css}
+
+    /* CSS PADRÃO (NEON, CORES, ETC) */
+    .main .block-container {{ max-width: 800px; }}
+    .main-title {{ font-size: 2.2rem !important; font-weight: bold; text-align: center; }}
+    .sub-title {{ color: gray; text-align: center; font-size: 1.25rem !important; }}
     
     /* --- BOTÕES COM NEON SUTIL --- */
-    
-    /* Botão Calcular (Laranja) */
-    div[data-testid="stHorizontalBlock"] > div:nth-of-type(1) div[data-testid="stButton"] > button { 
+    div[data-testid="stHorizontalBlock"] > div:nth-of-type(1) div[data-testid="stButton"] > button {{ 
         background-color: rgb(221, 79, 5) !important; 
         color: #FFFFFF !important; 
         border-radius: 4rem; 
         border-color: transparent;
-        transition: all 0.1s ease; /* Suavidade na transição */
-    }
-    
-    /* Hover Calcular: Brilho Laranja */
-    div[data-testid="stHorizontalBlock"] > div:nth-of-type(1) div[data-testid="stButton"] > button:hover {
+        transition: all 0.3s ease; 
+    }}
+    div[data-testid="stHorizontalBlock"] > div:nth-of-type(1) div[data-testid="stButton"] > button:hover {{
         box-shadow: 0 0 12px rgba(221, 79, 5, 0.8), 0 0 20px rgba(221, 79, 5, 0.4);
-        transform: scale(1.0); /* Leve aumento */
-    }
+        transform: scale(1.02);
+    }}
 
-    /* Botão Próximos Eventos (Verde/Teal) */
-    div[data-testid="stHorizontalBlock"] > div:nth-of-type(2) div[data-testid="stButton"] > button { 
+    div[data-testid="stHorizontalBlock"] > div:nth-of-type(2) div[data-testid="stButton"] > button {{ 
         background-color: rgb(0, 80, 81) !important; 
         color: #FFFFFF !important; 
         border-radius: 4rem; 
         border-color: transparent;
-        transition: all 0.1s ease; /* Suavidade na transição */
-    }
-
-    /* Hover Próximos Eventos: Brilho Verde */
-    div[data-testid="stHorizontalBlock"] > div:nth-of-type(2) div[data-testid="stButton"] > button:hover {
+        transition: all 0.3s ease;
+    }}
+    div[data-testid="stHorizontalBlock"] > div:nth-of-type(2) div[data-testid="stButton"] > button:hover {{
         box-shadow: 0 0 12px rgba(0, 80, 81, 0.8), 0 0 20px rgba(0, 80, 81, 0.4);
-        transform: scale(1.0); /* Leve aumento */
-    }
-
+        transform: scale(1.02);
+    }}
     /* ------------------------------ */
 
-    div[data-testid="stTextInput"] input { border-radius: 1.5rem !important; text-align: center; font-weight: 600; }
-    .main div[data-testid="stTextInput"] > label { text-align: center !important; width: 100%; display: block; }
-    .results-container, .event-list-container.visible { animation: fadeIn 0.5s ease-out forwards; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-    .event-list-item { background-color: #cacaca3b00; padding: 10px; border-radius: 1.5rem; margin-bottom: 5px; text-align: center; }
-    body.dark .event-list-item { background-color: #cacaca3b00; color: #fafafa; }
-    .custom-warning, .custom-error { border-radius: 1.5rem; padding: 1rem; margin-top: 1rem; text-align: center; }
-    .custom-warning { background-color: rgba(255, 170, 0, 0); border: 1px solid #ffaa0000; color: rgb(247, 185, 61); }
-    .custom-error { background-color: rgba(255, 108, 108, 0.15); border: 1px solid rgb(255, 108, 108); color: rgb(255, 75, 75); }
-    .custom-error p { margin: 0.5rem 0 0 0; }
-    div[data-testid="stHeading"] a { display: none !important; }
-    div[data-testid="stMetric"] { background-color: transparent !important; padding: 0 !important; }
+    div[data-testid="stTextInput"] input {{ border-radius: 1.5rem !important; text-align: center; font-weight: 600; }}
+    .main div[data-testid="stTextInput"] > label {{ text-align: center !important; width: 100%; display: block; }}
+    .results-container, .event-list-container.visible {{ animation: fadeIn 0.8s ease-out forwards; }}
+    @keyframes fadeIn {{ from {{ opacity: 0; transform: translateY(20px); }} to {{ opacity: 1; transform: translateY(0); }} }}
+    .event-list-item {{ background-color: #cacaca3b00; padding: 10px; border-radius: 1.5rem; margin-bottom: 5px; text-align: center; }}
+    body.dark .event-list-item {{ background-color: #cacaca3b00; color: #fafafa; }}
+    .custom-warning, .custom-error {{ border-radius: 1.5rem; padding: 1rem; margin-top: 1rem; text-align: center; }}
+    .custom-warning {{ background-color: rgba(255, 170, 0, 0); border: 1px solid #ffaa0000; color: rgb(247, 185, 61); }}
+    .custom-error {{ background-color: rgba(255, 108, 108, 0.15); border: 1px solid rgb(255, 108, 108); color: rgb(255, 75, 75); }}
+    .custom-error p {{ margin: 0.5rem 0 0 0; }}
+    div[data-testid="stHeading"] a {{ display: none !important; }}
+    div[data-testid="stMetric"] {{ background-color: transparent !important; padding: 0 !important; }}
     div[data-testid="stMetric"] [data-testid="stMetricLabel"] p,
-    div[data-testid="stMetric"] [data-testid="stMetricValue"] { color: inherit !important; }
-    .section-container { text-align: center; margin-top: 1.5rem; }
-    .metric-custom { background-color: #F0F2F6; border-radius: 4rem; padding: 1rem; text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center; color: #31333f; }
-    .metric-almoco { background-color: #F0F2F6; }
-    .metric-saldo-pos { background-color: rgb(84, 198, 121); }
-    .metric-saldo-neg { background-color: rgb(255, 108, 108); }
-    .metric-minimo { background-color: rgb(57, 94, 94); }
-    .metric-padrao { background-color: rgb(0, 80, 81); } 
-    .metric-maximo { background-color: rgb(221, 79, 5); } 
-    .metric-custom .label { font-size: 0.875rem; margin-bottom: 0.25rem; color: #5a5a5a; }
-    .metric-custom .value { font-size: 1.5rem; font-weight: 900; color: #31333f; }
-    .metric-custom .details { font-size: 0.75rem; margin-top: 0.25rem; color: #5a5a5a; }
-    .metric-saldo-pos .value, .metric-saldo-neg .value, .metric-minimo .value, .metric-padrao .value, .metric-maximo .value { color: #FFFFFF; }
-    .metric-saldo-pos .label, .metric-saldo-neg .label, .metric-minimo .label, .metric-padrao .label, .metric-maximo .label, .metric-minimo .details, .metric-padrao .details, .metric-maximo .details { color: rgba(255, 255, 255, 0.85); }
-    .predictions-grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
-    .summary-grid-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
+    div[data-testid="stMetric"] [data-testid="stMetricValue"] {{ color: inherit !important; }}
+    .section-container {{ text-align: center; margin-top: 1.5rem; }}
+    .metric-custom {{ background-color: #F0F2F6; border-radius: 4rem; padding: 1rem; text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center; color: #31333f; }}
+    .metric-almoco {{ background-color: #F0F2F6; }}
+    .metric-saldo-pos {{ background-color: rgb(84, 198, 121); }}
+    .metric-saldo-neg {{ background-color: rgb(255, 108, 108); }}
+    .metric-minimo {{ background-color: rgb(57, 94, 94); }}
+    .metric-padrao {{ background-color: rgb(0, 80, 81); }} 
+    .metric-maximo {{ background-color: rgb(221, 79, 5); }} 
+    .metric-custom .label {{ font-size: 0.875rem; margin-bottom: 0.25rem; color: #5a5a5a; }}
+    .metric-custom .value {{ font-size: 1.5rem; font-weight: 900; color: #31333f; }}
+    .metric-custom .details {{ font-size: 0.75rem; margin-top: 0.25rem; color: #5a5a5a; }}
+    .metric-saldo-pos .value, .metric-saldo-neg .value, .metric-minimo .value, .metric-padrao .value, .metric-maximo .value {{ color: #FFFFFF; }}
+    .metric-saldo-pos .label, .metric-saldo-neg .label, .metric-minimo .label, .metric-padrao .label, .metric-maximo .label, .metric-minimo .details, .metric-padrao .details, .metric-maximo .details {{ color: rgba(255, 255, 255, 0.85); }}
+    .predictions-grid-container {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }}
+    .summary-grid-container {{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }}
     
-    .predictions-wrapper {
+    .predictions-wrapper {{
         transition: opacity 0.4s ease-out, transform 0.4s ease-out, padding 0.4s ease-out;
-    }
-    .predictions-wrapper.de-emphasized {
+    }}
+    .predictions-wrapper.de-emphasized {{
         opacity: 0.5;
         transform: scale(0.98);
         padding-bottom: 1rem;
         margin-bottom: 1rem;
-    }
+    }}
 
     /* Centralização e Fonte do Checkbox */
-    div[data-testid="stCheckbox"] {
+    div[data-testid="stCheckbox"] {{
         display: flex;
         justify-content: center;
         margin-top: 0px;
         padding-bottom: 0px;
-    }
-    div[data-testid="stCheckbox"] label span p {
+    }}
+    div[data-testid="stCheckbox"] label span p {{
         font-size: 0.85rem !important;
         color: #555;
-    }
+    }}
 
-    @media (max-width: 640px) {
-        .predictions-grid-container { grid-template-columns: repeat(2, 1fr); }
-        .predictions-grid-container .metric-minimo { order: 2; }
-        .predictions-grid-container .metric-padrao { order: 1; grid-column: 1 / -1; }
-        .predictions-grid-container .metric-maximo { order: 3; }
-        .summary-grid-container { grid-template-columns: repeat(2, 1fr); }
-    }
+    @media (max-width: 640px) {{
+        .predictions-grid-container {{ grid-template-columns: repeat(2, 1fr); }}
+        .predictions-grid-container .metric-minimo {{ order: 2; }}
+        .predictions-grid-container .metric-padrao {{ order: 1; grid-column: 1 / -1; }}
+        .predictions-grid-container .metric-maximo {{ order: 3; }}
+        .summary-grid-container {{ grid-template-columns: repeat(2, 1fr); }}
+    }}
     /* Estilos gerais para classes instáveis do Streamlit */
-    .st-bv {    font-weight: 800;}
-    .st-ay {    font-size: 1.3rem;}
-    .st-aw {    border-bottom-right-radius: 1.5rem;}
-    .st-av {    border-top-right-radius: 1.5rem;}
-    .st-au {    border-bottom-left-radius: 1.5rem;}
-    .st-at {    border-top-left-radius: 1.5rem;}
-    .st-emotion-cache-yinll1 svg { display: none; } 
-    .st-emotion-cache-ubko3j svg { display: none; }
-    .st-emotion-cache-467cry hr:not([size]) {    display: none;}
-    .st-emotion-cache-zh2fnc {    place-items: center; width: auto !important;}
-    .st-emotion-cache-3uj0rx hr:not([size]) { display: none;}
-    .st-emotion-cache-14vh5up {    display: none;}
-    a._container_gzau3_1._viewerBadge_nim44_23 {    display: none;}
-    .st-emotion-cache-scp8yw.e3g0k5y6 {    display: none;}
-    img._profileImage_gzau3_78._lightThemeShadow_gzau3_95 {    display: none;}
-    ._container_gzau3_1 {      display: none;}
-    ._profileImage_gzau3_78 {    display: none;}
-    .st-emotion-cache-1sss6mo {    display: none !important;}
-
+    .st-bv {{    font-weight: 800;}}
+    .st-ay {{    font-size: 1.3rem;}}
+    .st-aw {{    border-bottom-right-radius: 1.5rem;}}
+    .st-av {{    border-top-right-radius: 1.5rem;}}
+    .st-au {{    border-bottom-left-radius: 1.5rem;}}
+    .st-at {{    border-top-left-radius: 1.5rem;}}
+    .st-emotion-cache-yinll1 svg {{ display: none; }} 
+    .st-emotion-cache-ubko3j svg {{ display: none; }}
+    .st-emotion-cache-467cry hr:not([size]) {{    display: none;}}
+    .st-emotion-cache-zh2fnc {{    place-items: center; width: auto !important;}}
+    .st-emotion-cache-3uj0rx hr:not([size]) {{ display: none;}}
+    .st-emotion-cache-14vh5up {{    display: none;}}
+    a._container_gzau3_1._viewerBadge_nim44_23 {{    display: none;}}
+    .st-emotion-cache-scp8yw.e3g0k5y6 {{    display: none;}}
+    img._profileImage_gzau3_78._lightThemeShadow_gzau3_95 {{    display: none;}}
+    ._container_gzau3_1 {{      display: none;}}
+    ._profileImage_gzau3_78 {{    display: none;}}
+    .st-emotion-cache-1sss6mo {{    display: none !important;}}
 
 </style>
 """, unsafe_allow_html=True)
@@ -354,7 +391,6 @@ with col_main:
     entrada_str = st.text_input("Entrada", key="entrada", help="formatos aceitos:\nHMM, HHMM ou HH:MM")
     
     # --- CHECKBOX DE INTERVALO AUTOMÁTICO ---
-    # Agora definido como True por padrão e sem o emoji
     usar_intervalo_auto = st.checkbox("Intervalo Automático (Mínimo)", value=True, help="Calcula o desconto automático (30min ou 15min) sem precisar digitar os horários de almoço.")
     
     if not usar_intervalo_auto:
@@ -555,10 +591,6 @@ if st.session_state.show_results:
                      valor_almoco_display = f"{duracao_almoco_minutos_real:.0f}min <span style='font-size: 0.85rem; font-weight: 400; color: #5a5a5a;'>(Auto)</span>"
 
                 # CÁLCULO FINAL:
-                # 1. Desconto do Intervalo Obrigatório: MAX(Obrigatório, Realizado_Válido)
-                # 2. Desconto de Ausência: (Total Realizado - Realizado Válido)
-                # Trabalho Líquido = Bruto - Desconto_Obrigatório - Ausência
-                
                 desconto_intervalo_oficial = max(min_intervalo_real, almoco_valido_minutos)
                 trabalho_liquido_minutos = trabalho_bruto_minutos - desconto_intervalo_oficial - desconto_ausencia
                 
@@ -591,7 +623,6 @@ if st.session_state.show_results:
                      lista_de_permanencia.append(f"Parte do intervalo ({desconto_ausencia:.0f}min) realizado fora do horário permitido (11h às 16h)")
                 
                 if min_intervalo_real > 0 and almoco_valido_minutos < min_intervalo_real:
-                     # Se houve desconto de ausência, a mensagem acima já cobre, mas se foi só curto mesmo:
                      if desconto_ausencia == 0:
                         lista_de_permanencia.append(f"O {termo_intervalo_real} foi inferior a {min_intervalo_real} minutos")
                 
