@@ -68,8 +68,8 @@ def get_daily_weather():
         hourly_data = data['hourly']
         uv_index_midday = hourly_data['uv_index'][12]
         
-        # Formatando as partes
-        part1 = f"{icon} Hoje: Mín {temp_min:.0f}° / Máx {temp_max:.0f}°"
+        # Volta ao formato de lista para facilitar a junção com pipes depois
+        part1 = f"{icon} Hoje: Mín {temp_min:.0f}° e Máx {temp_max:.0f}°"
         part2 = f"Chuva: {rain_prob:.0f}%"
         
         uv_value = uv_index_midday
@@ -80,8 +80,6 @@ def get_daily_weather():
         else: uv_label = "(Extremo)"
         part3 = f"UV: {uv_value:.1f} {uv_label}"
         
-        # Retorna uma lista de strings em vez de uma string única
-        # para podermos separar visualmente no footer
         return [part1, part2, part3]
         
     except Exception as e:
@@ -141,7 +139,7 @@ def gerar_contagem_regressiva_home_office():
         dias_restantes = (data_home_office - hoje).days
         if dias_restantes < 0: return ""
         texto_dias = "dia" if dias_restantes == 1 else "dias"
-        return f"<strong>Integra II:</strong> {dias_restantes} {texto_dias}"
+        return f"<strong>Integra II:</strong> {dias_restantes} {texto_dias} para o home office"
     except Exception as e:
         print(f"Erro ao gerar contagem regressiva: {e}")
         return ""
@@ -235,7 +233,7 @@ else:
     div.block-container {
         transform: translateY(0);
         transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-        padding-bottom: 120px;
+        padding-bottom: 120px; /* Garante que o conteúdo não fique atrás do footer */
     }
     .main-title, .sub-title, div[data-testid="stTextInput"], div[data-testid="stButton"], div[data-testid="stCheckbox"] {
         opacity: 0.5;
@@ -257,36 +255,30 @@ st.markdown(f"""
     .main-title {{ font-size: 2.2rem !important; font-weight: bold; text-align: center; }}
     .sub-title {{ color: gray; text-align: center; font-size: 1.25rem !important; }}
     
-    /* --- FOOTER TIPO "BARRA DE STATUS" --- */
-    .custom-footer {{
+    /* --- FOOTER FIXO ESTILO "CLEAN" --- */
+    .fixed-footer {{
         position: fixed;
         left: 0;
         bottom: 0;
         width: 100%;
-        background-color: #1e2126; /* Cor escura sólida, diferente do fundo */
-        border-top: 1px solid #31333f;
-        color: #e0e0e0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 12px 0; /* Mais altura na barra */
+        text-align: center;
+        padding: 15px 10px;
         font-size: 0.85rem;
-        z-index: 9999;
-        box-shadow: 0 -4px 6px rgba(0,0,0,0.1);
-        font-family: sans-serif;
-    }}
-    .custom-footer div {{
-        display: inline-block;
-    }}
-    /* Separador vertical estiloso */
-    .footer-separator {{
-        margin: 0 20px;
-        color: #555;
-        font-weight: 300;
-        font-size: 1.1em;
+        color: gray;
+        background-color: transparent; /* Fundo transparente como antes */
+        z-index: 999;
+        pointer-events: none; /* Deixa clicar através dele se não tiver texto */
     }}
     
-    /* Esconde o footer padrão */
+    /* O conteúdo de texto dentro do footer */
+    .fixed-footer-content {{
+        pointer-events: auto; /* O texto em si pode ser selecionado */
+        background-color: transparent;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }}
+
     footer {{visibility: hidden;}}
     
     /* BOTÕES COM NEON */
@@ -349,8 +341,6 @@ st.markdown(f"""
         .predictions-grid-container .metric-padrao {{ order: 1; grid-column: 1 / -1; }}
         .predictions-grid-container .metric-maximo {{ order: 3; }}
         .summary-grid-container {{ grid-template-columns: repeat(2, 1fr); }}
-        .custom-footer {{ flex-direction: column; gap: 8px; }} /* Ajuste mobile */
-        .footer-separator {{ display: none; }} /* Esconde o pipe no mobile */
     }}
     
     .st-bv {{    font-weight: 800;}} .st-ay {{    font-size: 1.3rem;}} .st-aw {{    border-bottom-right-radius: 1.5rem;}} .st-av {{    border-top-right-radius: 1.5rem;}} .st-au {{    border-bottom-left-radius: 1.5rem;}} .st-at {{    border-top-left-radius: 1.5rem;}}
@@ -529,21 +519,22 @@ if st.session_state.show_results:
             st.session_state.show_results = False
 
 # --- 5. RENDERIZAÇÃO DO FOOTER FIXO ---
-weather_data = get_daily_weather() # Agora retorna uma lista
+weather_data = get_daily_weather() # Retorna lista
 contagem_regressiva = gerar_contagem_regressiva_home_office()
 
-# Monta o conteúdo do footer com itens separados
-items_html = []
+# Monta o HTML do footer com a formatação "antiga" (pipes e empilhado)
+footer_html = ""
+
+# Linha 1: Previsão do tempo (com pipes, como era antes)
 if weather_data:
-    # Adiciona cada parte da previsão do tempo (Mín/Máx, Chuva, UV)
-    for part in weather_data:
-        items_html.append(f"<div>{part}</div>")
+    # Juntar os itens da lista com " | "
+    weather_line = " | ".join(weather_data)
+    footer_html += f"<div>{weather_line}</div>"
 
+# Linha 2: Contagem regressiva
 if contagem_regressiva:
-    items_html.append(f"<div>{contagem_regressiva}</div>")
+    footer_html += f"<div>{contagem_regressiva}</div>"
 
-if items_html:
-    # Junta os itens com o separador estilizado
-    separator = '<span class="footer-separator">|</span>'
-    final_html = separator.join(items_html)
-    st.markdown(f'<div class="custom-footer">{final_html}</div>', unsafe_allow_html=True)
+if footer_html:
+    # Div container fixed no bottom
+    st.markdown(f'<div class="fixed-footer"><div class="fixed-footer-content">{footer_html}</div></div>', unsafe_allow_html=True)
