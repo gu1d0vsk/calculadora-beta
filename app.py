@@ -69,16 +69,16 @@ def get_daily_weather():
         uv_index_midday = hourly_data['uv_index'][12]
         
         forecast_parts = [
-            f"{icon} Hoje no Rio: Mínima de {temp_min:.0f}°C e Máxima de {temp_max:.0f}°C",
-            f"💧 {rain_prob:.0f}%"
+            f"{icon} Hoje: Mín {temp_min:.0f}° / Máx {temp_max:.0f}°",
+            f"Chuva: {rain_prob:.0f}%"
         ]
         
         uv_value = uv_index_midday
-        if uv_value <= 2: uv_text = f"😎 UV ao meio-dia: {uv_value:.1f} (Baixo)"
-        elif uv_value <= 5: uv_text = f"🙂 UV ao meio-dia: {uv_value:.1f} (Moderado)"
-        elif uv_value <= 7: uv_text = f"🥵 UV ao meio-dia: {uv_value:.1f} (Alto)"
-        elif uv_value <= 10: uv_text = f"⚠️ UV ao meio-dia: {uv_value:.1f} (Muito Alto)"
-        else: uv_text = f"‼️ UV ao meio-dia: {uv_value:.1f} (Extremo)"
+        if uv_value <= 2: uv_text = f"UV: {uv_value:.1f} (Baixo)"
+        elif uv_value <= 5: uv_text = f"UV: {uv_value:.1f} (Mod)"
+        elif uv_value <= 7: uv_text = f"UV: {uv_value:.1f} (Alto)"
+        elif uv_value <= 10: uv_text = f"UV: {uv_value:.1f} (M. Alto)"
+        else: uv_text = f"UV: {uv_value:.1f} (Extremo)"
         
         forecast_parts.append(uv_text)
         return " | ".join(forecast_parts)
@@ -139,7 +139,7 @@ def gerar_contagem_regressiva_home_office():
         dias_restantes = (data_home_office - hoje).days
         if dias_restantes < 0: return ""
         texto_dias = "dia" if dias_restantes == 1 else "dias"
-        return f"<strong>Integra II:</strong> {dias_restantes} {texto_dias} para o home office"
+        return f"<strong>Integra II:</strong> {dias_restantes} {texto_dias}"
     except Exception as e:
         print(f"Erro ao gerar contagem regressiva: {e}")
         return ""
@@ -233,7 +233,7 @@ else:
     div.block-container {
         transform: translateY(0);
         transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-        padding-bottom: 120px;
+        padding-bottom: 120px; /* Espaço para o footer não cobrir conteúdo */
     }
     .main-title, .sub-title, div[data-testid="stTextInput"], div[data-testid="stButton"], div[data-testid="stCheckbox"] {
         opacity: 0.5;
@@ -255,18 +255,29 @@ st.markdown(f"""
     .main-title {{ font-size: 2.2rem !important; font-weight: bold; text-align: center; }}
     .sub-title {{ color: gray; text-align: center; font-size: 1.25rem !important; }}
     
-    /* FOOTER FIXO */
+    /* --- FOOTER TIPO BARRA (NEWS TICKER STYLE) --- */
     .custom-footer {{
-        position: fixed; left: 0; bottom: 0; width: 100%;
-        background-color: transparent;
-        backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
-        color: gray; text-align: center; padding: 15px 10px;
-        font-size: 0.85rem; z-index: 999;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        background-color: #0E1117; /* Cor de fundo escura do tema padrão */
+        border-top: 1px solid #262730; /* Linha de separação sutil */
+        color: #FAFAFA;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 10px 0;
+        font-size: 0.85rem;
+        z-index: 9999;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+    }}
+    .custom-footer div {{
+        margin: 0 15px;
     }}
     footer {{visibility: hidden;}}
     
-    /* BOTÕES COM NEON */
+    /* --- BOTÕES COM NEON --- */
     div[data-testid="stHorizontalBlock"] > div:nth-of-type(1) div[data-testid="stButton"] > button {{ 
         background-color: rgb(221, 79, 5) !important; color: #FFFFFF !important; border-radius: 4rem; border-color: transparent;
         transition: all 0.3s ease; 
@@ -326,8 +337,9 @@ st.markdown(f"""
         .predictions-grid-container .metric-padrao {{ order: 1; grid-column: 1 / -1; }}
         .predictions-grid-container .metric-maximo {{ order: 3; }}
         .summary-grid-container {{ grid-template-columns: repeat(2, 1fr); }}
+        .custom-footer {{ flex-direction: column; gap: 5px; }} /* Em celular, empilha */
     }}
-    /* Estilos gerais para classes instáveis do Streamlit */
+    
     .st-bv {{    font-weight: 800;}} .st-ay {{    font-size: 1.3rem;}} .st-aw {{    border-bottom-right-radius: 1.5rem;}} .st-av {{    border-top-right-radius: 1.5rem;}} .st-au {{    border-bottom-left-radius: 1.5rem;}} .st-at {{    border-top-left-radius: 1.5rem;}}
     .st-emotion-cache-yinll1 svg, .st-emotion-cache-ubko3j svg {{ display: none; }} 
     .st-emotion-cache-467cry hr:not([size]) {{    display: none;}} .st-emotion-cache-zh2fnc {{    place-items: center; width: auto !important;}} .st-emotion-cache-3uj0rx hr:not([size]) {{ display: none;}} .st-emotion-cache-14vh5up, a._container_gzau3_1._viewerBadge_nim44_23, .st-emotion-cache-scp8yw.e3g0k5y6, img._profileImage_gzau3_78._lightThemeShadow_gzau3_95, ._container_gzau3_1, ._profileImage_gzau3_78, .st-emotion-cache-1sss6mo {{    display: none !important;}}
@@ -507,11 +519,12 @@ if st.session_state.show_results:
 daily_forecast = get_daily_weather()
 contagem_regressiva = gerar_contagem_regressiva_home_office()
 
+# Monta o conteúdo do footer
 footer_content = ""
-if daily_forecast: footer_content += f"<div>{daily_forecast}</div>"
-if contagem_regressiva:
-    margin_top = "5px" if daily_forecast else "0"
-    footer_content += f"<div style='margin-top: {margin_top};'>{contagem_regressiva}</div>"
+items = []
+if daily_forecast: items.append(f"<div>{daily_forecast}</div>")
+if contagem_regressiva: items.append(f"<div>{contagem_regressiva}</div>")
 
-if footer_content:
+if items:
+    footer_content = "<div style='color: #666; margin: 0 10px;'>|</div>".join(items) # Separador
     st.markdown(f'<div class="custom-footer">{footer_content}</div>', unsafe_allow_html=True)
