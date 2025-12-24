@@ -68,23 +68,25 @@ def get_daily_weather():
         hourly_data = data['hourly']
         uv_index_midday = hourly_data['uv_index'][12]
         
-        forecast_parts = [
-            f"{icon} Hoje: Mín {temp_min:.0f}° / Máx {temp_max:.0f}°",
-            f"Chuva: {rain_prob:.0f}%"
-        ]
+        # Formatando as partes
+        part1 = f"{icon} Hoje: Mín {temp_min:.0f}° / Máx {temp_max:.0f}°"
+        part2 = f"Chuva: {rain_prob:.0f}%"
         
         uv_value = uv_index_midday
-        if uv_value <= 2: uv_text = f"UV: {uv_value:.1f} (Baixo)"
-        elif uv_value <= 5: uv_text = f"UV: {uv_value:.1f} (Mod)"
-        elif uv_value <= 7: uv_text = f"UV: {uv_value:.1f} (Alto)"
-        elif uv_value <= 10: uv_text = f"UV: {uv_value:.1f} (M. Alto)"
-        else: uv_text = f"UV: {uv_value:.1f} (Extremo)"
+        if uv_value <= 2: uv_label = "(Baixo)"
+        elif uv_value <= 5: uv_label = "(Mod)"
+        elif uv_value <= 7: uv_label = "(Alto)"
+        elif uv_value <= 10: uv_label = "(M. Alto)"
+        else: uv_label = "(Extremo)"
+        part3 = f"UV: {uv_value:.1f} {uv_label}"
         
-        forecast_parts.append(uv_text)
-        return " | ".join(forecast_parts)
+        # Retorna uma lista de strings em vez de uma string única
+        # para podermos separar visualmente no footer
+        return [part1, part2, part3]
+        
     except Exception as e:
         print(f"Erro ao buscar previsão diária: {e}")
-        return ""
+        return []
 
 def obter_artigo(nome_evento):
     nome_lower = nome_evento.lower()
@@ -233,7 +235,7 @@ else:
     div.block-container {
         transform: translateY(0);
         transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-        padding-bottom: 120px; /* Espaço para o footer não cobrir conteúdo */
+        padding-bottom: 120px;
     }
     .main-title, .sub-title, div[data-testid="stTextInput"], div[data-testid="stButton"], div[data-testid="stCheckbox"] {
         opacity: 0.5;
@@ -255,29 +257,39 @@ st.markdown(f"""
     .main-title {{ font-size: 2.2rem !important; font-weight: bold; text-align: center; }}
     .sub-title {{ color: gray; text-align: center; font-size: 1.25rem !important; }}
     
-    /* --- FOOTER TIPO BARRA (NEWS TICKER STYLE) --- */
+    /* --- FOOTER TIPO "BARRA DE STATUS" --- */
     .custom-footer {{
         position: fixed;
         left: 0;
         bottom: 0;
         width: 100%;
-        background-color: #0E1117; /* Cor de fundo escura do tema padrão */
-        border-top: 1px solid #262730; /* Linha de separação sutil */
-        color: #FAFAFA;
+        background-color: #1e2126; /* Cor escura sólida, diferente do fundo */
+        border-top: 1px solid #31333f;
+        color: #e0e0e0;
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 10px 0;
+        padding: 12px 0; /* Mais altura na barra */
         font-size: 0.85rem;
         z-index: 9999;
-        box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+        box-shadow: 0 -4px 6px rgba(0,0,0,0.1);
+        font-family: sans-serif;
     }}
     .custom-footer div {{
-        margin: 0 15px;
+        display: inline-block;
     }}
+    /* Separador vertical estiloso */
+    .footer-separator {{
+        margin: 0 20px;
+        color: #555;
+        font-weight: 300;
+        font-size: 1.1em;
+    }}
+    
+    /* Esconde o footer padrão */
     footer {{visibility: hidden;}}
     
-    /* --- BOTÕES COM NEON --- */
+    /* BOTÕES COM NEON */
     div[data-testid="stHorizontalBlock"] > div:nth-of-type(1) div[data-testid="stButton"] > button {{ 
         background-color: rgb(221, 79, 5) !important; color: #FFFFFF !important; border-radius: 4rem; border-color: transparent;
         transition: all 0.3s ease; 
@@ -337,7 +349,8 @@ st.markdown(f"""
         .predictions-grid-container .metric-padrao {{ order: 1; grid-column: 1 / -1; }}
         .predictions-grid-container .metric-maximo {{ order: 3; }}
         .summary-grid-container {{ grid-template-columns: repeat(2, 1fr); }}
-        .custom-footer {{ flex-direction: column; gap: 5px; }} /* Em celular, empilha */
+        .custom-footer {{ flex-direction: column; gap: 8px; }} /* Ajuste mobile */
+        .footer-separator {{ display: none; }} /* Esconde o pipe no mobile */
     }}
     
     .st-bv {{    font-weight: 800;}} .st-ay {{    font-size: 1.3rem;}} .st-aw {{    border-bottom-right-radius: 1.5rem;}} .st-av {{    border-top-right-radius: 1.5rem;}} .st-au {{    border-bottom-left-radius: 1.5rem;}} .st-at {{    border-top-left-radius: 1.5rem;}}
@@ -516,15 +529,21 @@ if st.session_state.show_results:
             st.session_state.show_results = False
 
 # --- 5. RENDERIZAÇÃO DO FOOTER FIXO ---
-daily_forecast = get_daily_weather()
+weather_data = get_daily_weather() # Agora retorna uma lista
 contagem_regressiva = gerar_contagem_regressiva_home_office()
 
-# Monta o conteúdo do footer
-footer_content = ""
-items = []
-if daily_forecast: items.append(f"<div>{daily_forecast}</div>")
-if contagem_regressiva: items.append(f"<div>{contagem_regressiva}</div>")
+# Monta o conteúdo do footer com itens separados
+items_html = []
+if weather_data:
+    # Adiciona cada parte da previsão do tempo (Mín/Máx, Chuva, UV)
+    for part in weather_data:
+        items_html.append(f"<div>{part}</div>")
 
-if items:
-    footer_content = "<div style='color: #666; margin: 0 10px;'>|</div>".join(items) # Separador
-    st.markdown(f'<div class="custom-footer">{footer_content}</div>', unsafe_allow_html=True)
+if contagem_regressiva:
+    items_html.append(f"<div>{contagem_regressiva}</div>")
+
+if items_html:
+    # Junta os itens com o separador estilizado
+    separator = '<span class="footer-separator">|</span>'
+    final_html = separator.join(items_html)
+    st.markdown(f'<div class="custom-footer">{final_html}</div>', unsafe_allow_html=True)
