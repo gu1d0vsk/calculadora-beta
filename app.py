@@ -214,19 +214,24 @@ if st.session_state.show_results and not entrada_str:
     st.warning("Por favor, preencha pelo menos o horário de entrada.")
     st.session_state.show_results = False
 
-# --- 3. LÓGICA DE CSS DINÂMICO OTIMIZADO ---
+# --- 3. LÓGICA DE CSS DINÂMICO OTIMIZADO PARA MOBILE ---
 has_active_content = st.session_state.show_results or st.session_state.show_events
 
 if not has_active_content:
-    # Estado Inicial: Empurrado para baixo via TRANSFORM (GPU Accelerated)
+    # Estado Inicial
     layout_css = """
     div.block-container {
-        transform: translateY(25vh); /* Usa GPU, muito mais leve que padding */
-        transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease-in-out; /* Curva de animação suave */
+        transform: translateY(25vh); /* Desktop: Centraliza bem */
+        transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease-in-out;
+    }
+    @media (max-width: 640px) {
+        div.block-container {
+            transform: translateY(10vh); /* Mobile: Sobe mais para não ficar "caído" */
+        }
     }
     """
 else:
-    # Estado Ativo: Posição original (0) + Opacidade nos inputs
+    # Estado Ativo: Posição original (0)
     layout_css = """
     div.block-container {
         transform: translateY(0);
