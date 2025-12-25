@@ -429,11 +429,16 @@ if st.session_state.show_results:
                         desconto_ausencia = duracao_almoco_minutos_real - almoco_valido_minutos
                 else:
                     trabalho_bruto_temp = 0
-                    if saida_valida > entrada_valida: trabalho_bruto_temp = (saida_valida - entrada_valida).total_seconds() / 60
-                    if trabalho_bruto_temp <= 240: almoco_valido_minutos = 0
+                    if saida_valida > entrada_valida:
+                         trabalho_bruto_temp = (saida_valida - entrada_valida).total_seconds() / 60
+                    
+                    if trabalho_bruto_temp <= 240:
+                        almoco_valido_minutos = 0
+                    elif (trabalho_bruto_temp - 15) <= 360: 
+                        almoco_valido_minutos = 15 
                     else:
-                        excedente_para_5h59 = trabalho_bruto_temp - 359
-                        almoco_valido_minutos = min(30, max(15, excedente_para_5h59))
+                        almoco_valido_minutos = 30
+                    
                     duracao_almoco_minutos_real = almoco_valido_minutos
 
                 almoco_fisico_minutos = duracao_almoco_minutos_real
@@ -500,8 +505,6 @@ if st.session_state.show_results:
             st.error(f"Ocorreu um erro inesperado: {e}")
         finally:
             st.session_state.show_results = False
-
-# ... (Mantenha todo o código acima até a linha: st.session_state.show_results = False) ...
 
 # --- CÁLCULO DOS DADOS DO RODAPÉ ---
 daily_forecast = get_daily_weather()
