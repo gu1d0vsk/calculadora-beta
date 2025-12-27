@@ -568,7 +568,7 @@ js_footer = f"""
         footer.style.bottom = "0";
         footer.style.width = "100%";
         footer.style.textAlign = "center";
-        footer.style.backgroundColor = "rgba(240, 242, 246, 0.01)"; // Fundo quase opaco
+        footer.style.backgroundColor = "rgba(240, 242, 246, 0.01)"; //
         footer.style.color = "#555";
         footer.style.padding = "8px 10px"; // Padding ajustado
         footer.style.fontSize = "0.75rem"; // Fonte menor para caber tudo
@@ -581,6 +581,7 @@ js_footer = f"""
         footer.style.flexWrap = "wrap"; // Permite quebrar linha no celular
         footer.style.lineHeight = "1.4";
         footer.style.fontFamily = "sans-serif";
+        footer.style.z-index: "9999999";
         
         // Injeta no corpo da página
         window.parent.document.body.appendChild(footer);
