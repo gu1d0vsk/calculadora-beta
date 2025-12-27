@@ -606,6 +606,7 @@ js_footer = f"""
 """
 
 components.html(js_footer, height=0)
+
 components.html(
     """
     <script>
