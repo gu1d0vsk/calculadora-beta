@@ -252,11 +252,30 @@ else:
 
 st.markdown(f"""
 <style>
-    /* Injeta o CSS dinâmico */
+    /* --- CSS "NUCLEAR" PARA LIMPAR A INTERFACE DO STREAMLIT --- */
+    
+    /* Esconde o rodapé padrão "Made with Streamlit" */
+    footer {{visibility: hidden;}}
+    
+    /* Esconde o menu de 3 pontos no topo direito (Opcional - remove se quiser manter o menu) */
+    #MainMenu {{visibility: hidden;}}
+    
+    /* Esconde a barra colorida no topo da tela */
+    header {{visibility: hidden;}}
+    
+    /* Tenta esconder o botão de deploy/gerenciar app (A Coroa) */
+    .stDeployButton {{display:none;}}
+    
+    /* Esconde ícones de status de execução */
+    [data-testid="stStatusWidget"] {{display:none;}}
+
+    /* --------------------------------------------------------- */
+
+    /* Injeta o CSS dinâmico de animação que você já tinha */
     {layout_css}
 
-    /* CSS GERAL */
-    .main .block-container {{ max-width: 800px; }}
+    /* CSS GERAL DO SEU APP */
+    .main .block-container {{ max-width: 800px; padding-bottom: 5rem; }} /* Padding extra pro footer não cobrir */
     .main-title {{ font-size: 2.2rem !important; font-weight: bold; text-align: center; }}
     .sub-title {{ color: gray; text-align: center; font-size: 1.25rem !important; }}
     
