@@ -606,3 +606,40 @@ js_footer = f"""
 """
 
 components.html(js_footer, height=0)
+components.html(
+    """
+    <script>
+        const removeStreamlitElements = () => {
+            // Alvo: O rodapé padrão (onde fica o "Made with Streamlit")
+            const footer = window.parent.document.querySelector('footer');
+            if (footer) {
+                footer.style.display = 'none';
+            }
+
+            // Alvo: O botão vermelho específico "Hosted with Streamlit" (caso seja separado do footer)
+            // Eles costumam mudar a classe, mas geralmente está numa div com 'viewerBadge'
+            const badge = window.parent.document.querySelector('div[class*="viewerBadge"]');
+            if (badge) {
+                badge.style.display = 'none';
+            }
+            
+            // Opcional: Remover o menu de hamburguer do topo (caso queira limpar tudo)
+            // const header = window.parent.document.querySelector('header');
+            // if (header) {
+            //    header.style.display = 'none';
+            // }
+        }
+
+        // Tenta rodar assim que carrega
+        removeStreamlitElements();
+
+        // Como o Streamlit as vezes recarrega elementos, vamos garantir com um observer
+        const observer = new MutationObserver(() => {
+            removeStreamlitElements();
+        });
+        
+        observer.observe(window.parent.document.body, { childList: true, subtree: true });
+    </script>
+    """,
+    height=0,
+)
