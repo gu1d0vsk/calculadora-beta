@@ -249,63 +249,26 @@ else:
         transform: scale(1);
     }
     """
-hide_st_style = """
-<style>
-#MainMenu {visibility: hidden;}
-footer {visibility: hidden;}
-</style>
-"""
 
 st.markdown(f"""
 <style>
     /* --- CSS "NUCLEAR" PARA LIMPAR A INTERFACE DO STREAMLIT --- */
     
-    /* 1. Oculta o Header Superior (onde fica o menu hambúrguer) */
-    header, [data-testid="stHeader"] {{
-        visibility: hidden !important;
-        height: 0px !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-        display: none !important;
-    }}
-    ._container_gzau3_1. {{ display: none !important;}}
+    /* Esconde o rodapé padrão "Made with Streamlit" */
+    footer {{visibility: hidden;}}
     
-    ._profileContainer_gzau3_53 {{  display: none !important;}}
-
-
-    /* 2. Oculta o Rodapé Padrão */
-    footer, [data-testid="stFooter"] {{
-        visibility: hidden !important;
-        height: 0px !important;
-        opacity: 0 !important;
-        display: none !important;
-    }}
+    /* Esconde o menu de 3 pontos no topo direito (Opcional - remove se quiser manter o menu) */
+    #MainMenu {{visibility: hidden;}}
     
-    /* 3. Oculta a Toolbar (botões de deploy, menu de 3 pontos, etc) */
-    [data-testid="stToolbar"], [data-testid="stStatusWidget"] {{
-        visibility: hidden !important;
-        display: none !important;
-        height: 0px !important;
-    }}
-
-    /* 4. Oculta a decoração colorida no topo */
-    [data-testid="stDecoration"] {{
-        visibility: hidden !important;
-        display: none !important;
-    }}
-
-    /* 5. Ajuste de Espaçamento para o conteúdo subir */
-    .main .block-container {{
-        padding-top: 1rem !important; 
-        padding-bottom: 5rem !important; /* Espaço para o seu rodapé fixo */
-        max-width: 800px;
-    }}
+    /* Esconde a barra colorida no topo da tela */
+    header {{visibility: hidden;}}
     
-    /* 6. Força bruta para remover o menu Hamburger especificamente (pelo ID) */
-    #MainMenu {{
-        visibility: hidden !important;
-        display: none !important;
-    }}
+    /* Tenta esconder o botão de deploy/gerenciar app (A Coroa) */
+    .stDeployButton {{display:none;}}
+    
+    /* Esconde ícones de status de execução */
+    [data-testid="stStatusWidget"] {{display:none;}}
+
     /* --------------------------------------------------------- */
 
     /* Injeta o CSS dinâmico de animação que você já tinha */
@@ -384,7 +347,7 @@ st.markdown(f"""
     .st-emotion-cache-yinll1 svg, .st-emotion-cache-ubko3j svg {{ display: none; }} 
     .st-emotion-cache-467cry hr:not([size]) {{    display: none;}} .st-emotion-cache-zh2fnc {{    place-items: center; width: auto !important;}} .st-emotion-cache-3uj0rx hr:not([size]) {{ display: none;}} .st-emotion-cache-14vh5up, a._container_gzau3_1._viewerBadge_nim44_23, .st-emotion-cache-scp8yw.e3g0k5y6, img._profileImage_gzau3_78._lightThemeShadow_gzau3_95, ._container_gzau3_1, ._profileImage_gzau3_78, .st-emotion-cache-1sss6mo {{    display: none !important;}}
 </style>
-""", hide_st_style, unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
 # --- 4. RENDERIZAÇÃO DOS CONTEÚDOS ---
 
