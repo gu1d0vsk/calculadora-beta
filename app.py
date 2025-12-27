@@ -254,33 +254,47 @@ st.markdown(f"""
 <style>
     /* --- CSS "NUCLEAR" PARA LIMPAR A INTERFACE DO STREAMLIT --- */
     
-    /* 1. Esconde o Header (Menu hamburguer e barra colorida no topo) */
-    header[data-testid="stHeader"] {{
-        display: none !important;
+    /* 1. Oculta o Header Superior (onde fica o menu hambúrguer) */
+    header, [data-testid="stHeader"] {{
         visibility: hidden !important;
+        height: 0px !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        display: none !important;
     }}
 
-    /* 2. Esconde o Rodapé padrão ("Made with Streamlit") */
-    footer[data-testid="stFooter"] {{
-        display: none !important;
+    /* 2. Oculta o Rodapé Padrão */
+    footer, [data-testid="stFooter"] {{
         visibility: hidden !important;
+        height: 0px !important;
+        opacity: 0 !important;
+        display: none !important;
     }}
     
-    /* 3. Tenta esconder elementos específicos de decoração */
-    div[data-testid="stDecoration"] {{
+    /* 3. Oculta a Toolbar (botões de deploy, menu de 3 pontos, etc) */
+    [data-testid="stToolbar"], [data-testid="stStatusWidget"] {{
+        visibility: hidden !important;
+        display: none !important;
+        height: 0px !important;
+    }}
+
+    /* 4. Oculta a decoração colorida no topo */
+    [data-testid="stDecoration"] {{
+        visibility: hidden !important;
         display: none !important;
     }}
 
-    /* 4. Esconde o botão de 'Status' que às vezes aparece */
-    div[data-testid="stStatusWidget"] {{
-        display: none !important;
-    }}
-
-    /* 5. Ajuste fino para garantir que o espaço do header suma */
+    /* 5. Ajuste de Espaçamento para o conteúdo subir */
     .main .block-container {{
-        padding-top: 1rem !important; /* Reduz o espaço vazio no topo */
-        padding-bottom: 5rem !important; /* Espaço pro seu rodapé fixo */
+        padding-top: 1rem !important; 
+        padding-bottom: 5rem !important; /* Espaço para o seu rodapé fixo */
         max-width: 800px;
+    }}
+    
+    /* 6. Força bruta para remover o menu Hamburger especificamente (pelo ID) */
+    #MainMenu {{
+        visibility: hidden !important;
+        display: none !important;
     }}
     /* --------------------------------------------------------- */
 
