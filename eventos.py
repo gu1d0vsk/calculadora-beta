@@ -7,47 +7,47 @@ import datetime
 
 FERIADOS = {
     # --- 2025 ---
-    datetime.date(2025, 1, 1): "dia da Confraternização Universal",
+    datetime.date(2025, 1, 1): "Confraternização Universal",
     datetime.date(2025, 1, 20): "dia de São Sebastião (RJ)",
     datetime.date(2025, 3, 3): "Ponto Facultativo de Carnaval",
     datetime.date(2025, 3, 4): "Carnaval",
     datetime.date(2025, 3, 5): "Ponto Facultativo de Carnaval",
-    datetime.date(2025, 4, 18): "dia da Paixão de Cristo",
+    datetime.date(2025, 4, 18): "Paixão de Cristo",
     datetime.date(2025, 4, 21): "dia de Tiradentes",
     datetime.date(2025, 4, 23): "Dia de São Jorge (RJ)",
-    datetime.date(2025, 5, 1): "dia do Trabalho",
-    datetime.date(2025, 5, 2): "Compensação (Dia Ponte)",
+    datetime.date(2025, 5, 1): "Trabalho",
+    datetime.date(2025, 5, 2): "Dia Ponte",
     datetime.date(2025, 6, 19): "dia de Corpus Christi",
-    datetime.date(2025, 6, 20): "Compensação (Dia Ponte)",
-    datetime.date(2025, 9, 7): "dia da Independência do Brasil",
-    datetime.date(2025, 10, 12): "dia da Nossa Senhora Aparecida",
+    datetime.date(2025, 6, 20): "Dia Ponte",
+    datetime.date(2025, 9, 7): "Independência do Brasil",
+    datetime.date(2025, 10, 12): "Nossa Senhora Aparecida",
     datetime.date(2025, 11, 2): "dia de Finados",
-    datetime.date(2025, 11, 15): "dia da Proclamação da República",
-    datetime.date(2025, 11, 20): "dia da Consciência Negra",
+    datetime.date(2025, 11, 15): "Proclamação da República",
+    datetime.date(2025, 11, 20): "Consciência Negra",
     datetime.date(2025, 11, 21): "dia Ponte",
     datetime.date(2025, 12, 24): "ponto Facultativo de Natal",
     datetime.date(2025, 12, 25): "Natal",
-    datetime.date(2025, 12, 26): "Compensação (Dia Ponte)",
+    datetime.date(2025, 12, 26): "Dia Ponte",
     datetime.date(2025, 12, 31): "ponto Facultativo de Ano Novo",
-    # [cite_start]--- 2026 [cite: 6] ---
-    datetime.date(2026, 1, 1): "dia da Confraternização Universal",
-    datetime.date(2026, 1, 2): "Compensação (Dia Ponte)",
+    # --- 2026 ---
+    datetime.date(2026, 1, 1): "Confraternização Universal",
+    datetime.date(2026, 1, 2): "Dia Ponte",
     datetime.date(2026, 1, 20): "dia de São Sebastião (RJ)",
     datetime.date(2026, 2, 16): "Ponto Facultativo de Carnaval",
     datetime.date(2026, 2, 17): "Carnaval",
     datetime.date(2026, 2, 18): "Ponto Facultativo (Quarta de Cinzas)",
-    datetime.date(2026, 4, 3): "dia da Paixão de Cristo",
-    datetime.date(2026, 4, 20): "Compensação (Dia Ponte)",
+    datetime.date(2026, 4, 3): "Paixão de Cristo",
+    datetime.date(2026, 4, 20): "Dia Ponte",
     datetime.date(2026, 4, 21): "dia de Tiradentes",
     datetime.date(2026, 4, 23): "Dia de São Jorge (RJ)",
-    datetime.date(2026, 5, 1): "dia do Trabalho",
+    datetime.date(2026, 5, 1): "Trabalho",
     datetime.date(2026, 6, 4): "dia de Corpus Christi",
-    datetime.date(2026, 6, 5): "Compensação (Dia Ponte)",
-    datetime.date(2026, 9, 7): "dia da Independência do Brasil",
-    datetime.date(2026, 10, 12): "dia da Nossa Senhora Aparecida",
+    datetime.date(2026, 6, 5): "Dia Ponte",
+    datetime.date(2026, 9, 7): "Independência do Brasil",
+    datetime.date(2026, 10, 12): "Nossa Senhora Aparecida",
     datetime.date(2026, 11, 2): "dia de Finados",
-    datetime.date(2026, 11, 15): "dia da Proclamação da República",
-    datetime.date(2026, 11, 20): "dia da Consciência Negra",
+    datetime.date(2026, 11, 15): "Proclamação da República",
+    datetime.date(2026, 11, 20): "Consciência Negra",
     datetime.date(2026, 12, 24): "ponto Facultativo de Natal",
     datetime.date(2026, 12, 25): "Natal",
     datetime.date(2026, 12, 31): "ponto Facultativo de Ano Novo",
@@ -67,7 +67,7 @@ DATAS_PAGAMENTO_VA_VR = {
     datetime.date(2025, 10, 30): "Crédito do VA/VR (Ref. Novembro)",
     datetime.date(2025, 11, 28): "Crédito do VA/VR (Ref. Dezembro)",
     datetime.date(2025, 12, 30): "Crédito do VA/VR (Ref. Janeiro/26)",
-    # [cite_start]--- 2026 [cite: 63] ---
+    # --- 2026 ---
     datetime.date(2026, 1, 30): "Crédito do VA/VR (Ref. Fevereiro)",
     datetime.date(2026, 2, 27): "Crédito do VA/VR (Ref. Março)",
     datetime.date(2026, 3, 30): "Crédito do VA/VR (Ref. Abril)",
@@ -96,7 +96,7 @@ DATAS_LIMITE_BENEFICIOS = {
     datetime.date(2025, 10, 10): "data limite de solicitações e alterações de benefícios (Outubro)",
     datetime.date(2025, 11, 10): "data limite de solicitações e alterações de benefícios (Novembro)",
     datetime.date(2025, 12, 10): "data limite de solicitações e alterações de benefícios (Dezembro)",
-    # [cite_start]--- 2026 [cite: 54] ---
+    # --- 2026 ---
     datetime.date(2026, 1, 12): "data limite de solicitações e alterações de benefícios (Janeiro)",
     datetime.date(2026, 2, 10): "data limite de solicitações e alterações de benefícios (Fevereiro)",
     datetime.date(2026, 3, 10): "data limite de solicitações e alterações de benefícios (Março)",
@@ -125,7 +125,7 @@ DATAS_PAGAMENTO_SALARIO = {
     datetime.date(2025, 10, 30): "Pagamento do Salário (Outubro)",
     datetime.date(2025, 11, 28): "Pagamento do Salário (Novembro)",
     datetime.date(2025, 12, 30): "Pagamento do Salário (Dezembro)",
-    # [cite_start]--- 2026 [cite: 14] ---
+    # --- 2026 ---
     datetime.date(2026, 1, 30): "Pagamento do Salário (Janeiro)",
     datetime.date(2026, 2, 27): "Pagamento do Salário (Fevereiro)",
     datetime.date(2026, 3, 30): "Pagamento do Salário (Março)",
@@ -145,7 +145,7 @@ DATAS_PAGAMENTO_13 = {
     datetime.date(2025, 1, 10): "Adiantamento 1ª parcela do 13º Salário",
     datetime.date(2025, 11, 28): "13º Salário (para quem não pediu adiantamento)",
     datetime.date(2025, 12, 19): "2ª parcela do 13º Salário",
-    # [cite_start]--- 2026 [cite: 42] ---
+    # --- 2026 ---
     datetime.date(2026, 1, 9): "Adiantamento 1ª parcela do 13º Salário",
     datetime.date(2026, 11, 30): "1ª parcela do 13º Salário (para quem não adiantou)",
     datetime.date(2026, 12, 18): "2ª parcela do 13º Salário",
@@ -165,7 +165,7 @@ DATAS_ADIANTAMENTO_SALARIO = {
     datetime.date(2025, 10, 15): "Adiantamento Salarial (Outubro)",
     datetime.date(2025, 11, 14): "Adiantamento Salarial (Novembro)",
     datetime.date(2025, 12, 12): "Adiantamento Salarial (Dezembro)",
-    # [cite_start]--- 2026 [cite: 16-41] ---
+    # --- 2026 ---
     datetime.date(2026, 1, 15): "Adiantamento Salarial (Janeiro)",
     datetime.date(2026, 2, 13): "Adiantamento Salarial (Fevereiro)",
     datetime.date(2026, 3, 13): "Adiantamento Salarial (Março)",
@@ -183,6 +183,6 @@ DATAS_ADIANTAMENTO_SALARIO = {
 CESTA_NATALINA = {
     # --- 2025 ---
     datetime.date(2025, 12, 19): "Cesta Natalina",
-    # [cite_start]--- 2026 [cite: 63] ---
+    # --- 2026 ---
     datetime.date(2026, 12, 18): "Cesta Natalina",
 }
