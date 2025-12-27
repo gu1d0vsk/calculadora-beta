@@ -262,9 +262,9 @@ st.markdown(f"""
         pointer-events: none !important;
         display: none !important;
     }}
-    ._container_gzau3_1. {{  display: none !important;}}
+    ._container_gzau3_1. { display: none !important;}
     
-    ._profileContainer_gzau3_53 {{  display: none !important;}}
+    ._profileContainer_gzau3_53 {  display: none !important;}
 hide_streamlit_style = """
             <style>
             #MainMenu {visibility: hidden;}
