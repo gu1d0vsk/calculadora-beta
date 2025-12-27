@@ -380,7 +380,7 @@ st.markdown(f"""
     }}
     /* Estilos gerais para classes instáveis do Streamlit */
     .st-emotion-cache-yfw52f hr {{    display: none !important;}}
-    .st-bv {{    font-weight: 800;}} .st-ay {{    font-size: 1.3rem;}} .st-aw {{    border-bottom-right-radius: 1.5rem !important;}} .st-av {{    border-top-right-radius: 1.5rem !important;}} .st-au {{    border-bottom-left-radius: 1.5rem !important;}} .st-at {{    border-top-left-radius: 1.5rem !important;}}
+    .st-bv {{    font-weight: 800;}} .st-ay {{    font-size: 1.3rem;}} .st-aw {{    border-bottom-right-radius: 1.5rem;}} .st-av {{    border-top-right-radius: 1.5rem;}} .st-au {{    border-bottom-left-radius: 1.5rem;}} .st-at {{    border-top-left-radius: 1.5rem;}}
     .st-emotion-cache-yinll1 svg, .st-emotion-cache-ubko3j svg {{ display: none; }} 
     .st-emotion-cache-467cry hr:not([size]) {{    display: none;}} .st-emotion-cache-zh2fnc {{    place-items: center; width: auto !important;}} .st-emotion-cache-3uj0rx hr:not([size]) {{ display: none;}} .st-emotion-cache-14vh5up, a._container_gzau3_1._viewerBadge_nim44_23, .st-emotion-cache-scp8yw.e3g0k5y6, img._profileImage_gzau3_78._lightThemeShadow_gzau3_95, ._container_gzau3_1, ._profileImage_gzau3_78, .st-emotion-cache-1sss6mo {{    display: none !important;}}
 </style>
