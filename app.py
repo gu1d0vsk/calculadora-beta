@@ -249,6 +249,13 @@ else:
         transform: scale(1);
     }
     """
+hide_streamlit_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            </style>
+            """
+st.markdown(hide_streamlit_style, unsafe_allow_html=True) 
 
 st.markdown(f"""
 <style>
@@ -262,16 +269,10 @@ st.markdown(f"""
         pointer-events: none !important;
         display: none !important;
     }}
-    ._container_gzau3_1. { display: none !important;}
+    ._container_gzau3_1. {{ display: none !important;}}
     
-    ._profileContainer_gzau3_53 {  display: none !important;}
-hide_streamlit_style = """
-            <style>
-            #MainMenu {visibility: hidden;}
-            footer {visibility: hidden;}
-            </style>
-            """
-st.markdown(hide_streamlit_style, unsafe_allow_html=True) 
+    ._profileContainer_gzau3_53 {{  display: none !important;}}
+
 
     /* 2. Oculta o Rodapé Padrão */
     footer, [data-testid="stFooter"] {{
