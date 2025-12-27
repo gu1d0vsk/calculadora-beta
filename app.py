@@ -118,7 +118,7 @@ def verificar_eventos_proximos():
             else: 
                 texto_eventos = ", ".join(partes_evento[:-1]) + " e " + partes_evento[-1]
             
-            # Formata a mensagem de forma concisa (estilo novo que você pediu)
+            # Formata a mensagem de forma concisa
             if delta.days == 0:
                 mensagem = f"{emoji} Hoje: {texto_eventos}"
             elif delta.days == 1:
@@ -176,118 +176,7 @@ def formatar_duracao(minutos):
 # --- Interface do Web App com Streamlit ---
 st.set_page_config(page_title="Calculadora de Jornada", page_icon="🧮", layout="centered")
 
-# --- CSS: ESTILOS GERAIS E OCULTAÇÃO (TENTATIVA) ---
-has_active_content = st.session_state.get('show_results', False) or st.session_state.get('show_events', False)
-
-if not has_active_content:
-    layout_css = """
-    div.block-container {
-        transform: translateY(25vh);
-        transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease-in-out;
-    }
-    @media (max-width: 640px) {
-        div.block-container {
-            transform: translateY(10vh);
-        }
-    }
-    """
-else:
-    layout_css = """
-    div.block-container {
-        transform: translateY(0);
-        transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-    }
-    .main-title, .sub-title, div[data-testid="stTextInput"], div[data-testid="stButton"], div[data-testid="stCheckbox"] {
-        opacity: 0.5;
-        transform: scale(0.98);
-        transition: all 0.8s ease-in-out;
-    }
-    .main-title:hover, .sub-title:hover, div[data-testid="stTextInput"]:hover, div[data-testid="stButton"]:hover, div[data-testid="stCheckbox"]:hover {
-        opacity: 1;
-        transform: scale(1);
-    }
-    """
-
-st.markdown(f"""
-<style>
-    /* Ocultação de elementos padrão (tentativa) */
-    header, [data-testid="stHeader"] {{ visibility: hidden; opacity: 0; pointer-events: none; }}
-    footer, [data-testid="stFooter"] {{ visibility: hidden; opacity: 0; }}
-    [data-testid="stStatusWidget"] {{ visibility: hidden; }}
-    [data-testid="stDecoration"] {{ visibility: hidden; }}
-    
-    /* Layout dinâmico */
-    {layout_css}
-
-    /* CSS GERAL */
-    .main .block-container {{ max-width: 800px; padding-top: 2rem; padding-bottom: 5rem; }}
-    .main-title {{ font-size: 2.2rem !important; font-weight: bold; text-align: center; }}
-    .sub-title {{ color: gray; text-align: center; font-size: 1.25rem !important; }}
-    
-    /* Botões */
-    div[data-testid="stHorizontalBlock"] > div:nth-of-type(1) div[data-testid="stButton"] > button {{ 
-        background-color: rgb(221, 79, 5) !important; color: #FFFFFF !important; border-radius: 4rem; border-color: transparent; transition: all 0.3s ease; 
-    }}
-    div[data-testid="stHorizontalBlock"] > div:nth-of-type(1) div[data-testid="stButton"] > button:hover {{
-        box-shadow: 0 0 12px rgba(221, 79, 5, 0.8), 0 0 20px rgba(221, 79, 5, 0.4); transform: scale(1.02);
-    }}
-    div[data-testid="stHorizontalBlock"] > div:nth-of-type(2) div[data-testid="stButton"] > button {{ 
-        background-color: rgb(0, 80, 81) !important; color: #FFFFFF !important; border-radius: 4rem; border-color: transparent; transition: all 0.3s ease;
-    }}
-    div[data-testid="stHorizontalBlock"] > div:nth-of-type(2) div[data-testid="stButton"] > button:hover {{
-        box-shadow: 0 0 12px rgba(0, 80, 81, 0.8), 0 0 20px rgba(0, 80, 81, 0.4); transform: scale(1.02);
-    }}
-
-    div[data-testid="stTextInput"] input {{ border-radius: 1.5rem !important; text-align: center; font-weight: 600; }}
-    .main div[data-testid="stTextInput"] > label {{ text-align: center !important; width: 100%; display: block; }}
-    
-    /* Resultados e Eventos */
-    .results-container, .event-list-container.visible {{ animation: fadeIn 0.8s ease-out forwards; }}
-    @keyframes fadeIn {{ from {{ opacity: 0; transform: translateY(20px); }} to {{ opacity: 1; transform: translateY(0); }} }}
-    
-    .event-list-item {{ padding: 10px; border-radius: 1.5rem; margin-bottom: 5px; text-align: center; }}
-    .custom-warning, .custom-error {{ border-radius: 1.5rem; padding: 1rem; margin-top: 1rem; text-align: center; }}
-    .custom-warning {{ background-color: rgba(255, 170, 0, 0); border: 1px solid #ffaa0000; color: rgb(247, 185, 61); }}
-    .custom-error {{ background-color: rgba(255, 108, 108, 0.15); border: 1px solid rgb(255, 108, 108); color: rgb(255, 75, 75); }}
-    .custom-error p {{ margin: 0.5rem 0 0 0; }}
-    
-    /* Metrics */
-    div[data-testid="stMetric"] {{ background-color: transparent !important; padding: 0 !important; }}
-    div[data-testid="stMetric"] [data-testid="stMetricLabel"] p,
-    div[data-testid="stMetric"] [data-testid="stMetricValue"] {{ color: inherit !important; }}
-    .section-container {{ text-align: center; margin-top: 1.5rem; }}
-    .metric-custom {{ background-color: #F0F2F6; border-radius: 4rem; padding: 1rem; text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center; color: #31333f; }}
-    .metric-almoco {{ background-color: #F0F2F6; }}
-    .metric-saldo-pos {{ background-color: rgb(84, 198, 121); }}
-    .metric-saldo-neg {{ background-color: rgb(255, 108, 108); }}
-    .metric-minimo {{ background-color: rgb(57, 94, 94); }}
-    .metric-padrao {{ background-color: rgb(0, 80, 81); }} 
-    .metric-maximo {{ background-color: rgb(221, 79, 5); }} 
-    .metric-custom .label {{ font-size: 0.875rem; margin-bottom: 0.25rem; color: #5a5a5a; }}
-    .metric-custom .value {{ font-size: 1.5rem; font-weight: 900; color: #31333f; }}
-    .metric-custom .details {{ font-size: 0.75rem; margin-top: 0.25rem; color: #5a5a5a; }}
-    .metric-saldo-pos .value, .metric-saldo-neg .value, .metric-minimo .value, .metric-padrao .value, .metric-maximo .value {{ color: #FFFFFF; }}
-    .metric-saldo-pos .label, .metric-saldo-neg .label, .metric-minimo .label, .metric-padrao .label, .metric-maximo .label, .metric-minimo .details, .metric-padrao .details, .metric-maximo .details {{ color: rgba(255, 255, 255, 0.85); }}
-    
-    .predictions-grid-container {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }}
-    .summary-grid-container {{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }}
-    .predictions-wrapper {{ transition: opacity 0.4s ease-out, transform 0.4s ease-out, padding 0.4s ease-out; }}
-    .predictions-wrapper.de-emphasized {{ opacity: 0.5; transform: scale(0.98); padding-bottom: 1rem; margin-bottom: 1rem; }}
-    div[data-testid="stCheckbox"] {{ display: flex; justify-content: center; margin-top: 0px; padding-bottom: 0px; }}
-    div[data-testid="stCheckbox"] label span p {{ font-size: 0.85rem !important; color: #555; }}
-    
-    @media (max-width: 640px) {{
-        .predictions-grid-container {{ grid-template-columns: repeat(2, 1fr); }}
-        .predictions-grid-container .metric-minimo {{ order: 2; }}
-        .predictions-grid-container .metric-padrao {{ order: 1; grid-column: 1 / -1; }}
-        .predictions-grid-container .metric-maximo {{ order: 3; }}
-        .summary-grid-container {{ grid-template-columns: repeat(2, 1fr); }}
-    }}
-    .st-emotion-cache-yfw52f hr, .st-emotion-cache-1sss6mo, .st-emotion-cache-14vh5up {{ display: none !important; }}
-</style>
-""", unsafe_allow_html=True)
-
-# --- 4. RENDERIZAÇÃO DOS CONTEÚDOS ---
+# --- 1. RENDERIZAÇÃO DOS INPUTS E BOTÕES ---
 mensagem_do_dia = obter_mensagem_do_dia()
 st.markdown(f'<p class="main-title">{mensagem_do_dia}</p>', unsafe_allow_html=True)
 st.markdown('<p class="sub-title">Informe seus horários para calcular a jornada diária</p>', unsafe_allow_html=True)
@@ -322,6 +211,182 @@ if calculate_clicked: st.session_state.show_results = True
 if st.session_state.show_results and not entrada_str:
     st.warning("Por favor, preencha pelo menos o horário de entrada.")
     st.session_state.show_results = False
+
+# --- 3. LÓGICA DE CSS DINÂMICO OTIMIZADO PARA MOBILE ---
+has_active_content = st.session_state.show_results or st.session_state.show_events
+
+if not has_active_content:
+    # Estado Inicial
+    layout_css = """
+    div.block-container {
+        transform: translateY(25vh); /* Desktop: Centraliza bem */
+        transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease-in-out;
+    }
+    @media (max-width: 640px) {
+        div.block-container {
+            transform: translateY(10vh); /* Mobile: Sobe mais para não ficar "caído" */
+        }
+    }
+    """
+else:
+    # Estado Ativo: Posição original (0)
+    layout_css = """
+    div.block-container {
+        transform: translateY(0);
+        transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    
+    /* Reduz foco da área de input */
+    .main-title, .sub-title, div[data-testid="stTextInput"], div[data-testid="stButton"], div[data-testid="stCheckbox"] {
+        opacity: 0.5;
+        transform: scale(0.98);
+        transition: all 0.8s ease-in-out;
+    }
+    
+    /* Restaura foco ao passar o mouse */
+    .main-title:hover, .sub-title:hover, div[data-testid="stTextInput"]:hover, div[data-testid="stButton"]:hover, div[data-testid="stCheckbox"]:hover {
+        opacity: 1;
+        transform: scale(1);
+    }
+    """
+hide_st_style = """
+<style>
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+</style>
+"""
+
+st.markdown(f"""
+<style>
+    /* --- CSS "NUCLEAR" PARA LIMPAR A INTERFACE DO STREAMLIT --- */
+    
+    /* 1. Oculta o Header Superior (onde fica o menu hambúrguer) */
+    header, [data-testid="stHeader"] {{
+        visibility: hidden !important;
+        height: 0px !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        display: none !important;
+    }}
+    ._container_gzau3_1. {{ display: none !important;}}
+    
+    ._profileContainer_gzau3_53 {{  display: none !important;}}
+
+
+    /* 2. Oculta o Rodapé Padrão */
+    footer, [data-testid="stFooter"] {{
+        visibility: hidden !important;
+        height: 0px !important;
+        opacity: 0 !important;
+        display: none !important;
+    }}
+    
+    /* 3. Oculta a Toolbar (botões de deploy, menu de 3 pontos, etc) */
+    [data-testid="stToolbar"], [data-testid="stStatusWidget"] {{
+        visibility: hidden !important;
+        display: none !important;
+        height: 0px !important;
+    }}
+
+    /* 4. Oculta a decoração colorida no topo */
+    [data-testid="stDecoration"] {{
+        visibility: hidden !important;
+        display: none !important;
+    }}
+
+    /* 5. Ajuste de Espaçamento para o conteúdo subir */
+    .main .block-container {{
+        padding-top: 1rem !important; 
+        padding-bottom: 5rem !important; /* Espaço para o seu rodapé fixo */
+        max-width: 800px;
+    }}
+    
+    /* 6. Força bruta para remover o menu Hamburger especificamente (pelo ID) */
+    #MainMenu {{
+        visibility: hidden !important;
+        display: none !important;
+    }}
+    /* --------------------------------------------------------- */
+
+    /* Injeta o CSS dinâmico de animação que você já tinha */
+    {layout_css}
+
+    /* CSS GERAL DO SEU APP */
+    .main .block-container {{ max-width: 800px; padding-bottom: 5rem; }} /* Padding extra pro footer não cobrir */
+    .main-title {{ font-size: 2.2rem !important; font-weight: bold; text-align: center; }}
+    .sub-title {{ color: gray; text-align: center; font-size: 1.25rem !important; }}
+    
+    /* --- BOTÕES COM NEON (Efeito Hover) --- */
+    div[data-testid="stHorizontalBlock"] > div:nth-of-type(1) div[data-testid="stButton"] > button {{ 
+        background-color: rgb(221, 79, 5) !important; color: #FFFFFF !important; border-radius: 4rem; border-color: transparent;
+        transition: all 0.3s ease; 
+    }}
+    div[data-testid="stHorizontalBlock"] > div:nth-of-type(1) div[data-testid="stButton"] > button:hover {{
+        box-shadow: 0 0 12px rgba(221, 79, 5, 0.8), 0 0 20px rgba(221, 79, 5, 0.4); transform: scale(1.02);
+    }}
+    div[data-testid="stHorizontalBlock"] > div:nth-of-type(2) div[data-testid="stButton"] > button {{ 
+        background-color: rgb(0, 80, 81) !important; color: #FFFFFF !important; border-radius: 4rem; border-color: transparent;
+        transition: all 0.3s ease;
+    }}
+    div[data-testid="stHorizontalBlock"] > div:nth-of-type(2) div[data-testid="stButton"] > button:hover {{
+        box-shadow: 0 0 12px rgba(0, 80, 81, 0.8), 0 0 20px rgba(0, 80, 81, 0.4); transform: scale(1.02);
+    }}
+
+    div[data-testid="stTextInput"] input {{ border-radius: 1.5rem !important; text-align: center; font-weight: 600; }}
+    .main div[data-testid="stTextInput"] > label {{ text-align: center !important; width: 100%; display: block; }}
+    
+    /* Animação de entrada dos resultados */
+    .results-container, .event-list-container.visible {{ animation: fadeIn 0.8s ease-out forwards; }}
+    @keyframes fadeIn {{ from {{ opacity: 0; transform: translateY(20px); }} to {{ opacity: 1; transform: translateY(0); }} }}
+    
+    .event-list-item {{ background-color: #cacaca3b00; padding: 10px; border-radius: 1.5rem; margin-bottom: 5px; text-align: center; }}
+    body.dark .event-list-item {{ background-color: #cacaca3b00; color: #fafafa; }}
+    .custom-warning, .custom-error {{ border-radius: 1.5rem; padding: 1rem; margin-top: 1rem; text-align: center; }}
+    .custom-warning {{ background-color: rgba(255, 170, 0, 0); border: 1px solid #ffaa0000; color: rgb(247, 185, 61); }}
+    .custom-error {{ background-color: rgba(255, 108, 108, 0.15); border: 1px solid rgb(255, 108, 108); color: rgb(255, 75, 75); }}
+    .custom-error p {{ margin: 0.5rem 0 0 0; }}
+    div[data-testid="stHeading"] a {{ display: none !important; }}
+    div[data-testid="stMetric"] {{ background-color: transparent !important; padding: 0 !important; }}
+    div[data-testid="stMetric"] [data-testid="stMetricLabel"] p,
+    div[data-testid="stMetric"] [data-testid="stMetricValue"] {{ color: inherit !important; }}
+    .section-container {{ text-align: center; margin-top: 1.5rem; }}
+    .metric-custom {{ background-color: #F0F2F6; border-radius: 4rem; padding: 1rem; text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center; color: #31333f; }}
+    .metric-almoco {{ background-color: #F0F2F6; }}
+    .metric-saldo-pos {{ background-color: rgb(84, 198, 121); }}
+    .metric-saldo-neg {{ background-color: rgb(255, 108, 108); }}
+    .metric-minimo {{ background-color: rgb(57, 94, 94); }}
+    .metric-padrao {{ background-color: rgb(0, 80, 81); }} 
+    .metric-maximo {{ background-color: rgb(221, 79, 5); }} 
+    .metric-custom .label {{ font-size: 0.875rem; margin-bottom: 0.25rem; color: #5a5a5a; }}
+    .metric-custom .value {{ font-size: 1.5rem; font-weight: 900; color: #31333f; }}
+    .metric-custom .details {{ font-size: 0.75rem; margin-top: 0.25rem; color: #5a5a5a; }}
+    .metric-saldo-pos .value, .metric-saldo-neg .value, .metric-minimo .value, .metric-padrao .value, .metric-maximo .value {{ color: #FFFFFF; }}
+    .metric-saldo-pos .label, .metric-saldo-neg .label, .metric-minimo .label, .metric-padrao .label, .metric-maximo .label, .metric-minimo .details, .metric-padrao .details, .metric-maximo .details {{ color: rgba(255, 255, 255, 0.85); }}
+    .predictions-grid-container {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }}
+    .summary-grid-container {{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }}
+    
+    .predictions-wrapper {{ transition: opacity 0.4s ease-out, transform 0.4s ease-out, padding 0.4s ease-out; }}
+    .predictions-wrapper.de-emphasized {{ opacity: 0.5; transform: scale(0.98); padding-bottom: 1rem; margin-bottom: 1rem; }}
+
+    div[data-testid="stCheckbox"] {{ display: flex; justify-content: center; margin-top: 0px; padding-bottom: 0px; }}
+    div[data-testid="stCheckbox"] label span p {{ font-size: 0.85rem !important; color: #555; }}
+
+    @media (max-width: 640px) {{
+        .predictions-grid-container {{ grid-template-columns: repeat(2, 1fr); }}
+        .predictions-grid-container .metric-minimo {{ order: 2; }}
+        .predictions-grid-container .metric-padrao {{ order: 1; grid-column: 1 / -1; }}
+        .predictions-grid-container .metric-maximo {{ order: 3; }}
+        .summary-grid-container {{ grid-template-columns: repeat(2, 1fr); }}
+    }}
+    /* Estilos gerais para classes instáveis do Streamlit */
+    .st-emotion-cache-yfw52f hr {{    display: none !important;}}
+    .st-bv {{    font-weight: 800;}} .st-ay {{    font-size: 1.3rem;}} .st-aw {{    border-bottom-right-radius: 1.5rem;}} .st-av {{    border-top-right-radius: 1.5rem;}} .st-au {{    border-bottom-left-radius: 1.5rem;}} .st-at {{    border-top-left-radius: 1.5rem;}}
+    .st-emotion-cache-yinll1 svg, .st-emotion-cache-ubko3j svg {{ display: none; }} 
+    .st-emotion-cache-467cry hr:not([size]) {{    display: none;}} .st-emotion-cache-zh2fnc {{    place-items: center; width: auto !important;}} .st-emotion-cache-3uj0rx hr:not([size]) {{ display: none;}} .st-emotion-cache-14vh5up, a._container_gzau3_1._viewerBadge_nim44_23, .st-emotion-cache-scp8yw.e3g0k5y6, img._profileImage_gzau3_78._lightThemeShadow_gzau3_95, ._container_gzau3_1, ._profileImage_gzau3_78, .st-emotion-cache-1sss6mo {{    display: none !important;}}
+</style>
+""", hide_st_style, unsafe_allow_html=True)
+
+# --- 4. RENDERIZAÇÃO DOS CONTEÚDOS ---
 
 events_placeholder = st.empty()
 if st.session_state.show_events:
@@ -501,25 +566,37 @@ contagem_regressiva = gerar_contagem_regressiva_home_office()
 # Monta o conteúdo HTML do rodapé combinando as variáveis
 footer_items = []
 if daily_forecast:
+    # Remove tags P e centralização que possam vir da função original se houver, 
+    # ou usa o texto cru. Como sua função retorna texto puro com pipes, está ótimo.
     footer_items.append(f"<span>{daily_forecast}</span>")
 
 if contagem_regressiva:
     footer_items.append(f"<span>{contagem_regressiva}</span>")
 
+# Une os itens com um separador visual
 footer_content = " <span style='opacity: 0.3; margin: 0 8px;'>|</span> ".join(footer_items)
-if not footer_content: footer_content = "&nbsp;"
+
+# Se não tiver nada, coloca um espaço vazio para não quebrar o layout
+if not footer_content:
+    footer_content = "&nbsp;"
 
 # --- INJEÇÃO DO RODAPÉ FIXO VIA JAVASCRIPT ---
+import streamlit.components.v1 as components
+
 js_footer = f"""
 <script>
     function injectFooter() {{
         var footerId = "footer-fixo-js";
         
+        // Remove rodapé antigo para atualizar
         var oldFooter = window.parent.document.getElementById(footerId);
         if (oldFooter) {{ oldFooter.remove(); }}
 
+        // Cria o elemento
         var footer = window.parent.document.createElement("div");
         footer.id = footerId;
+        
+        // Injeta o conteúdo gerado no Python (usando f-string)
         footer.innerHTML = `{footer_content}`;
         
         // Estilos CSS
@@ -528,33 +605,35 @@ js_footer = f"""
         footer.style.bottom = "0";
         footer.style.width = "100%";
         footer.style.textAlign = "center";
-        
-        // MÁGICA: Cor de fundo opaca igual ao tema do app (cobre o nativo)
-        footer.style.backgroundColor = "var(--background-color)";
-        
-        footer.style.color = "var(--text-color)"; // Garante que texto apareça em qlq tema
-        footer.style.padding = "8px 10px";
-        footer.style.fontSize = "0.75rem";
-        footer.style.borderTop = "1px solid var(--secondary-background-color)"; // Sutil separação
-        footer.style.zIndex = "999999"; // Fica acima de tudo
+        footer.style.backgroundColor = "rgba(240, 242, 246, 0.01)"; // Fundo quase opaco
+        footer.style.color = "#555";
+        footer.style.padding = "8px 10px"; // Padding ajustado
+        footer.style.fontSize = "0.75rem"; // Fonte menor para caber tudo
+        footer.style.borderTop = "0px solid #e6e6e6";
+        footer.style.zIndex = "999999";
+        footer.style.backdropFilter = "blur(5px)";
         footer.style.display = "flex";
         footer.style.justifyContent = "center";
         footer.style.alignItems = "center";
-        footer.style.flexWrap = "wrap";
+        footer.style.flexWrap = "wrap"; // Permite quebrar linha no celular
         footer.style.lineHeight = "1.4";
         footer.style.fontFamily = "sans-serif";
         
+        // Injeta no corpo da página
         window.parent.document.body.appendChild(footer);
         
+        // Ajusta o padding da página principal para o conteúdo não ficar escondido
         var mainContainer = window.parent.document.querySelector('.main .block-container');
         if (mainContainer) {{
             mainContainer.style.paddingBottom = "4rem";
         }}
         
+        // Remove as linhas horizontais extras (hr) que o Streamlit coloca automaticamente no final
         var hrs = window.parent.document.querySelectorAll('.st-emotion-cache-yfw52f hr');
         hrs.forEach(hr => hr.style.display = 'none');
     }}
     
+    // Executa
     injectFooter();
 </script>
 """
