@@ -573,7 +573,7 @@ js_footer = f"""
         footer.style.padding = "8px 10px"; // Padding ajustado
         footer.style.fontSize = "0.75rem"; // Fonte menor para caber tudo
         footer.style.borderTop = "0px solid #e6e6e6";
-        footer.style.zIndex = "999999";
+        footer.style.setProperty("z-index", "2147483647", "important");
         footer.style.backdropFilter = "blur(5px)";
         footer.style.display = "flex";
         footer.style.justifyContent = "center";
@@ -581,7 +581,7 @@ js_footer = f"""
         footer.style.flexWrap = "wrap"; // Permite quebrar linha no celular
         footer.style.lineHeight = "1.4";
         footer.style.fontFamily = "sans-serif";
-        footer.style.z-index: "9999999";
+    
         
         // Injeta no corpo da página
         window.parent.document.body.appendChild(footer);
