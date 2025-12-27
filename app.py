@@ -254,21 +254,34 @@ st.markdown(f"""
 <style>
     /* --- CSS "NUCLEAR" PARA LIMPAR A INTERFACE DO STREAMLIT --- */
     
-    /* Esconde o rodapé padrão "Made with Streamlit" */
-    footer {{visibility: hidden;}}
-    
-    /* Esconde o menu de 3 pontos no topo direito (Opcional - remove se quiser manter o menu) */
-    #MainMenu {{visibility: hidden;}}
-    
-    /* Esconde a barra colorida no topo da tela */
-    header {{visibility: hidden;}}
-    
-    /* Tenta esconder o botão de deploy/gerenciar app (A Coroa) */
-    .stDeployButton {{display:none;}}
-    
-    /* Esconde ícones de status de execução */
-    [data-testid="stStatusWidget"] {{display:none;}}
+    /* 1. Esconde o Header (Menu hamburguer e barra colorida no topo) */
+    header[data-testid="stHeader"] {{
+        display: none !important;
+        visibility: hidden !important;
+    }}
 
+    /* 2. Esconde o Rodapé padrão ("Made with Streamlit") */
+    footer[data-testid="stFooter"] {{
+        display: none !important;
+        visibility: hidden !important;
+    }}
+    
+    /* 3. Tenta esconder elementos específicos de decoração */
+    div[data-testid="stDecoration"] {{
+        display: none !important;
+    }}
+
+    /* 4. Esconde o botão de 'Status' que às vezes aparece */
+    div[data-testid="stStatusWidget"] {{
+        display: none !important;
+    }}
+
+    /* 5. Ajuste fino para garantir que o espaço do header suma */
+    .main .block-container {{
+        padding-top: 1rem !important; /* Reduz o espaço vazio no topo */
+        padding-bottom: 5rem !important; /* Espaço pro seu rodapé fixo */
+        max-width: 800px;
+    }}
     /* --------------------------------------------------------- */
 
     /* Injeta o CSS dinâmico de animação que você já tinha */
