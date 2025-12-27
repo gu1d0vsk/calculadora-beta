@@ -87,12 +87,6 @@ def get_daily_weather():
         print(f"Erro ao buscar previsão diária: {e}")
         return ""
 
-def obter_artigo(nome_evento):
-    nome_lower = nome_evento.lower()
-    femininas = ["confraternização", "paixão", "independência", "república", "consciência", "compensação", "volta", "saída", "data", "parcela", "cesta", "jornada"]
-    if any(palavra in nome_lower for palavra in femininas): return "a"
-    return "o"
-
 def verificar_eventos_proximos():
     fuso_horario_brasil = pytz.timezone("America/Sao_Paulo")
     hoje = datetime.datetime.now(fuso_horario_brasil).date()
@@ -115,19 +109,22 @@ def verificar_eventos_proximos():
             elif any("Data limite" in s for s in lista_nomes): emoji = "❗️"
             else: emoji = "🗓️"
             
-            partes_evento = []
-            for nome in lista_nomes:
-                nome_limpo = nome.split('(')[0].strip()
-                artigo = obter_artigo(nome_limpo)
-                preposicao = "do" if artigo == "o" else "da"
-                partes_evento.append(f"{preposicao} {nome_limpo}")
+            # Limpa os nomes (tira parenteses e espaços)
+            partes_evento = [nome.split('(')[0].strip() for nome in lista_nomes]
 
-            if len(partes_evento) == 1: texto_final = partes_evento[0]
-            else: texto_final = ", ".join(partes_evento[:-1]) + " e " + partes_evento[-1]
+            # Junta os nomes com vírgula e "e"
+            if len(partes_evento) == 1: 
+                texto_eventos = partes_evento[0]
+            else: 
+                texto_eventos = ", ".join(partes_evento[:-1]) + " e " + partes_evento[-1]
             
-            if delta.days == 0: mensagem = f"{emoji} Hoje é o dia {texto_final}!"
-            elif delta.days == 1: mensagem = f"{emoji} Amanhã é o dia {texto_final}!"
-            else: mensagem = f"{emoji} Faltam {delta.days} dias para o dia {texto_final}!"
+            # Formata a mensagem de forma concisa
+            if delta.days == 0:
+                mensagem = f"{emoji} Hoje: {texto_eventos}"
+            elif delta.days == 1:
+                mensagem = f"{emoji} Amanhã: {texto_eventos}"
+            else:
+                mensagem = f"{emoji} {delta.days} dias: {texto_eventos}"
                 
             mensagens.append(mensagem)
     return mensagens
