@@ -343,6 +343,8 @@ st.markdown(f"""
     }}
     /* Estilos gerais para classes instáveis do Streamlit */
     ._link_gzau3_10 {{   display: none !important;}}
+    ##._link_gzau3_10 {{   display: none !important;}}
+    ##._profileContainer_gzau3_53 {{   display: none !important;}}
     .st-emotion-cache-yfw52f hr {{    display: none !important;}}
     .st-bv {{    font-weight: 800;}} .st-ay {{    font-size: 1.3rem;}} .st-aw {{    border-bottom-right-radius: 1.5rem;}} .st-av {{    border-top-right-radius: 1.5rem;}} .st-au {{    border-bottom-left-radius: 1.5rem;}} .st-at {{    border-top-left-radius: 1.5rem;}}
     .st-emotion-cache-yinll1 svg, .st-emotion-cache-ubko3j svg {{ display: none; }} 
