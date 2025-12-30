@@ -342,6 +342,9 @@ st.markdown(f"""
         .summary-grid-container {{ grid-template-columns: repeat(2, 1fr); }}
     }}
     /* Estilos gerais para classes instáveis do Streamlit */
+    .stApp.stAppEmbeddingId-t83ty5zauhw3.st-emotion-cache-nhzh23.ee4bbma0 {{ 
+  background: linear-gradient(rgb(2, 45, 44) 0%, rgb(0, 21, 21) 100%);
+}}
     ._link_gzau3_10 {{   display: none !important;}}
     ##._link_gzau3_10 {{   display: none !important;}}
     ##._profileContainer_gzau3_53 {{   display: none !important;}}
