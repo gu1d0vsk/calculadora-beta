@@ -278,8 +278,6 @@ st.markdown(f"""
     .main .block-container {{ max-width: 800px; padding-bottom: 5rem; }} /* Padding extra pro footer não cobrir */
     .main-title {{ font-size: 2.2rem !important; font-weight: bold; text-align: center; }}
     .sub-title {{ color: gray; text-align: center; font-size: 1.25rem !important; }}
-
-    .stApp {{        background: linear-gradient(rgb(2, 45, 44) 0%, rgb(0, 21, 21) 100%;             }}
     
     /* --- BOTÕES COM NEON (Efeito Hover) --- */
     div[data-testid="stHorizontalBlock"] > div:nth-of-type(1) div[data-testid="stButton"] > button {{ 
