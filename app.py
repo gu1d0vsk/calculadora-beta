@@ -546,64 +546,91 @@ footer_content = " <span style='opacity: 0.3; margin: 0 8px;'>|</span> ".join(fo
 if not footer_content:
     footer_content = "&nbsp;"
 
-# --- INJEÇÃO DO RODAPÉ FIXO VIA JAVASCRIPT ---
+# --- INJEÇÃO DO RODAPÉ (AGORA NO TOPO/CABEÇALHO) VIA JAVASCRIPT ---
 import streamlit.components.v1 as components
 
 js_footer = f"""
 <script>
-    function injectFooter() {{
-        var footerId = "footer-fixo-js";
+    function injectHeader() {{
+        var headerId = "header-fixo-js";
         
-        // Remove rodapé antigo para atualizar
-        var oldFooter = window.parent.document.getElementById(footerId);
-        if (oldFooter) {{ oldFooter.remove(); }}
+        // Remove cabeçalho antigo para atualizar se houver reload
+        var oldHeader = window.parent.document.getElementById(headerId);
+        if (oldHeader) {{ oldHeader.remove(); }}
 
         // Cria o elemento
-        var footer = window.parent.document.createElement("div");
-        footer.id = footerId;
+        var header = window.parent.document.createElement("div");
+        header.id = headerId;
         
-        // Injeta o conteúdo gerado no Python (usando f-string)
-        footer.innerHTML = `{footer_content}`;
+        // Injeta o conteúdo gerado no Python
+        header.innerHTML = `{footer_content}`;
         
-        // Estilos CSS
-        footer.style.position = "fixed";
-        footer.style.left = "0";
-        footer.style.bottom = "0";
-        footer.style.width = "100%";
-        footer.style.textAlign = "center";
-        footer.style.backgroundColor = "rgba(240, 242, 246, 0.01)"; //
-        footer.style.color = "#555";
-        footer.style.padding = "8px 10px"; // Padding ajustado
-        footer.style.fontSize = "0.75rem"; // Fonte menor para caber tudo
-        footer.style.borderTop = "0px solid #e6e6e6";
-        footer.style.setProperty("z-index", "2147483647", "important");
-        footer.style.backdropFilter = "blur(5px)";
-        footer.style.display = "flex";
-        footer.style.justifyContent = "center";
-        footer.style.alignItems = "center";
-        footer.style.flexWrap = "wrap"; // Permite quebrar linha no celular
-        footer.style.lineHeight = "1.4";
-        footer.style.fontFamily = "sans-serif";
+        // --- ESTILOS CSS PARA O TOPO ---
+        header.style.position = "fixed";
+        header.style.top = "0";          // Fixa no topo
+        header.style.left = "0";
+        header.style.width = "100%";
+        header.style.textAlign = "center";
+        
+        // Visual
+        header.style.backgroundColor = "rgba(240, 242, 246, 0.85)"; // Mais opaco para não misturar com o texto rolando por baixo
+        header.style.color = "#555";
+        header.style.padding = "10px 10px";
+        header.style.fontSize = "0.75rem";
+        header.style.borderBottom = "1px solid rgba(0,0,0,0.1)"; // Borda em baixo agora
+        
+        // Comportamento
+        header.style.zIndex = "2147483647"; // Máximo z-index para ficar sobre tudo
+        header.style.backdropFilter = "blur(8px)"; // Blur mais forte
+        header.style.display = "flex";
+        header.style.justifyContent = "center";
+        header.style.alignItems = "center";
+        header.style.flexWrap = "wrap";
+        header.style.lineHeight = "1.4";
+        header.style.fontFamily = "sans-serif";
     
-        
         // Injeta no corpo da página
-        window.parent.document.body.appendChild(footer);
+        window.parent.document.body.appendChild(header);
         
-        // Ajusta o padding da página principal para o conteúdo não ficar escondido
+        // --- AJUSTE DE ESPAÇAMENTO DO CONTEÚDO PRINCIPAL ---
+        // Empurra o conteúdo para baixo para não ficar escondido atrás da barra
         var mainContainer = window.parent.document.querySelector('.main .block-container');
         if (mainContainer) {{
-            mainContainer.style.paddingBottom = "4rem";
+            mainContainer.style.marginTop = "3rem"; // Espaço extra no topo
+            mainContainer.style.paddingTop = "1rem";
         }}
         
-        // Remove as linhas horizontais extras (hr) que o Streamlit coloca automaticamente no final
+        // Remove as linhas horizontais extras
         var hrs = window.parent.document.querySelectorAll('.st-emotion-cache-yfw52f hr');
         hrs.forEach(hr => hr.style.display = 'none');
     }}
     
     // Executa
-    injectFooter();
+    injectHeader();
 </script>
 """
+
+components.html(js_footer, height=0)
+
+components.html(
+    """
+    <script>
+        const removeStreamlitElements = () => {
+            const footer = window.parent.document.querySelector('footer');
+            if (footer) { footer.style.display = 'none'; }
+
+            const badge = window.parent.document.querySelector('div[class*="viewerBadge"]');
+            if (badge) { badge.style.display = 'none'; }
+        }
+        removeStreamlitElements();
+        const observer = new MutationObserver(() => {
+            removeStreamlitElements();
+        });
+        observer.observe(window.parent.document.body, { childList: true, subtree: true });
+    </script>
+    """,
+    height=0,
+)
 
 components.html(js_footer, height=0)
 
