@@ -573,11 +573,11 @@ js_footer = f"""
         header.style.textAlign = "center";
         
         // Visual
-        header.style.backgroundColor = "rgba(240, 242, 246, 0.85)"; // Mais opaco para não misturar com o texto rolando por baixo
+        header.style.backgroundColor = "rgba(240, 242, 246, 0.05)"; // Mais opaco para não misturar com o texto rolando por baixo
         header.style.color = "#555";
         header.style.padding = "10px 10px";
         header.style.fontSize = "0.75rem";
-        header.style.borderBottom = "1px solid rgba(0,0,0,0.1)"; // Borda em baixo agora
+        header.style.borderBottom = "1px solid rgba(0,0,0,0)"; // Borda em baixo agora
         
         // Comportamento
         header.style.zIndex = "2147483647"; // Máximo z-index para ficar sobre tudo
@@ -596,8 +596,8 @@ js_footer = f"""
         // Empurra o conteúdo para baixo para não ficar escondido atrás da barra
         var mainContainer = window.parent.document.querySelector('.main .block-container');
         if (mainContainer) {{
-            mainContainer.style.marginTop = "3rem"; // Espaço extra no topo
-            mainContainer.style.paddingTop = "1rem";
+            mainContainer.style.marginTop = "0rem"; // Espaço extra no topo
+            mainContainer.style.paddingTop = "0rem";
         }}
         
         // Remove as linhas horizontais extras
