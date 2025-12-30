@@ -279,7 +279,7 @@ st.markdown(f"""
     .main-title {{ font-size: 2.2rem !important; font-weight: bold; text-align: center; }}
     .sub-title {{ color: gray; text-align: center; font-size: 1.25rem !important; }}
 
-    .stApp {{        background: linear-gradient(rgb(2, 45, 44) 0%, rgb(0, 21, 21) 100%;             }}
+    .stApp {{ background-color: linear-gradient(rgb(2, 45, 44) 0%, rgb(0, 21, 21) 100% !important; }}
     
     /* --- BOTÕES COM NEON (Efeito Hover) --- */
     div[data-testid="stHorizontalBlock"] > div:nth-of-type(1) div[data-testid="stButton"] > button {{ 
