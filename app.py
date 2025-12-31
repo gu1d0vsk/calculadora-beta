@@ -319,8 +319,8 @@ st.markdown(f"""
 
     div[data-testid="stTextInput"] input {{ 
         background-color: rgba(38, 39, 48, 0.35) !important; 
-        color: #ffffff !important; 
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+         
+        border: px solid rgba(255, 255, 255, 0.2) !important;
         border-radius: 1.5rem !important; 
         text-align: center; 
         font-weight: 600; 
