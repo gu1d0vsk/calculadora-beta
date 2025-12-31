@@ -319,11 +319,7 @@ st.markdown(f"""
 div[data-testid="stTextInput"] input {{ border-radius: 1.5rem !important; text-align: center; font-weight: 600; }}
         .main div[data-testid="stTextInput"] > label {{ text-align: center !important; width: 100%; display: block; }}
     .st-b7 {{  background-color: rgba(38, 39, 48, 0.4) !important; }}
-  .st-b6 {{  border-bottom-color: rgba(38, 39, 48, 0) !important; }}
-  .st-b6 {{  border-bottom-color: rgba(38, 39, 48, 0); }}
-.st-b5 {{  border-top-color: rgba(38, 39, 48, 0) !important; }}
-.st-b4 {{  border-right-color: rgba(38, 39, 48, 0) !important; }}
-.st-b3 {{  border-left-color: rgba(38, 39, 48, 0) !important; }}
+
 
     /* Animação de entrada dos resultados */
     .results-container, .event-list-container.visible {{ animation: fadeIn 0.8s ease-out forwards; }}
@@ -369,12 +365,13 @@ div[data-testid="stTextInput"] input {{ border-radius: 1.5rem !important; text-a
         .summary-grid-container {{ grid-template-columns: repeat(2, 1fr); }}
     }}
     /* Estilos gerais para classes instáveis do Streamlit */
-    .stApp.stAppEmbeddingId-t83ty5zauhw3.st-emotion-cache-nhzh23.ee4bbma0 {{  background: linear-gradient(rgb(2, 45, 44) 0%, rgb(0, 21, 21) 100%) !important; }}
+   
     ._link_gzau3_10 {{   display: none !important;}}
     ##._link_gzau3_10 {{   display: none !important;}}
     ##._profileContainer_gzau3_53 {{   display: none !important;}}
     .st-emotion-cache-yfw52f hr {{    display: none !important;}}
     .st-bv {{    font-weight: 800;}} .st-ay {{    font-size: 1.3rem;}} .st-aw {{    border-bottom-right-radius: 1.5rem;}} .st-av {{    border-top-right-radius: 1.5rem;}} .st-au {{    border-bottom-left-radius: 1.5rem;}} .st-at {{    border-top-left-radius: 1.5rem;}}
+      .st-b6 {{  border-bottom-color: rgba(38, 39, 48, 0) !important;}} .st-b5 {{  border-top-color: rgba(38, 39, 48, 0) !important;}} .st-b4 {{  border-right-color: rgba(38, 39, 48, 0) !important;}} .st-b3 {{  border-left-color: rgba(38, 39, 48, 0) !important;}}
     .st-emotion-cache-yinll1 svg, .st-emotion-cache-ubko3j svg {{ display: none; }} 
     .st-emotion-cache-467cry hr:not([size]) {{    display: none;}} .st-emotion-cache-zh2fnc {{    place-items: center; width: auto !important;}} .st-emotion-cache-3uj0rx hr:not([size]) {{ display: none;}} .st-emotion-cache-14vh5up, a._container_gzau3_1._viewerBadge_nim44_23, .st-emotion-cache-scp8yw.e3g0k5y6, img._profileImage_gzau3_78._lightThemeShadow_gzau3_95, ._container_gzau3_1, ._profileImage_gzau3_78, .st-emotion-cache-1sss6mo {{    display: none !important;}}
 </style>
