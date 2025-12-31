@@ -316,7 +316,7 @@ st.markdown(f"""
     div[data-testid="stHorizontalBlock"] > div:nth-of-type(2) div[data-testid="stButton"] > button:hover {{
         box-shadow: 0 0 12px rgba(0, 80, 81, 0.8), 0 0 20px rgba(0, 80, 81, 0.4); transform: scale(1.02);
     }}
-.st-b7 {{  background-color: rgb(38, 39, 48, 0);}} #----fundo input----#
+.st-b7 {{  background-color: rgb(38, 39, 48, 0) !important;}} #----fundo input----#
     div[data-testid="stTextInput"] input {{ 
         background-color: rgba(38, 39, 48, 0.35) !important; 
          
