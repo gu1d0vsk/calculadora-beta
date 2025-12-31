@@ -179,7 +179,7 @@ st.set_page_config(page_title="Calculadora de Jornada", page_icon="🧮", layout
 #----------------------
 page_bg_img = """
 <style>
-[data-testid="stAppViewContainer"] {
+[data-testid="stApp"] {
     background-image: linear-gradient(rgb(2, 45, 44) 0%, rgb(0, 21, 21) 100%);
     background-attachment: fixed;
 }
