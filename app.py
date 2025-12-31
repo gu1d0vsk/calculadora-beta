@@ -249,7 +249,7 @@ else:
         transform: scale(1);
     }
     """
-
+[data-testid="stApp"] {background: linear-gradient(rgb(2, 45, 44) 0%, rgb(0, 21, 21) 100%); }
 st.markdown(f"""
 <style>
     /* --- CSS "NUCLEAR" PARA LIMPAR A INTERFACE DO STREAMLIT --- */
