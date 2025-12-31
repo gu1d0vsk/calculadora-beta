@@ -239,7 +239,7 @@ if not has_active_content:
     # Estado Inicial
     layout_css = """
     div.block-container {
-        transform: translateY(25vh); /* Desktop: Centraliza bem */
+        transform: translateY(20vh); /* Desktop: Centraliza bem */
         transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease-in-out;
     }
     @media (max-width: 640px) {
