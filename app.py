@@ -320,6 +320,7 @@ div[data-testid="stTextInput"] input {{ border-radius: 1.5rem !important; text-a
         .main div[data-testid="stTextInput"] > label {{ text-align: center !important; width: 100%; display: block; }}
     .st-b7 {{  background-color: rgba(38, 39, 48, 0.4) !important; }}
   .st-b6 {{  border-bottom-color: rgba(38, 39, 48, 0) !important; }}
+  .st-b6 {{  border-bottom-color: rgba(38, 39, 48, 0); }}
 .st-b5 {{  border-top-color: rgba(38, 39, 48, 0) !important; }}
 .st-b4 {{  border-right-color: rgba(38, 39, 48, 0) !important; }}
 .st-b3 {{  border-left-color: rgba(38, 39, 48, 0) !important; }}
