@@ -318,8 +318,7 @@ st.markdown(f"""
     }}
 div[data-testid="stTextInput"] input {{ border-radius: 1.5rem !important; text-align: center; font-weight: 600; }}
         .main div[data-testid="stTextInput"] > label {{ text-align: center !important; width: 100%; display: block; }}
-    .st-b7 {{
-  background-color: rgb(38, 39, 48,0.4) !important;}}
+    .st-b7 {{  background-color: rgba(38, 39, 48, 0.4) !important; }}
   
     /* Animação de entrada dos resultados */
     .results-container, .event-list-container.visible {{ animation: fadeIn 0.8s ease-out forwards; }}
