@@ -251,12 +251,14 @@ else:
     """
 
 st.markdown(f"""
-<style>
 [data-testid="stApp"] {{
         background: linear-gradient(rgb(2, 45, 44) 0%, rgb(0, 21, 21) 100%) !important;
         background-attachment: fixed !important;
         background-size: cover !important;
     }}
+    
+<style>
+
     /* --- CSS "NUCLEAR" PARA LIMPAR A INTERFACE DO STREAMLIT --- */
     
     /* Esconde o rodapé padrão "Made with Streamlit" */
