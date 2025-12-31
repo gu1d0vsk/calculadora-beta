@@ -176,6 +176,26 @@ def formatar_duracao(minutos):
 # --- Interface do Web App com Streamlit ---
 st.set_page_config(page_title="Calculadora de Jornada", page_icon="🧮", layout="centered")
 
+#----------------------
+page_bg_img = """
+<style>
+[data-testid="stAppViewContainer"] {
+    background-image: linear-gradient(rgb(2, 45, 44) 0%, rgb(0, 21, 21) 100%);
+    background-attachment: fixed;
+}
+
+[data-testid="stHeader"] {
+    background-color: rgba(0,0,0,0); /* Deixa a barra superior transparente */
+}
+
+/* Força texto claro (já que o fundo é escuro) */
+.stMarkdown, .stText, p, h1, h2, h3, h4, h5, h6, label, span {
+    color: #e0e0e0 !important;
+}
+</style>
+"""
+
+st.markdown(page_bg_img, unsafe_allow_html=True)
 # --- 1. RENDERIZAÇÃO DOS INPUTS E BOTÕES ---
 mensagem_do_dia = obter_mensagem_do_dia()
 st.markdown(f'<p class="main-title">{mensagem_do_dia}</p>', unsafe_allow_html=True)
@@ -251,12 +271,7 @@ else:
     """
 
 st.markdown(f"""
-[data-testid="stApp"] {{
-        background: linear-gradient(rgb(2, 45, 44) 0%, rgb(0, 21, 21) 100%) !important;
-        background-attachment: fixed !important;
-        background-size: cover !important;
-    }}
-    
+  
 <style>
 
     /* --- CSS "NUCLEAR" PARA LIMPAR A INTERFACE DO STREAMLIT --- */
