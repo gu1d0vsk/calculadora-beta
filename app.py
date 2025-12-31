@@ -317,7 +317,7 @@ st.markdown(f"""
         box-shadow: 0 0 12px rgba(0, 80, 81, 0.8), 0 0 20px rgba(0, 80, 81, 0.4); transform: scale(1.02);
     }}
 .st-b7 {{  background-color: rgb(38, 39, 48, 0.30) !important; text-align: center; border: 0 px solid rgba(255, 255, 255, 0.2) !important}} #----fundo input----#
-.st-bl {{  border-bottom-style: none;}} .st-bk {{  border-top-style: none;}} .st-bj {{  border-right-style: none;}} .st-bi {{  border-left-style: none;}} .st-bh {{  border-bottom-width: 0px;}} .st-bg {{  border-top-width: 0px;}} .st-bf {{  border-right-width: 0px;}} .st-be {{  border-left-width: 0px;}}
+.st-bl {{  border-bottom-style: none !important;}} .st-bk {{  border-top-style: none !important;}} .st-bj {{  border-right-style: none !important;}} .st-bi {{  border-left-style: none !important;}} .st-bh {{  border-bottom-width: 0px !important;}} .st-bg {{  border-top-width: 0px !important;}} .st-bf {{  border-right-width: 0px !important;}} .st-be {{  border-left-width: 0px !important;}}
     div[data-testid="stTextInput"] input {{ 
         background-color: rgba(38, 39, 48, 0.35) !important; 
         border: 0 px solid rgba(255, 255, 255, 0.2) !important;
