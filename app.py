@@ -317,7 +317,18 @@ st.markdown(f"""
         box-shadow: 0 0 12px rgba(0, 80, 81, 0.8), 0 0 20px rgba(0, 80, 81, 0.4); transform: scale(1.02);
     }}
 
-    div[data-testid="stTextInput"] input {{ border-radius: 1.5rem !important; text-align: center; font-weight: 600; }}
+    div[data-testid="stTextInput"] input {{ 
+        background-color: rgba(38, 39, 48, 0.35) !important; 
+        color: #ffffff !important; 
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 1.5rem !important; 
+        text-align: center; 
+        font-weight: 600; 
+    }}
+    div[data-testid="stTextInput"] input:focus {{
+        background-color: rgba(38, 39, 48, 0.6) !important; /* Fica um pouco mais escuro ao digitar */
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    }}
     .main div[data-testid="stTextInput"] > label {{ text-align: center !important; width: 100%; display: block; }}
     
     /* Animação de entrada dos resultados */
