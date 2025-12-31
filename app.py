@@ -262,9 +262,7 @@ else:
         transform: scale(0.98);
         transition: all 0.8s ease-in-out;
     }
-    .st-b7 {
-  background-color: rgb(38, 39, 48,0.4) !important;
-}
+    
     /* Restaura foco ao passar o mouse */
     .main-title:hover, .sub-title:hover, div[data-testid="stTextInput"]:hover, div[data-testid="stButton"]:hover, div[data-testid="stCheckbox"]:hover {
         opacity: 1;
@@ -320,7 +318,9 @@ st.markdown(f"""
     }}
 div[data-testid="stTextInput"] input {{ border-radius: 1.5rem !important; text-align: center; font-weight: 600; }}
         .main div[data-testid="stTextInput"] > label {{ text-align: center !important; width: 100%; display: block; }}
-    
+    .st-b7 {{
+  background-color: rgb(38, 39, 48,0.4) !important;}}
+  
     /* Animação de entrada dos resultados */
     .results-container, .event-list-container.visible {{ animation: fadeIn 0.8s ease-out forwards; }}
     @keyframes fadeIn {{ from {{ opacity: 0; transform: translateY(20px); }} to {{ opacity: 1; transform: translateY(0); }} }}
