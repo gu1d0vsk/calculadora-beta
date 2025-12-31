@@ -262,7 +262,9 @@ else:
         transform: scale(0.98);
         transition: all 0.8s ease-in-out;
     }
-    
+    .st-b7 {
+  background-color: rgb(38, 39, 48,0.4) !important;
+}
     /* Restaura foco ao passar o mouse */
     .main-title:hover, .sub-title:hover, div[data-testid="stTextInput"]:hover, div[data-testid="stButton"]:hover, div[data-testid="stCheckbox"]:hover {
         opacity: 1;
