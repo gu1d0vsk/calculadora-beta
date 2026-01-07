@@ -150,7 +150,7 @@ def gerar_contagem_regressiva_home_office():
         dias_uteis = int(np.busday_count(hoje, data_home_office, holidays=feriados_rj))
         
         texto_dias = "dia" if dias_restantes == 1 else "dias"
-        texto_uteis = "dia útil" if dias_uteis == 1 else "dias úteis"
+        texto_uteis = "dia útil" if dias_uteis == 1 else "úteis"
         
         return f"<strong>Integra II:</strong> {dias_restantes} {texto_dias} ({dias_uteis} {texto_uteis}) para o home office"
     except Exception as e:
