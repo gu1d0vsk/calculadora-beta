@@ -6,6 +6,7 @@ from mensagens import obter_mensagem_do_dia
 import requests
 import pytz
 import streamlit.components.v1 as components
+import numpy as np
 
 # --- Funções de Lógica ---
 
@@ -134,10 +135,24 @@ def gerar_contagem_regressiva_home_office():
         fuso_horario_brasil = pytz.timezone("America/Sao_Paulo")
         hoje = datetime.datetime.now(fuso_horario_brasil).date()
         data_home_office = datetime.date(2026, 2, 1)
+        
         dias_restantes = (data_home_office - hoje).days
         if dias_restantes < 0: return ""
+
+        # --- Cálculo de Dias Úteis ---
+        # Definimos o feriado de São Sebastião (RJ) e outros que desejar
+        feriados_rj = [
+            '2026-01-01', # Ano Novo
+            '2026-01-20', # São Sebastião (RJ)
+        ]
+        
+        # O numpy.busday_count calcula dias úteis entre datas (exclui o dia final)
+        dias_uteis = int(np.busday_count(hoje, data_home_office, holidays=feriados_rj))
+        
         texto_dias = "dia" if dias_restantes == 1 else "dias"
-        return f"<strong>Integra II:</strong> {dias_restantes} {texto_dias} para o home office"
+        texto_uteis = "dia útil" if dias_uteis == 1 else "dias úteis"
+        
+        return f"<strong>Integra II:</strong> {dias_restantes} {texto_dias} ({dias_uteis} {texto_uteis}) para o home office"
     except Exception as e:
         print(f"Erro ao gerar contagem regressiva: {e}")
         return ""
