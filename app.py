@@ -255,7 +255,7 @@ if not has_active_content:
     layout_css = """
     div.block-container {
         transform: translateY(17vh); /* Desktop: Centraliza bem */
-        transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease-in-out;
+        transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease-in-out;
     }
     @media (max-width: 640px) {
         div.block-container {
@@ -337,7 +337,7 @@ div[data-testid="stTextInput"] input {{ border-radius: 1.5rem !important; text-a
 
 
     /* Animação de entrada dos resultados */
-    .results-container, .event-list-container.visible {{ animation: fadeIn 0.8s ease-out forwards; }}
+    .results-container, .event-list-container.visible {{ animation: fadeIn 0.4s ease-out forwards; }}
     @keyframes fadeIn {{ from {{ opacity: 0; transform: translateY(20px); }} to {{ opacity: 1; transform: translateY(0); }} }}
     
     .event-list-item {{ background-color: #cacaca3b00; padding: 10px; border-radius: 1.5rem; margin-bottom: 5px; text-align: center; }}
