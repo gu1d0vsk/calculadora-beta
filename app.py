@@ -268,14 +268,14 @@ else:
     layout_css = """
     div.block-container {
         transform: translateY(0);
-        transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+        transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
     }
     
     /* Reduz foco da área de input */
     .main-title, .sub-title, div[data-testid="stTextInput"], div[data-testid="stButton"], div[data-testid="stCheckbox"] {
         opacity: 0.5;
         transform: scale(0.98);
-        transition: all 0.8s ease-in-out;
+        transition: all 0.2s ease-in-out;
     }
     
     /* Restaura foco ao passar o mouse */
@@ -621,7 +621,7 @@ js_footer = f"""
         
         // Comportamento
         header.style.zIndex = "2147483647"; // Máximo z-index para ficar sobre tudo
-        header.style.backdropFilter = "blur(8px)"; // Blur mais forte
+        header.style.backdropFilter = "blur(0)"; // Blur mais forte
         header.style.display = "flex";
         header.style.justifyContent = "center";
         header.style.alignItems = "center";
