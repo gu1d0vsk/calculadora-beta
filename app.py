@@ -164,14 +164,16 @@ def formatar_hora_input(input_str):
     if len(input_str) != 4 or not input_str.isdigit(): raise ValueError("Formato de hora inválido.")
     return f"{input_str[:2]}:{input_str[2:]}"
 
-def calcular_tempo_nucleo(entrada, saida, saida_almoco, retorno_almoco):
+def calcular_tempo_nucleo(entrada, saida, saida_almoco, retorno_almoco, saida_extra=None, retorno_extra=None):
     nucleo_inicio = entrada.replace(hour=9, minute=0, second=0, microsecond=0)
     nucleo_fim = entrada.replace(hour=18, minute=0, second=0, microsecond=0)
     inicio_trabalho_nucleo = max(entrada, nucleo_inicio)
     fim_trabalho_nucleo = min(saida, nucleo_fim)
     if inicio_trabalho_nucleo >= fim_trabalho_nucleo: return 0
+    
     tempo_bruto_nucleo_segundos = (fim_trabalho_nucleo - inicio_trabalho_nucleo).total_seconds()
     tempo_almoco_no_nucleo_segundos = 0
+    tempo_extra_no_nucleo_segundos = 0
     
     if saida_almoco and retorno_almoco:
         inicio_almoco_sobreposicao = max(inicio_trabalho_nucleo, saida_almoco)
@@ -179,7 +181,13 @@ def calcular_tempo_nucleo(entrada, saida, saida_almoco, retorno_almoco):
         if fim_almoco_sobreposicao > inicio_almoco_sobreposicao:
             tempo_almoco_no_nucleo_segundos = (fim_almoco_sobreposicao - inicio_almoco_sobreposicao).total_seconds()
             
-    tempo_liquido_nucleo_segundos = tempo_bruto_nucleo_segundos - tempo_almoco_no_nucleo_segundos
+    if saida_extra and retorno_extra:
+        inicio_extra_sobreposicao = max(inicio_trabalho_nucleo, saida_extra)
+        fim_extra_sobreposicao = min(fim_trabalho_nucleo, retorno_extra)
+        if fim_extra_sobreposicao > inicio_extra_sobreposicao:
+            tempo_extra_no_nucleo_segundos = (fim_extra_sobreposicao - inicio_extra_sobreposicao).total_seconds()
+            
+    tempo_liquido_nucleo_segundos = tempo_bruto_nucleo_segundos - tempo_almoco_no_nucleo_segundos - tempo_extra_no_nucleo_segundos
     return max(0, tempo_liquido_nucleo_segundos / 60)
 
 def formatar_duracao(minutos):
@@ -229,6 +237,16 @@ with col_main:
         with col2: retorno_almoco_str = st.text_input("Volta do Almoço", key="retorno_almoco")
     else:
         saida_almoco_str, retorno_almoco_str = "", ""
+
+    # --- NOVO BLOCO PARA SAÍDA EXTRA ---
+    tem_saida_extra = st.checkbox("Adicionar outra saída/ausência", value=False)
+    if tem_saida_extra:
+        col_ex1, col_ex2 = st.columns(2)
+        with col_ex1: saida_extra_str = st.text_input("Saída Extra", key="saida_extra")
+        with col_ex2: retorno_extra_str = st.text_input("Retorno Extra", key="retorno_extra")
+    else:
+        saida_extra_str, retorno_extra_str = "", ""
+    # -----------------------------------
 
     saida_real_str = st.text_input("Saída", key="saida_real")
     col_calc, col_events = st.columns(2)
@@ -500,11 +518,22 @@ if st.session_state.show_results:
                     
                     duracao_almoco_minutos_real = almoco_valido_minutos
 
+                # --- CÁLCULO DA SAÍDA EXTRA ---
+                duracao_extra_minutos = 0
+                saida_extra, retorno_extra = None, None
+                
+                if saida_extra_str and retorno_extra_str:
+                    saida_extra = datetime.datetime.strptime(formatar_hora_input(saida_extra_str), "%H:%M")
+                    retorno_extra = datetime.datetime.strptime(formatar_hora_input(retorno_extra_str), "%H:%M")
+                    if retorno_extra < saida_extra: raise ValueError("O retorno extra deve ser depois da saída extra.")
+                    duracao_extra_minutos = (retorno_extra - saida_extra).total_seconds() / 60
+                # ------------------------------
+
                 almoco_fisico_minutos = duracao_almoco_minutos_real
                 trabalho_bruto_minutos = 0
                 if saida_valida > entrada_valida: trabalho_bruto_minutos = (saida_valida - entrada_valida).total_seconds() / 60
                 
-                tempo_trabalhado_efetivo = trabalho_bruto_minutos - almoco_fisico_minutos
+                tempo_trabalhado_efetivo = trabalho_bruto_minutos - almoco_fisico_minutos - duracao_extra_minutos
                 if tempo_trabalhado_efetivo > 360: min_intervalo_real, termo_intervalo_real = 30, "almoço"
                 elif tempo_trabalhado_efetivo > 240: min_intervalo_real, termo_intervalo_real = 15, "intervalo"
                 else: min_intervalo_real, termo_intervalo_real = 0, "intervalo"
@@ -520,13 +549,18 @@ if st.session_state.show_results:
                      valor_almoco_display = f"{duracao_almoco_minutos_real:.0f}min <span style='font-size: 0.85rem; font-weight: 400; color: #5a5a5a;'>(Auto)</span>"
 
                 desconto_intervalo_oficial = max(min_intervalo_real, almoco_valido_minutos)
-                trabalho_liquido_minutos = trabalho_bruto_minutos - desconto_intervalo_oficial - desconto_ausencia
+                
+                # Descontamos a duração extra do trabalho líquido também
+                trabalho_liquido_minutos = trabalho_bruto_minutos - desconto_intervalo_oficial - desconto_ausencia - duracao_extra_minutos
                 saldo_banco_horas_minutos = trabalho_liquido_minutos - 480
-                tempo_nucleo_minutos = calcular_tempo_nucleo(entrada_valida, saida_valida, saida_almoco, retorno_almoco)
+                
+                # Incluímos a saída extra no cálculo de tempo no núcleo
+                tempo_nucleo_minutos = calcular_tempo_nucleo(entrada_valida, saida_valida, saida_almoco, retorno_almoco, saida_extra, retorno_extra)
                 
                 if usar_intervalo_auto and duracao_almoco_minutos_real > 0:
                     tempo_bruto_nucleo = tempo_nucleo_minutos
-                    tempo_fora_nucleo = trabalho_bruto_minutos - tempo_bruto_nucleo
+                    # O tempo fora do núcleo precisa considerar apenas o tempo real de trabalho, descontando a saída extra
+                    tempo_fora_nucleo = (trabalho_bruto_minutos - duracao_extra_minutos) - tempo_bruto_nucleo
                     intervalo_restante = max(0, duracao_almoco_minutos_real - tempo_fora_nucleo)
                     tempo_nucleo_minutos = max(0, tempo_bruto_nucleo - intervalo_restante)
 
@@ -572,8 +606,6 @@ contagem_regressiva = gerar_contagem_regressiva_home_office()
 # Monta o conteúdo HTML do rodapé combinando as variáveis
 footer_items = []
 if daily_forecast:
-    # Remove tags P e centralização que possam vir da função original se houver, 
-    # ou usa o texto cru. Como sua função retorna texto puro com pipes, está ótimo.
     footer_items.append(f"<span>{daily_forecast}</span>")
 
 if contagem_regressiva:
@@ -666,46 +698,6 @@ components.html(
         const observer = new MutationObserver(() => {
             removeStreamlitElements();
         });
-        observer.observe(window.parent.document.body, { childList: true, subtree: true });
-    </script>
-    """,
-    height=0,
-)
-
-components.html(js_footer, height=0)
-
-components.html(
-    """
-    <script>
-        const removeStreamlitElements = () => {
-            // Alvo: O rodapé padrão (onde fica o "Made with Streamlit")
-            const footer = window.parent.document.querySelector('footer');
-            if (footer) {
-                footer.style.display = 'none';
-            }
-
-            // Alvo: O botão vermelho específico "Hosted with Streamlit" (caso seja separado do footer)
-            // Eles costumam mudar a classe, mas geralmente está numa div com 'viewerBadge'
-            const badge = window.parent.document.querySelector('div[class*="viewerBadge"]');
-            if (badge) {
-                badge.style.display = 'none';
-            }
-            
-            // Opcional: Remover o menu de hamburguer do topo (caso queira limpar tudo)
-            // const header = window.parent.document.querySelector('header');
-            // if (header) {
-            //    header.style.display = 'none';
-            // }
-        }
-
-        // Tenta rodar assim que carrega
-        removeStreamlitElements();
-
-        // Como o Streamlit as vezes recarrega elementos, vamos garantir com um observer
-        const observer = new MutationObserver(() => {
-            removeStreamlitElements();
-        });
-        
         observer.observe(window.parent.document.body, { childList: true, subtree: true });
     </script>
     """,
