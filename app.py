@@ -260,10 +260,7 @@ with col_main:
         event_button_text = "Próximos Eventos 🗓️" if mensagens_eventos else "Próximos Eventos"
         events_clicked = st.button(event_button_text, use_container_width=True)
 
-# --- 2. LÓGICA DE ESTADO E OPACIDADE DINÂMICA ---
-# Força a opacidade exata baseado no estado do botão:
-toggle_opacity = "1.0" if is_lactante else "0.45"
-
+# --- 2. LÓGICA DE ESTADO ---
 if 'show_events' not in st.session_state: st.session_state.show_events = False
 if 'show_results' not in st.session_state: st.session_state.show_results = False
 
@@ -311,7 +308,6 @@ else:
     }
     """
 
-
 st.markdown(f"""
   
 <style>
@@ -350,21 +346,19 @@ st.markdown(f"""
     .main div[data-testid="stTextInput"] > label {{ text-align: center !important; width: 100%; display: block; }}
     .st-b7 {{  background-color: rgba(12, 19, 14, 0.31) !important; }}
 
-    /* --- ESTILO NOVO DO TOGGLE LACTANTE --- */
+    /* --- TESTE RIGOROSO DO TOGGLE LACTANTE --- */
     div[data-testid="stToggle"] {{
-        
-        margin-top: -20px !important;           /* Puxa mais pra perto do botão calcular */
-        padding-left: 2px;
-        opacity: 0.5 !important;   /* Aplicação direta do Python na força bruta */
-        transition: opacity 0.2s ease-in-out;
+        justify-content: flex-start !important; /* Fixado na esquerda */
+        margin-top: -12px !important;           /* Puxado pra cima */
+        padding-left: 2px !important;
+        opacity: 0.7 !important;                /* CRAVADO EM 0.7 PRA TESTE */
     }}
-    div[data-testid="stToggle"]:hover {{
-        opacity: 1.0 !important;                /* Acende se passar o dedo/mouse por cima */
-    }}
+    
     div[data-testid="stToggle"] label p {{
-        font-size: 0.6rem !important;
+        font-size: 0.9rem !important;
         color: #e0e0e0 !important;
     }}
+    /* Removido qualquer pseudo-classe como :hover ou input:checked para não haver conflito */
     /* -------------------------------------- */
 
     /* Animações e Cards */
