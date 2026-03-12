@@ -231,6 +231,10 @@ with col_main:
     entrada_str = st.text_input("Entrada", key="entrada", help="formatos aceitos:\nHMM, HHMM ou HH:MM")
     usar_intervalo_auto = st.checkbox("Intervalo Automático (Mínimo)", value=True, help="Calcula o desconto automático (30min ou 15min) sem precisar digitar os horários de almoço.")
     
+    # --- NOVO CHECKBOX: LACTANTE ---
+    is_lactante = st.checkbox("Horário Especial (Lactante - 6h)", value=False, help="Muda a jornada padrão para 6h e ajusta o cálculo do banco de horas.")
+    # -------------------------------
+
     if not usar_intervalo_auto:
         col1, col2 = st.columns(2)
         with col1: saida_almoco_str = st.text_input("Saída para o Almoço", key="saida_almoco")
@@ -238,7 +242,7 @@ with col_main:
     else:
         saida_almoco_str, retorno_almoco_str = "", ""
 
-    # --- NOVO BLOCO PARA SAÍDA EXTRA ---
+    # BLOCO PARA SAÍDA EXTRA
     tem_saida_extra = st.checkbox("Adicionar outra saída/ausência", value=False)
     if tem_saida_extra:
         col_ex1, col_ex2 = st.columns(2)
@@ -246,7 +250,6 @@ with col_main:
         with col_ex2: retorno_extra_str = st.text_input("Retorno Extra", key="retorno_extra")
     else:
         saida_extra_str, retorno_extra_str = "", ""
-    # -----------------------------------
 
     saida_real_str = st.text_input("Saída", key="saida_real")
     col_calc, col_events = st.columns(2)
@@ -453,7 +456,7 @@ if st.session_state.show_results:
                     if ret_ext_prev > saida_ext_prev:
                         duracao_extra_previsao = (ret_ext_prev - saida_ext_prev).total_seconds() / 60
                 except ValueError:
-                    pass # ignora erros enquanto você ainda está digitando a hora
+                    pass
             # ------------------------------------------
             
             hora_nucleo_inicio = hora_entrada.replace(hour=9, minute=0)
@@ -465,35 +468,47 @@ if st.session_state.show_results:
             if jornada_total_minima_min > 360: intervalo_obrigatorio_5h = 30
             else: intervalo_obrigatorio_5h = 15
 
-            # --- SOMA A DURAÇÃO EXTRA NOS CÁLCULOS DAS PREVISÕES ---
+            # --- CONFIGURAÇÕES DE JORNADA (LACTANTE vs PADRÃO) ---
+            if is_lactante:
+                horas_padrao = 6
+                min_intervalo_padrao = 15
+            else:
+                horas_padrao = 8
+                min_intervalo_padrao = 30
+            # -----------------------------------------------------
+
+            # PREVISÃO 5H (MÍNIMO)
             minutos_intervalo_5h = max(intervalo_obrigatorio_5h, duracao_almoço_previsao)
             hora_base_5h = max(entrada_valida_previsao, hora_nucleo_inicio)
             hora_saida_5h_calculada = hora_base_5h + datetime.timedelta(hours=5, minutes=minutos_intervalo_5h + duracao_extra_previsao)
             hora_saida_5h = min(hora_saida_5h_calculada, limite_saida)
             
-            minutos_intervalo_demais = max(30, duracao_almoço_previsao)
-            hora_saida_8h_calculada = entrada_valida_previsao + datetime.timedelta(hours=8, minutes=minutos_intervalo_demais + duracao_extra_previsao)
-            hora_saida_8h = min(hora_saida_8h_calculada, limite_saida)
+            # PREVISÃO PADRÃO (6H ou 8H)
+            minutos_intervalo_demais = max(min_intervalo_padrao, duracao_almoço_previsao)
+            hora_saida_padrao_calculada = entrada_valida_previsao + datetime.timedelta(hours=horas_padrao, minutes=minutos_intervalo_demais + duracao_extra_previsao)
+            hora_saida_padrao = min(hora_saida_padrao_calculada, limite_saida)
             
-            hora_saida_10h_calculada = entrada_valida_previsao + datetime.timedelta(hours=10, minutes=minutos_intervalo_demais + duracao_extra_previsao)
+            # PREVISÃO 10H (MÁXIMO) - Mantém o almoço mínimo de 30min independente de ser lactante
+            minutos_intervalo_max = max(30, duracao_almoço_previsao)
+            hora_saida_10h_calculada = entrada_valida_previsao + datetime.timedelta(hours=10, minutes=minutos_intervalo_max + duracao_extra_previsao)
             hora_saida_10h = min(hora_saida_10h_calculada, limite_saida)
-            # -------------------------------------------------------
 
+            # CÁLCULO DAS DURAÇÕES FINAIS PARA EXIBIÇÃO
             duracao_5h_min = (hora_saida_5h - entrada_valida_previsao).total_seconds() / 60 - minutos_intervalo_5h - duracao_extra_previsao
-            duracao_8h_min = (hora_saida_8h - entrada_valida_previsao).total_seconds() / 60 - minutos_intervalo_demais - duracao_extra_previsao
-            duracao_10h_min = (hora_saida_10h - entrada_valida_previsao).total_seconds() / 60 - minutos_intervalo_demais - duracao_extra_previsao
+            duracao_padrao_min = (hora_saida_padrao - entrada_valida_previsao).total_seconds() / 60 - minutos_intervalo_demais - duracao_extra_previsao
+            duracao_10h_min = (hora_saida_10h - entrada_valida_previsao).total_seconds() / 60 - minutos_intervalo_max - duracao_extra_previsao
             
             texto_desc_5h = f"({formatar_duracao(duracao_5h_min)})" if hora_saida_5h_calculada > limite_saida else "(5h no núcleo)"
-            texto_desc_8h = f"({formatar_duracao(duracao_8h_min)})" if hora_saida_8h_calculada > limite_saida else "(8h)"
+            texto_desc_padrao = f"({formatar_duracao(duracao_padrao_min)})" if hora_saida_padrao_calculada > limite_saida else f"({horas_padrao}h)"
             texto_desc_10h = f"({formatar_duracao(duracao_10h_min)})" if hora_saida_10h_calculada > limite_saida else "(10h)"
 
-            if minutos_intervalo_5h >= 30: termo_intervalo_5h = "almoço"
-            else: termo_intervalo_5h = "intervalo"
+            termo_intervalo_5h = "almoço" if minutos_intervalo_5h >= 30 else "intervalo"
+            termo_intervalo_padrao = "almoço" if minutos_intervalo_demais >= 30 else "intervalo"
+            termo_intervalo_max = "almoço" if minutos_intervalo_max >= 30 else "intervalo"
             
-            # Adiciona um aviso na previsão se houver saída extra
             texto_detalhe_extra = f" + {duracao_extra_previsao:.0f}m extra" if duracao_extra_previsao > 0 else ""
 
-            predictions_html = f"""<div class='section-container'><h3>Previsões de Saída</h3><div class="predictions-grid-container"><div class="metric-custom metric-minimo"><div class="label">Mínimo {texto_desc_5h}</div><div class="value">{hora_saida_5h.strftime('%H:%M')}</div><div class="details">{minutos_intervalo_5h:.0f}min de {termo_intervalo_5h}{texto_detalhe_extra}</div></div><div class="metric-custom metric-padrao"><div class="label">Jornada Padrão {texto_desc_8h}</div><div class="value">{hora_saida_8h.strftime('%H:%M')}</div><div class="details">{minutos_intervalo_demais:.0f}min de almoço{texto_detalhe_extra}</div></div><div class="metric-custom metric-maximo"><div class="label">Máximo {texto_desc_10h}</div><div class="value">{hora_saida_10h.strftime('%H:%M')}</div><div class="details">{minutos_intervalo_demais:.0f}min de almoço{texto_detalhe_extra}</div></div></div></div>"""
+            predictions_html = f"""<div class='section-container'><h3>Previsões de Saída</h3><div class="predictions-grid-container"><div class="metric-custom metric-minimo"><div class="label">Mínimo {texto_desc_5h}</div><div class="value">{hora_saida_5h.strftime('%H:%M')}</div><div class="details">{minutos_intervalo_5h:.0f}min de {termo_intervalo_5h}{texto_detalhe_extra}</div></div><div class="metric-custom metric-padrao"><div class="label">Jornada Padrão {texto_desc_padrao}</div><div class="value">{hora_saida_padrao.strftime('%H:%M')}</div><div class="details">{minutos_intervalo_demais:.0f}min de {termo_intervalo_padrao}{texto_detalhe_extra}</div></div><div class="metric-custom metric-maximo"><div class="label">Máximo {texto_desc_10h}</div><div class="value">{hora_saida_10h.strftime('%H:%M')}</div><div class="details">{minutos_intervalo_max:.0f}min de {termo_intervalo_max}{texto_detalhe_extra}</div></div></div></div>"""
             
             footnote, warnings_html = "", ""
             if saida_real_str:
@@ -537,7 +552,6 @@ if st.session_state.show_results:
                     
                     duracao_almoco_minutos_real = almoco_valido_minutos
 
-                # --- CÁLCULO DA SAÍDA EXTRA PARA O RESUMO DO DIA ---
                 duracao_extra_minutos = 0
                 saida_extra, retorno_extra = None, None
                 
@@ -546,7 +560,6 @@ if st.session_state.show_results:
                     retorno_extra = datetime.datetime.strptime(formatar_hora_input(retorno_extra_str), "%H:%M")
                     if retorno_extra < saida_extra: raise ValueError("O retorno extra deve ser depois da saída extra.")
                     duracao_extra_minutos = (retorno_extra - saida_extra).total_seconds() / 60
-                # ---------------------------------------------------
 
                 almoco_fisico_minutos = duracao_almoco_minutos_real
                 trabalho_bruto_minutos = 0
@@ -568,12 +581,13 @@ if st.session_state.show_results:
                      valor_almoco_display = f"{duracao_almoco_minutos_real:.0f}min <span style='font-size: 0.85rem; font-weight: 400; color: #5a5a5a;'>(Auto)</span>"
 
                 desconto_intervalo_oficial = max(min_intervalo_real, almoco_valido_minutos)
-                
-                # Descontamos a duração extra do trabalho líquido
                 trabalho_liquido_minutos = trabalho_bruto_minutos - desconto_intervalo_oficial - desconto_ausencia - duracao_extra_minutos
-                saldo_banco_horas_minutos = trabalho_liquido_minutos - 480
                 
-                # Incluímos a saída extra no cálculo de tempo no núcleo
+                # --- NOVO CÁLCULO DE SALDO ---
+                meta_diaria_minutos = 360 if is_lactante else 480
+                saldo_banco_horas_minutos = trabalho_liquido_minutos - meta_diaria_minutos
+                # -----------------------------
+                
                 tempo_nucleo_minutos = calcular_tempo_nucleo(entrada_valida, saida_valida, saida_almoco, retorno_almoco, saida_extra, retorno_extra)
                 
                 if usar_intervalo_auto and duracao_almoco_minutos_real > 0:
