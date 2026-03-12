@@ -253,14 +253,17 @@ with col_main:
     col_calc, col_events = st.columns(2)
     with col_calc: 
         calculate_clicked = st.button("Calcular", use_container_width=True)
-        # Toggle colado no botão Calcular
+        # Toggle na raiz da coluna, nome simplificado
         is_lactante = st.toggle("Lactante", value=False)
         
     with col_events:
         event_button_text = "Próximos Eventos 🗓️" if mensagens_eventos else "Próximos Eventos"
         events_clicked = st.button(event_button_text, use_container_width=True)
 
-# --- 2. LÓGICA DE ESTADO ---
+# --- 2. LÓGICA DE ESTADO E OPACIDADE DINÂMICA ---
+# Força a opacidade exata baseado no estado do botão:
+toggle_opacity = "1.0" if is_lactante else "0.45"
+
 if 'show_events' not in st.session_state: st.session_state.show_events = False
 if 'show_results' not in st.session_state: st.session_state.show_results = False
 
@@ -295,7 +298,7 @@ else:
     }
     
     /* Reduz foco da área de input (menos o toggle) */
-    .main-title, .sub-title, div[data-testid="stTextInput"], div[data-testid="stButton"], div[data-testid="stCheckbox"] {
+    .main-title, .sub-title, div[data-testid="stTextInput"], div[data-testid="stButton"]:not(:last-child), div[data-testid="stCheckbox"] {
         opacity: 0.5;
         transform: scale(0.98);
         transition: all 0.2s ease-in-out;
@@ -308,41 +311,27 @@ else:
     }
     """
 
-# Definindo a opacidade na força bruta baseado no estado da variável python
-toggle_opacity = "1.0" if is_lactante else "0.5"
 
 st.markdown(f"""
   
 <style>
 
     /* --- CSS "NUCLEAR" PARA LIMPAR A INTERFACE DO STREAMLIT --- */
-    
-    /* Esconde o rodapé padrão "Made with Streamlit" */
     footer {{visibility: hidden;}}
-    
-    /* Esconde o menu de 3 pontos no topo direito (Opcional - remove se quiser manter o menu) */
     #MainMenu {{visibility: hidden;}}
-    
-    /* Esconde a barra colorida no topo da tela */
     header {{visibility: hidden;}}
-    
-    /* Tenta esconder o botão de deploy/gerenciar app (A Coroa) */
     .stDeployButton {{display:none;}}
-    
-    /* Esconde ícones de status de execução */
     [data-testid="stStatusWidget"] {{display:none;}}
-
     /* --------------------------------------------------------- */
 
-    /* Injeta o CSS dinâmico de animação que você já tinha */
     {layout_css}
 
     /* CSS GERAL DO SEU APP */
-    .main .block-container {{ max-width: 800px; padding-bottom: 5rem; }} /* Padding extra pro footer não cobrir */
+    .main .block-container {{ max-width: 800px; padding-bottom: 5rem; }} 
     .main-title {{ font-size: 2.2rem !important; font-weight: bold; text-align: center; }}
     .sub-title {{ color: gray; text-align: center; font-size: 1.25rem !important; }}
     
-    /* --- BOTÕES COM NEON (Efeito Hover) --- */
+    /* --- BOTÕES COM NEON --- */
     div[data-testid="stHorizontalBlock"] > div:nth-of-type(1) div[data-testid="stButton"] > button {{ 
         background-color: rgb(221, 79, 5) !important; color: #FFFFFF !important; border-radius: 4rem; border-color: transparent;
         transition: all 0.3s ease; 
@@ -363,20 +352,22 @@ st.markdown(f"""
 
     /* --- ESTILO NOVO DO TOGGLE LACTANTE --- */
     div[data-testid="stToggle"] {{
-        opacity: {toggle_opacity} !important;
-        transition: opacity 0.3s ease-in-out;
-        margin-top: -15px !important; /* Puxa para cima colando no botão Calcular */
+        justify-content: flex-start !important; /* Alinha firmemente à esquerda, evita o pulo */
+        margin-top: -12px !important;           /* Puxa mais pra perto do botão calcular */
+        padding-left: 2px;
+        opacity: {toggle_opacity} !important;   /* Aplicação direta do Python na força bruta */
+        transition: opacity 0.2s ease-in-out;
     }}
     div[data-testid="stToggle"]:hover {{
-        opacity: 1.0 !important;
+        opacity: 1.0 !important;                /* Acende se passar o dedo/mouse por cima */
     }}
     div[data-testid="stToggle"] label p {{
         font-size: 0.9rem !important;
-        color: #e0e0e0;
+        color: #e0e0e0 !important;
     }}
     /* -------------------------------------- */
 
-    /* Animação de entrada dos resultados */
+    /* Animações e Cards */
     .results-container, .event-list-container.visible {{ animation: fadeIn 0.4s ease-out forwards; }}
     @keyframes fadeIn {{ from {{ opacity: 0; transform: translateY(20px); }} to {{ opacity: 1; transform: translateY(0); }} }}
     
@@ -388,8 +379,7 @@ st.markdown(f"""
     .custom-error p {{ margin: 0.5rem 0 0 0; }}
     div[data-testid="stHeading"] a {{ display: none !important; }}
     div[data-testid="stMetric"] {{ background-color: transparent !important; padding: 0 !important; }}
-    div[data-testid="stMetric"] [data-testid="stMetricLabel"] p,
-    div[data-testid="stMetric"] [data-testid="stMetricValue"] {{ color: inherit !important; }}
+    div[data-testid="stMetric"] [data-testid="stMetricLabel"] p, div[data-testid="stMetric"] [data-testid="stMetricValue"] {{ color: inherit !important; }}
     .section-container {{ text-align: center; margin-top: 1.5rem; }}
     .metric-custom {{ background-color: #F0F2F6; border-radius: 4rem; padding: 1rem; text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center; color: #31333f; }}
     .metric-almoco {{ background-color: #F0F2F6; }}
@@ -419,16 +409,13 @@ st.markdown(f"""
         .predictions-grid-container .metric-maximo {{ order: 3; }}
         .summary-grid-container {{ grid-template-columns: repeat(2, 1fr); }}
     }}
-    /* Estilos gerais para classes instáveis do Streamlit */
-   
-    ._link_gzau3_10 {{   display: none !important;}}
-    ##._link_gzau3_10 {{   display: none !important;}}
-    ##._profileContainer_gzau3_53 {{   display: none !important;}}
-    .st-emotion-cache-yfw52f hr {{    display: none !important;}}
-    .st-bv {{    font-weight: 800;}} .st-ay {{    font-size: 1.3rem;}} .st-aw {{    border-bottom-right-radius: 1.5rem;}} .st-av {{    border-top-right-radius: 1.5rem;}} .st-au {{    border-bottom-left-radius: 1.5rem;}} .st-at {{    border-top-left-radius: 1.5rem;}}
-      .st-b6 {{  border-bottom-color: rgba(38, 39, 48, 0) !important;}} .st-b5 {{  border-top-color: rgba(38, 39, 48, 0) !important;}} .st-b4 {{  border-right-color: rgba(38, 39, 48, 0) !important;}} .st-b3 {{  border-left-color: rgba(38, 39, 48, 0) !important;}}
+    
+    ._link_gzau3_10 {{ display: none !important; }}
+    .st-emotion-cache-yfw52f hr {{ display: none !important; }}
+    .st-bv {{ font-weight: 800; }} .st-ay {{ font-size: 1.3rem; }} .st-aw {{ border-bottom-right-radius: 1.5rem; }} .st-av {{ border-top-right-radius: 1.5rem; }} .st-au {{ border-bottom-left-radius: 1.5rem; }} .st-at {{ border-top-left-radius: 1.5rem; }}
+    .st-b6 {{ border-bottom-color: rgba(38, 39, 48, 0) !important; }} .st-b5 {{ border-top-color: rgba(38, 39, 48, 0) !important; }} .st-b4 {{ border-right-color: rgba(38, 39, 48, 0) !important; }} .st-b3 {{ border-left-color: rgba(38, 39, 48, 0) !important; }}
     .st-emotion-cache-yinll1 svg, .st-emotion-cache-ubko3j svg {{ display: none; }} 
-    .st-emotion-cache-467cry hr:not([size]) {{    display: none;}} .st-emotion-cache-zh2fnc {{    place-items: center; width: auto !important;}} .st-emotion-cache-3uj0rx hr:not([size]) {{ display: none;}} .st-emotion-cache-14vh5up, a._container_gzau3_1._viewerBadge_nim44_23, .st-emotion-cache-scp8yw.e3g0k5y6, img._profileImage_gzau3_78._lightThemeShadow_gzau3_95, ._container_gzau3_1, ._profileImage_gzau3_78, .st-emotion-cache-1sss6mo {{    display: none !important;}}
+    .st-emotion-cache-467cry hr:not([size]) {{ display: none; }} .st-emotion-cache-zh2fnc {{ place-items: center; width: auto !important; }} .st-emotion-cache-3uj0rx hr:not([size]) {{ display: none;}} .st-emotion-cache-14vh5up, a._container_gzau3_1._viewerBadge_nim44_23, .st-emotion-cache-scp8yw.e3g0k5y6, img._profileImage_gzau3_78._lightThemeShadow_gzau3_95, ._container_gzau3_1, ._profileImage_gzau3_78, .st-emotion-cache-1sss6mo {{ display: none !important; }}
 </style>
 """, unsafe_allow_html=True)
 
