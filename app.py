@@ -258,7 +258,7 @@ with col_main:
 
     # --- NOVO LOCAL DO TOGGLE (Abaixo dos botões, centralizado e com opacidade dinâmica) ---
     st.write("") # Espaço em branco
-    is_lactante = st.toggle("Horário Especial: Lactante (6h)", value=False)
+    is_lactante = st.toggle("Lactante", value=False)
     # --------------------------------------------------------------------------------------
 
 # --- 2. LÓGICA DE ESTADO ---
