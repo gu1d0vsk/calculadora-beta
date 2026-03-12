@@ -354,7 +354,7 @@ st.markdown(f"""
     div[data-testid="stToggle"] {{
         
         margin-top: -20px !important;           /* Puxa mais pra perto do botão calcular */
-        padding-left: 2px;
+        padding-left: 2000px;
         opacity: 0.5 !important;   /* Aplicação direta do Python na força bruta */
         transition: opacity 0.2s ease-in-out;
     }}
