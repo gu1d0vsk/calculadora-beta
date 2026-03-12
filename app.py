@@ -137,7 +137,7 @@ def gerar_contagem_regressiva_home_office():
         texto_dias = "dia" if dias_restantes == 1 else "dias"
         texto_uteis = "dia útil" if dias_uteis == 1 else "úteis"
         
-        return f"<strong>Integra II:</strong> {dias_restantes} {texto_dias} ({dias_uteis} {texto_uteis}) para o home office"
+        return f"<strong>Integra II:</strong> {dias_restantes} {texto_dias} ({dias_uteis} {texto_uteis})"
     except Exception as e:
         print(f"Erro ao gerar contagem regressiva: {e}")
         return ""
@@ -147,13 +147,13 @@ def gerar_contagem_regressiva_novatos():
         fuso_horario_brasil = pytz.timezone("America/Sao_Paulo")
         hoje = datetime.datetime.now(fuso_horario_brasil).date()
         
-        # 6 meses cravados da data de entrada (02/03/2026 -> 02/09/2026)
+        # 6 meses após a entrada em 02/03/2026
         data_home_office_novos = datetime.date(2026, 9, 2)
         
         dias_restantes = (data_home_office_novos - hoje).days
         if dias_restantes < 0: return ""
 
-        # Feriados relevantes entre Março e Setembro de 2026 no RJ
+        # Feriados no RJ entre Março e Setembro de 2026
         feriados_2026 = [
             '2026-04-03', # Paixão de Cristo
             '2026-04-21', # Tiradentes
@@ -167,7 +167,7 @@ def gerar_contagem_regressiva_novatos():
         texto_dias = "dia" if dias_restantes == 1 else "dias"
         texto_uteis = "dia útil" if dias_uteis == 1 else "úteis"
         
-        return f"<strong>UltraNovos (Homeoffice):</strong> {dias_restantes} {texto_dias} ({dias_uteis} {texto_uteis})"
+        return f"<strong>Novos (H.O):</strong> {dias_restantes} {texto_dias} ({dias_uteis} {texto_uteis})"
     except Exception as e:
         print(f"Erro ao gerar contagem regressiva dos novos: {e}")
         return ""
@@ -235,6 +235,12 @@ mensagens_eventos = verificar_eventos_proximos()
 col_buffer_1, col_main, col_buffer_2 = st.columns([1, 6, 1])
 with col_main:
     
+    # --- TOGGLE LACTANTE ALINHADO À DIREITA (SEGURO E NATIVO) ---
+    col_espaco, col_lactante = st.columns([5, 3])
+    with col_lactante:
+        is_lactante = st.toggle("Lactante (6h)", value=False, key="toggle_lactante")
+    # ------------------------------------------------------------
+    
     entrada_str = st.text_input("Entrada", key="entrada", help="formatos aceitos:\nHMM, HHMM ou HH:MM")
     
     # --- CHECKBOXES LADO A LADO ---
@@ -266,7 +272,6 @@ with col_main:
     col_calc, col_events = st.columns(2)
     with col_calc: 
         calculate_clicked = st.button("Calcular", use_container_width=True)
-        is_lactante = st.toggle("Lactante", value=False)
         
     with col_events:
         event_button_text = "Próximos Eventos 🗓️" if mensagens_eventos else "Próximos Eventos"
@@ -301,12 +306,12 @@ else:
         transform: translateY(0);
         transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
     }
-    .main-title, .sub-title, div[data-testid="stTextInput"], div[data-testid="stButton"]:not(:last-child), div[data-testid="stCheckbox"] {
+    .main-title, .sub-title, div[data-testid="stTextInput"], div[data-testid="stButton"], div[data-testid="stCheckbox"], div[data-testid="stToggle"] {
         opacity: 0.5;
         transform: scale(0.98);
         transition: all 0.2s ease-in-out;
     }
-    .main-title:hover, .sub-title:hover, div[data-testid="stTextInput"]:hover, div[data-testid="stButton"]:hover, div[data-testid="stCheckbox"]:hover {
+    .main-title:hover, .sub-title:hover, div[data-testid="stTextInput"]:hover, div[data-testid="stButton"]:hover, div[data-testid="stCheckbox"]:hover, div[data-testid="stToggle"]:hover {
         opacity: 1;
         transform: scale(1);
     }
@@ -347,33 +352,14 @@ st.markdown(f"""
     .main div[data-testid="stTextInput"] > label {{ text-align: center !important; width: 100%; display: block; }}
     .st-b7 {{  background-color: rgba(12, 19, 14, 0.31) !important; }}
 
-    /* TOGGLE LACTANTE */
+    /* Ajuste sutil para o Toggle nativo não ficar tão colado em cima */
     div[data-testid="stToggle"] {{
-        background-color: rgba(255, 255, 255, 0.03) !important; 
-        border: 1px solid rgba(255, 255, 255, 0.08) !important; 
-        border-radius: 20px !important; 
-        padding: 4px 14px 4px 4px !important;
-        margin-top: 5px !important; 
-        width: fit-content !important; 
-        display: inline-flex !important;
-        justify-content: flex-start !important;
-        box-shadow: inset 0 2px 4px rgba(0,0,0,0.2) !important;
-        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+        margin-top: 10px;
+        justify-content: flex-end;
     }}
-    
-    div[data-testid="stToggle"]:hover {{
-        background-color: rgba(0, 80, 81, 0.15) !important;
-        border: 1px solid rgba(0, 80, 81, 0.6) !important;
-        box-shadow: 0 2px 8px rgba(0, 80, 81, 0.3) !important;
-    }}
-
     div[data-testid="stToggle"] label p {{
-        font-size: 0.75rem !important;
-        font-weight: 600 !important;
-        color: #b0b0b0 !important; 
-        text-transform: uppercase !important;
-        letter-spacing: 1.2px !important;
-        margin-left: 2px !important;
+        font-size: 0.85rem !important;
+        color: #e0e0e0 !important;
     }}
 
     /* Animações e Cards */
@@ -481,12 +467,15 @@ if st.session_state.show_results:
             if jornada_total_minima_min > 360: intervalo_obrigatorio_5h = 30
             else: intervalo_obrigatorio_5h = 15
 
+            # LÓGICA BLINDADA DO LACTANTE
             if is_lactante:
                 horas_padrao = 6
                 min_intervalo_padrao = 15
+                meta_diaria_minutos = 360
             else:
                 horas_padrao = 8
                 min_intervalo_padrao = 30
+                meta_diaria_minutos = 480
 
             minutos_intervalo_5h = max(intervalo_obrigatorio_5h, duracao_almoço_previsao)
             hora_base_5h = max(entrada_valida_previsao, hora_nucleo_inicio)
@@ -590,7 +579,7 @@ if st.session_state.show_results:
                 desconto_intervalo_oficial = max(min_intervalo_real, almoco_valido_minutos)
                 trabalho_liquido_minutos = trabalho_bruto_minutos - desconto_intervalo_oficial - desconto_ausencia - duracao_extra_minutos
                 
-                meta_diaria_minutos = 360 if is_lactante else 480
+                # O CÁLCULO DE SALDO ESTÁ BLINDADO AQUI
                 saldo_banco_horas_minutos = trabalho_liquido_minutos - meta_diaria_minutos
                 
                 tempo_nucleo_minutos = calcular_tempo_nucleo(entrada_valida, saida_valida, saida_almoco, retorno_almoco, saida_extra, retorno_extra)
