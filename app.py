@@ -167,7 +167,7 @@ def gerar_contagem_regressiva_novatos():
         texto_dias = "dia" if dias_restantes == 1 else "dias"
         texto_uteis = "dia útil" if dias_uteis == 1 else "úteis"
         
-        return f"<strong>Novos (H.O):</strong> {dias_restantes} {texto_dias} ({dias_uteis} {texto_uteis})"
+        return f"<strong>UltraNovos (Homeoffice):</strong> {dias_restantes} {texto_dias} ({dias_uteis} {texto_uteis})"
     except Exception as e:
         print(f"Erro ao gerar contagem regressiva dos novos: {e}")
         return ""
