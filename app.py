@@ -354,7 +354,7 @@ st.markdown(f"""
     div[data-testid="stToggle"] {{
         
         margin-top: -20px !important;           /* Puxa mais pra perto do botão calcular */
-        padding-left: 2000px;
+        padding-left: 2px;
         opacity: 0.5 !important;   /* Aplicação direta do Python na força bruta */
         transition: opacity 0.2s ease-in-out;
     }}
@@ -362,7 +362,7 @@ st.markdown(f"""
         opacity: 1.0 !important;                /* Acende se passar o dedo/mouse por cima */
     }}
     div[data-testid="stToggle"] label p {{
-        font-size: 0.9rem !important;
+        font-size: 0.6rem !important;
         color: #e0e0e0 !important;
     }}
     /* -------------------------------------- */
