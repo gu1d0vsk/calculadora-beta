@@ -229,12 +229,6 @@ mensagens_eventos = verificar_eventos_proximos()
 col_buffer_1, col_main, col_buffer_2 = st.columns([1, 6, 1])
 with col_main:
     
-    # --- NOVO LOCAL DO CHECKBOX LACTANTE (Alinhado à direita) ---
-    col_espaco, col_lactante = st.columns([3, 2])
-    with col_lactante:
-        is_lactante = st.checkbox("Lactante (6h)", value=False, help="Muda a jornada padrão para 6h e ajusta o cálculo.")
-    # -----------------------------------------------------------
-
     entrada_str = st.text_input("Entrada", key="entrada", help="formatos aceitos:\nHMM, HHMM ou HH:MM")
     usar_intervalo_auto = st.checkbox("Intervalo Automático (Mínimo)", value=True, help="Calcula o desconto automático (30min ou 15min) sem precisar digitar os horários de almoço.")
 
@@ -255,11 +249,17 @@ with col_main:
         saida_extra_str, retorno_extra_str = "", ""
 
     saida_real_str = st.text_input("Saída", key="saida_real")
+    
     col_calc, col_events = st.columns(2)
     with col_calc: calculate_clicked = st.button("Calcular", use_container_width=True)
     with col_events:
         event_button_text = "Próximos Eventos 🗓️" if mensagens_eventos else "Próximos Eventos"
         events_clicked = st.button(event_button_text, use_container_width=True)
+
+    # --- NOVO LOCAL DO TOGGLE (Abaixo dos botões, centralizado e com opacidade dinâmica) ---
+    st.write("") # Espaço em branco
+    is_lactante = st.toggle("Horário Especial: Lactante (6h)", value=False)
+    # --------------------------------------------------------------------------------------
 
 # --- 2. LÓGICA DE ESTADO ---
 if 'show_events' not in st.session_state: st.session_state.show_events = False
@@ -295,7 +295,7 @@ else:
         transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
     }
     
-    /* Reduz foco da área de input */
+    /* Reduz foco da área de input (menos o toggle) */
     .main-title, .sub-title, div[data-testid="stTextInput"], div[data-testid="stButton"], div[data-testid="stCheckbox"] {
         opacity: 0.5;
         transform: scale(0.98);
@@ -355,10 +355,26 @@ st.markdown(f"""
     div[data-testid="stHorizontalBlock"] > div:nth-of-type(2) div[data-testid="stButton"] > button:hover {{
         box-shadow: 0 0 12px rgba(0, 80, 81, 0.8), 0 0 20px rgba(0, 80, 81, 0.4); transform: scale(1.02);
     }}
-div[data-testid="stTextInput"] input {{ border-radius: 1.5rem !important; text-align: center; font-weight: 600; }}
-        .main div[data-testid="stTextInput"] > label {{ text-align: center !important; width: 100%; display: block; }}
+    div[data-testid="stTextInput"] input {{ border-radius: 1.5rem !important; text-align: center; font-weight: 600; }}
+    .main div[data-testid="stTextInput"] > label {{ text-align: center !important; width: 100%; display: block; }}
     .st-b7 {{  background-color: rgba(12, 19, 14, 0.31) !important; }}
 
+    /* --- ESTILO NOVO DO TOGGLE LACTANTE --- */
+    div[data-testid="stToggle"] {{
+        opacity: 0.5;
+        transition: opacity 0.3s ease-in-out;
+        display: flex;
+        justify-content: center; /* Mantém ele no meio da tela */
+        margin-top: 15px;
+    }}
+    div[data-testid="stToggle"]:has(input:checked) {{
+        opacity: 1.0;
+    }}
+    div[data-testid="stToggle"] label p {{
+        font-size: 0.9rem !important;
+        color: #e0e0e0;
+    }}
+    /* -------------------------------------- */
 
     /* Animação de entrada dos resultados */
     .results-container, .event-list-container.visible {{ animation: fadeIn 0.4s ease-out forwards; }}
