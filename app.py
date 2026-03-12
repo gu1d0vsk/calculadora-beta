@@ -251,15 +251,14 @@ with col_main:
     saida_real_str = st.text_input("Saída", key="saida_real")
     
     col_calc, col_events = st.columns(2)
-    with col_calc: calculate_clicked = st.button("Calcular", use_container_width=True)
+    with col_calc: 
+        calculate_clicked = st.button("Calcular", use_container_width=True)
+        # Toggle colado no botão Calcular
+        is_lactante = st.toggle("Lactante", value=False)
+        
     with col_events:
         event_button_text = "Próximos Eventos 🗓️" if mensagens_eventos else "Próximos Eventos"
         events_clicked = st.button(event_button_text, use_container_width=True)
-
-    # --- NOVO LOCAL DO TOGGLE (Abaixo dos botões, centralizado e com opacidade dinâmica) ---
-    st.write("") # Espaço em branco
-    is_lactante = st.toggle("Lactante", value=False)
-    # --------------------------------------------------------------------------------------
 
 # --- 2. LÓGICA DE ESTADO ---
 if 'show_events' not in st.session_state: st.session_state.show_events = False
@@ -308,6 +307,9 @@ else:
         transform: scale(1);
     }
     """
+
+# Definindo a opacidade na força bruta baseado no estado da variável python
+toggle_opacity = "1.0" if is_lactante else "0.5"
 
 st.markdown(f"""
   
@@ -361,14 +363,12 @@ st.markdown(f"""
 
     /* --- ESTILO NOVO DO TOGGLE LACTANTE --- */
     div[data-testid="stToggle"] {{
-        opacity: 0.5;
+        opacity: {toggle_opacity} !important;
         transition: opacity 0.3s ease-in-out;
-        display: flex;
-        justify-content: center; /* Mantém ele no meio da tela */
-        margin-top: 15px;
+        margin-top: -15px !important; /* Puxa para cima colando no botão Calcular */
     }}
-    div[data-testid="stToggle"]:has(input:checked) {{
-        opacity: 1.0;
+    div[data-testid="stToggle"]:hover {{
+        opacity: 1.0 !important;
     }}
     div[data-testid="stToggle"] label p {{
         font-size: 0.9rem !important;
