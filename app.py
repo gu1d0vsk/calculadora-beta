@@ -228,12 +228,15 @@ mensagens_eventos = verificar_eventos_proximos()
 
 col_buffer_1, col_main, col_buffer_2 = st.columns([1, 6, 1])
 with col_main:
+    
+    # --- NOVO LOCAL DO CHECKBOX LACTANTE (Alinhado à direita) ---
+    col_espaco, col_lactante = st.columns([3, 2])
+    with col_lactante:
+        is_lactante = st.checkbox("Lactante (6h)", value=False, help="Muda a jornada padrão para 6h e ajusta o cálculo.")
+    # -----------------------------------------------------------
+
     entrada_str = st.text_input("Entrada", key="entrada", help="formatos aceitos:\nHMM, HHMM ou HH:MM")
     usar_intervalo_auto = st.checkbox("Intervalo Automático (Mínimo)", value=True, help="Calcula o desconto automático (30min ou 15min) sem precisar digitar os horários de almoço.")
-    
-    # --- NOVO CHECKBOX: LACTANTE ---
-    is_lactante = st.checkbox("Horário Especial (Lactante - 6h)", value=False, help="Muda a jornada padrão para 6h e ajusta o cálculo do banco de horas.")
-    # -------------------------------
 
     if not usar_intervalo_auto:
         col1, col2 = st.columns(2)
