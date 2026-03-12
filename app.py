@@ -352,10 +352,10 @@ st.markdown(f"""
 
     /* --- ESTILO NOVO DO TOGGLE LACTANTE --- */
     div[data-testid="stToggle"] {{
-        justify-content: flex-start !important; /* Alinha firmemente à esquerda, evita o pulo */
-        margin-top: -12px !important;           /* Puxa mais pra perto do botão calcular */
+        
+        margin-top: -20px !important;           /* Puxa mais pra perto do botão calcular */
         padding-left: 2px;
-        opacity: {toggle_opacity} !important;   /* Aplicação direta do Python na força bruta */
+        opacity: 0.5 !important;   /* Aplicação direta do Python na força bruta */
         transition: opacity 0.2s ease-in-out;
     }}
     div[data-testid="stToggle"]:hover {{
