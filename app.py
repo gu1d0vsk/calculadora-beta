@@ -142,6 +142,36 @@ def gerar_contagem_regressiva_home_office():
         print(f"Erro ao gerar contagem regressiva: {e}")
         return ""
 
+def gerar_contagem_regressiva_novatos():
+    try:
+        fuso_horario_brasil = pytz.timezone("America/Sao_Paulo")
+        hoje = datetime.datetime.now(fuso_horario_brasil).date()
+        
+        # 6 meses cravados da data de entrada (02/03/2026 -> 02/09/2026)
+        data_home_office_novos = datetime.date(2026, 9, 2)
+        
+        dias_restantes = (data_home_office_novos - hoje).days
+        if dias_restantes < 0: return ""
+
+        # Feriados relevantes entre Março e Setembro de 2026 no RJ
+        feriados_2026 = [
+            '2026-04-03', # Paixão de Cristo
+            '2026-04-21', # Tiradentes
+            '2026-04-23', # São Jorge (RJ)
+            '2026-05-01', # Dia do Trabalhador
+            '2026-06-04', # Corpus Christi
+        ]
+        
+        dias_uteis = int(np.busday_count(hoje, data_home_office_novos, holidays=feriados_2026))
+        
+        texto_dias = "dia" if dias_restantes == 1 else "dias"
+        texto_uteis = "dia útil" if dias_uteis == 1 else "úteis"
+        
+        return f"<strong>Novos (H.O):</strong> {dias_restantes} {texto_dias} ({dias_uteis} {texto_uteis})"
+    except Exception as e:
+        print(f"Erro ao gerar contagem regressiva dos novos: {e}")
+        return ""
+
 def formatar_hora_input(input_str):
     input_str = input_str.strip()
     if ':' in input_str: return input_str
@@ -236,7 +266,6 @@ with col_main:
     col_calc, col_events = st.columns(2)
     with col_calc: 
         calculate_clicked = st.button("Calcular", use_container_width=True)
-        # Toggle Minimalista logo abaixo do botão calcular
         is_lactante = st.toggle("Lactante", value=False)
         
     with col_events:
@@ -283,7 +312,6 @@ else:
     }
     """
 
-
 st.markdown(f"""
 <style>
     /* CSS NUCLEAR PARA LIMPAR STREAMLIT */
@@ -319,38 +347,34 @@ st.markdown(f"""
     .main div[data-testid="stTextInput"] > label {{ text-align: center !important; width: 100%; display: block; }}
     .st-b7 {{  background-color: rgba(12, 19, 14, 0.31) !important; }}
 
-    /* ======================================================== */
-    /* NOVA PÍLULA MINIMALISTA "LACTANTE" (Glassmorphism) */
+    /* TOGGLE LACTANTE */
     div[data-testid="stToggle"] {{
-        background-color: rgba(255, 255, 255, 0.03) !important; /* Fundo hiper sutil */
-        border: 1px solid rgba(255, 255, 255, 0.08) !important; /* Borda quase invisível */
-        border-radius: 20px !important; /* Formato de pílula arredondada */
+        background-color: rgba(255, 255, 255, 0.03) !important; 
+        border: 1px solid rgba(255, 255, 255, 0.08) !important; 
+        border-radius: 20px !important; 
         padding: 4px 14px 4px 4px !important;
-        margin-top: 5px !important; /* Um leve respiro abaixo do botão calcular */
-        width: fit-content !important; /* Só ocupa o tamanho do texto */
+        margin-top: 5px !important; 
+        width: fit-content !important; 
         display: inline-flex !important;
         justify-content: flex-start !important;
         box-shadow: inset 0 2px 4px rgba(0,0,0,0.2) !important;
         transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
     }}
     
-    /* Efeito ao passar o mouse: acende com a cor verde do seu app */
     div[data-testid="stToggle"]:hover {{
         background-color: rgba(0, 80, 81, 0.15) !important;
         border: 1px solid rgba(0, 80, 81, 0.6) !important;
         box-shadow: 0 2px 8px rgba(0, 80, 81, 0.3) !important;
     }}
 
-    /* Estilizando o Texto do Toggle */
     div[data-testid="stToggle"] label p {{
         font-size: 0.75rem !important;
         font-weight: 600 !important;
-        color: #b0b0b0 !important; /* Cinza elegante */
+        color: #b0b0b0 !important; 
         text-transform: uppercase !important;
         letter-spacing: 1.2px !important;
         margin-left: 2px !important;
     }}
-    /* ======================================================== */
 
     /* Animações e Cards */
     .results-container, .event-list-container.visible {{ animation: fadeIn 0.4s ease-out forwards; }}
@@ -612,13 +636,16 @@ if st.session_state.show_results:
         finally:
             st.session_state.show_results = False
 
-# --- CÁLCULO DOS DADOS DO RODAPÉ ---
+# --- CÁLCULO DOS DADOS DO RODAPÉ (CABEÇALHO) ---
 daily_forecast = get_daily_weather()
 contagem_regressiva = gerar_contagem_regressiva_home_office()
+contagem_novatos = gerar_contagem_regressiva_novatos()
 
 footer_items = []
 if daily_forecast: footer_items.append(f"<span>{daily_forecast}</span>")
 if contagem_regressiva: footer_items.append(f"<span>{contagem_regressiva}</span>")
+if contagem_novatos: footer_items.append(f"<span>{contagem_novatos}</span>")
+
 footer_content = " <span style='opacity: 0.3; margin: 0 8px;'>|</span> ".join(footer_items)
 if not footer_content: footer_content = "&nbsp;"
 
