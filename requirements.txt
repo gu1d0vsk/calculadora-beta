@@ -3,3 +3,4 @@ requests
 pytz
 feedparser
 beautifulsoup4
+starlette<1.4.0
